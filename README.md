@@ -128,13 +128,13 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 │  Handlungsbedarf: [Klickbare Gruppen]           │
 │                                                 │
 │  ┌─────────┐  ┌─────────┐  ┌─────────┐          │
-│  │🩸Blutbild│  │🔥Entzünd│  │💧 Niere │  ...     │
+│  │Blutbild │  │ Entzünd │  │  Niere  │  ...     │
 │  │ Status  │  │ Status  │  │ Status  │          │
 │  │Sparkline│  │Sparkline│  │Sparkline│          │
 │  └────┬────┘  └────┬────┘  └────┬────┘          │
-└───────┼─────────────┼───────────┼───────────────┘
-        │             │           │
-        ▼             ▼           ▼
+└───────┼────────────┼────────────┼───────────────┘
+        │            │            │
+        ▼            ▼            ▼
 ┌─────────────────────────────────────────────────┐
 │  GRUPPE (z.B. Niere)                            │
 │  Beschreibung + KPIs (OK/Auffällig/Einschätzung)│
