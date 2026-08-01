@@ -1,0 +1,62 @@
+# -----------------------------------------------
+# Secrets & Environment
+# -----------------------------------------------
+.env
+.envrc
+
+# -----------------------------------------------
+# Python
+# -----------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+.venv/
+
+# -----------------------------------------------
+# Data (privat + generiert)
+# -----------------------------------------------
+data/labor.db
+data/labor.db-wal
+data/labor.db-shm
+data/befunde/
+data/import/
+
+# labor_config.yaml WIRD versioniert (Konfiguration, keine Patientendaten)
+
+# -----------------------------------------------
+# Frontend Build-Artefakte
+# -----------------------------------------------
+frontend/static/js/main.bundle.js
+frontend/static/js/main.bundle.js.map
+frontend/static/css/style.bundle.css
+frontend/static/css/style.bundle.css.map
+
+# -----------------------------------------------
+# Logs & Temp
+# -----------------------------------------------
+logs/*.log
+!logs/.gitkeep
+
+# -----------------------------------------------
+# IDE & OS
+# -----------------------------------------------
+.vscode/
+.kiro/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# -----------------------------------------------
+# Docker
+# -----------------------------------------------
+docker-compose.override.yml
+
+# -----------------------------------------------
+# Sonstiges
+# -----------------------------------------------
+hugo-blog/
+apps/

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Labor Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E🩸%3C/text%3E%3C/svg%3E">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="static/css/theme.css">
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-wrap">
+      <div>
+        <div class="title"><span style="color:var(--red)">Labor</span><span style="color:var(--teal)">Werte</span> Peter Siebler</div>
+        <div class="subtitle" id="subtitle">Verlaufsanalyse</div>
+      </div>
+      <div class="header-right">
+        <svg viewBox="0 0 240 70" style="width:auto;height:55px;opacity:.45;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round">
+          <!-- Reagenzglas -->
+          <rect x="20" y="10" width="16" height="50" rx="8" stroke="var(--teal)" />
+          <line x1="20" y1="30" x2="36" y2="30" stroke="var(--teal)" stroke-width="1.5" />
+          <circle cx="28" cy="42" r="3" fill="var(--red)" stroke="none" opacity=".6" />
+          <circle cx="28" cy="50" r="2" fill="var(--red)" stroke="none" opacity=".4" />
+          <!-- Puls-Linie -->
+          <path d="M 55 40 L 75 40 L 82 20 L 90 55 L 98 30 L 105 45 L 112 40 L 140 40" stroke="var(--green)" stroke-width="2.5" />
+          <!-- Herz -->
+          <path d="M 155 35 C 155 25 165 20 170 28 C 175 20 185 25 185 35 C 185 48 170 55 170 55 C 170 55 155 48 155 35" stroke="var(--red)" stroke-width="2" fill="var(--red)" fill-opacity=".15" />
+          <!-- Diagramm -->
+          <rect x="200" y="15" width="30" height="45" rx="3" stroke="var(--accent)" stroke-width="1.5" />
+          <polyline points="205,50 210,40 215,45 220,30 225,35" stroke="var(--accent)" stroke-width="2" />
+        </svg>
+        <span id="header-update" class="header-badge"></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Breadcrumb -->
+    <nav id="breadcrumb" class="breadcrumb"></nav>
+
+    <!-- Gruppen-Beschreibung (nur in Drilldown sichtbar) -->
+    <div id="view-description" class="view-description"></div>
+
+    <!-- KPI Summary -->
+    <section id="kpis" class="kpis"></section>
+
+    <!-- Chart -->
+    <section class="chart-card" id="chartCard">
+      <canvas id="mainChart"></canvas>
+    </section>
+
+    <!-- Cards Grid -->
+    <section id="cards" class="cards"></section>
+  </main>
+
+  <footer class="footer">
+    Labor Dashboard · Langzeit-Verlauf
+    <span style="margin:0 8px; color:var(--border);">|</span>
+    <span id="themeToggleFooter" style="cursor:pointer; font-weight:500;">🌓 Design wechseln</span>
+  </footer>
+
+  <script src="static/js/theme-init.js?v=2"></script>
+  <script type="module" src="static/js/main.js?v=2"></script>
+</body>
+</html>

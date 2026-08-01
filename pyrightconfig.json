@@ -1,0 +1,16 @@
+{
+    "include": [
+        "app"
+    ],
+    "exclude": [
+        "test",
+        ".venv",
+        "**/__pycache__"
+    ],
+    "reportArgumentType": "warning",
+    "reportReturnType": "warning",
+    "reportOptionalOperand": "warning",
+    "reportOptionalMemberAccess": "warning",
+    "reportAttributeAccessIssue": "warning",
+    "pythonVersion": "3.12"
+}

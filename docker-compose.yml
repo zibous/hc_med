@@ -1,0 +1,30 @@
+services:
+  hc_med:
+    build: .
+    container_name: hc_med
+    restart: unless-stopped
+
+    ports:
+      - "8065:5065"
+
+    volumes:
+      - ${PWD}/data:/app/data
+      - ${PWD}/app:/app/app
+      - ${PWD}/frontend:/app/frontend
+      - ${PWD}/logs:/app/logs
+
+    environment:
+      - TZ=Europe/Vaduz
+
+    healthcheck:
+      test: "curl -sf http://localhost:5065/api/status || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

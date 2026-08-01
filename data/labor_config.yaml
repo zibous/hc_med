@@ -1,0 +1,216 @@
+# Labor Dashboard Konfiguration
+# Beschreibungen, Gruppen, Farben und Icons
+
+gruppen:
+  Blutbild:
+    icon: "🩸"
+    farbe: "#ef4444"
+    beschreibung: >
+      Zeigt ob genug rote/weiße Blutkörperchen und Blutplättchen vorhanden sind –
+      wichtig für Sauerstofftransport und Immunabwehr.
+  Differentialblutbild:
+    icon: "🔬"
+    farbe: "#f97316"
+    beschreibung: >
+      Aufschlüsselung der weißen Blutzellen – zeigt welcher Teil des Immunsystems
+      gerade aktiv ist.
+  Entzündung:
+    icon: "🔥"
+    farbe: "#f59e0b"
+    beschreibung: >
+      Entzündung ist die Abwehrreaktion des Körpers auf schädigende Reize.
+      Hohe Werte deuten auf Infektionen oder Gewebeschäden hin.
+  Leber:
+    icon: "🫁"
+    farbe: "#84cc16"
+    beschreibung: >
+      Die Leber entgiftet das Blut und produziert wichtige Eiweiße.
+      Erhöhte Werte können auf Leberschäden oder Gallenstau hinweisen.
+  Niere:
+    icon: "💧"
+    farbe: "#06b6d4"
+    beschreibung: >
+      Die Nieren filtern Abfallstoffe aus dem Blut. Die GFR zeigt wie gut sie
+      arbeiten – sinkt natürlich im Alter leicht ab.
+  Elektrolyte:
+    icon: "⚡"
+    farbe: "#8b5cf6"
+    beschreibung: >
+      Mineralstoffe die für Nerven, Muskeln und Wasserhaushalt essenziell sind.
+      Müssen in engem Bereich bleiben.
+  Stoffwechsel:
+    icon: "🧬"
+    farbe: "#ec4899"
+    beschreibung: >
+      Blutzucker und Langzeitwert HbA1c – zeigen wie gut der Körper Zucker
+      verarbeitet. Wichtig für Diabetes-Früherkennung.
+  Lipide:
+    icon: "🫀"
+    farbe: "#f43f5e"
+    beschreibung: >
+      Blutfette wie Cholesterin und Triglyceride. Zu hohe Werte erhöhen langfristig
+      das Risiko für Herzinfarkt und Schlaganfall.
+  Pankreas:
+    icon: "🟡"
+    farbe: "#eab308"
+    beschreibung: >
+      Enzyme der Bauchspeicheldrüse. Erhöhte Werte können auf eine Entzündung
+      oder Gallenstein hindeuten.
+  Gerinnung:
+    icon: "🩹"
+    farbe: "#14b8a6"
+    beschreibung: >
+      Zeigt wie schnell das Blut gerinnt. Wichtig bei Blutverdünner-Therapie
+      und vor Operationen.
+  Harnanalyse:
+    icon: "🧪"
+    farbe: "#6366f1"
+    beschreibung: >
+      Urin-Untersuchung – kann Hinweise auf Nieren-, Blasen- oder
+      Stoffwechselprobleme geben, ohne Blutabnahme.
+  Schilddrüse:
+    icon: "🦋"
+    farbe: "#0ea5e9"
+    beschreibung: >
+      TSH steuert die Schilddrüse. Zu hoch = Unterfunktion (müde, kalt),
+      zu niedrig = Überfunktion (unruhig, schneller Puls).
+  Tumor-Marker:
+    icon: "🎯"
+    farbe: "#a855f7"
+    beschreibung: >
+      PSA ist ein Screening-Wert für die Prostata. Ein Anstieg muss nicht Krebs
+      bedeuten, sollte aber beobachtet werden.
+  Autoimmun:
+    icon: "🛡️"
+    farbe: "#10b981"
+    beschreibung: >
+      Antikörper die zeigen ob das Immunsystem fälschlicherweise eigenes Gewebe
+      angreift (z.B. bei Rheuma).
+  Hormone:
+    icon: "💉"
+    farbe: "#d946ef"
+    beschreibung: >
+      Botenstoffe die Stoffwechsel, Wachstum und Fortpflanzung steuern.
+  Körperdaten:
+    icon: "📏"
+    farbe: "#64748b"
+    beschreibung: >
+      Gewicht, BMI, Muskelmasse und Fettanteil – die Basis für die Interpretation
+      vieler Laborwerte.
+  Sonstige:
+    icon: "📋"
+    farbe: "#78716c"
+    beschreibung: >
+      Weitere Laborwerte die keiner Hauptgruppe zugeordnet sind.
+
+tests:
+  Leukozyten: "Weiße Blutkörperchen – das Immunsystem. Erhöht bei Infekten, Stress oder nach OPs."
+  Erythrozyten: "Rote Blutkörperchen – transportieren Sauerstoff. Zu wenig = Blutarmut, Müdigkeit."
+  Hämoglobin: "Roter Blutfarbstoff – trägt den Sauerstoff. Niedrig = Anämie, hoch = Austrocknung."
+  Hämatokrit: "Anteil fester Bestandteile im Blut. Zeigt Verdünnung oder Eindickung."
+  MCV: "Größe der roten Blutkörperchen. Hilft die Art einer Blutarmut zu bestimmen."
+  MCH: "Hämoglobin pro rotem Blutkörperchen – wie gut sie beladen sind."
+  MCHC: "Konzentration des Hämoglobins in den roten Blutkörperchen."
+  RDW: "Größenverteilung der roten Blutkörperchen – erhöht bei Eisenmangel."
+  Thrombozyten: "Blutplättchen – wichtig für die Gerinnung. Zu wenig = Blutungsrisiko."
+  MPV: "Durchschnittliche Größe der Blutplättchen – jung und aktiv = größer."
+  CRP: "C-reaktives Protein – ein Entzündungsmarker. Steigt schnell bei Infekten und Gewebeschäden."
+  Interleukin-6: "Botenstoff der Entzündung – reagiert noch schneller als CRP."
+  Procalcitonin: "Erhöht bei bakteriellen Infekten. Normal bei Virusinfekten."
+  BSG 1h: "Blutsenkung nach 1 Stunde – unspezifischer Entzündungsmarker."
+  GOT: "Leberenzym (AST) – erhöht bei Leberschäden, auch bei Herzinfarkt."
+  GPT: "Leberenzym (ALT) – spezifischer für Leberzellschäden als GOT."
+  GGT: "Gamma-GT – empfindlicher Marker für Leber-/Gallenprobleme und Alkohol."
+  Alk. Phosphatase: "Alkalische Phosphatase – erhöht bei Gallenstau oder Knochenprozessen."
+  Bilirubin: "Abbauprodukt des Hämoglobins. Erhöht = Gelbsucht, Leberproblem oder Hämolyse."
+  LDH: "Unspezifisches Enzym – erhöht bei Zellzerfall (Leber, Blut, Muskel)."
+  Cholinesterase: "Von der Leber produziert. Erniedrigt bei schweren Leberschäden."
+  Kreatinin: "Abbauprodukt der Muskeln, von den Nieren ausgeschieden. Erhöht = Nierenschwäche."
+  GFR: "Glomeruläre Filtrationsrate – zeigt direkt wie gut die Nieren filtern. Sinkt mit dem Alter."
+  Harnstoff: "Eiweißabbauprodukt. Erhöht bei Nierenschwäche oder eiweißreicher Ernährung."
+  Harnsäure: "Endprodukt des Purinstoffwechsels. Zu hoch = Gichtrisiko."
+  Natrium: "Wichtigstes Elektrolyt für Wasserhaushalt und Nervenleitung."
+  Kalium: "Essenziell für Herzrhythmus und Muskeln. Zu hoch oder zu tief ist gefährlich."
+  Chlorid: "Elektrolyt – folgt meist dem Natrium. Wichtig für Säure-Basen-Haushalt."
+  Calcium: "Für Knochen, Muskeln und Nerven. Reguliert durch Vitamin D und Nebenschilddrüse."
+  Magnesium: "Muskel- und Nervenfunktion. Mangel führt zu Krämpfen und Herzrhythmusstörungen."
+  Phosphat: "Baustein für Knochen und Energiestoffwechsel (ATP)."
+  Glucose: "Nüchtern-Blutzucker – zeigt ob der Körper Zucker normal verarbeitet."
+  HbA1c: "Langzeit-Blutzucker (letzte 8-12 Wochen). Der wichtigste Diabetes-Wert."
+  Totalprotein: "Gesamteiweiß im Blut – niedrig bei Mangelernährung oder Leberproblemen."
+  Cholesterin: "Gesamtcholesterin – Baustein für Zellen, aber zu viel lagert sich in Gefäßen ab."
+  HDL: "Gutes Cholesterin – räumt Ablagerungen aus den Gefäßen. Je höher, desto besser."
+  LDL: "Schlechtes Cholesterin – lagert sich in Gefäßwänden ab. Sollte niedrig sein."
+  Triglyceride: "Blutfette aus der Nahrung. Erhöht bei fettreicher Ernährung und Übergewicht."
+  Quotient Chol/HDL: "Verhältnis Gesamt/HDL-Cholesterin. Unter 5 ist das Ziel."
+  Quotient LDL/HDL: "Verhältnis schlechtes/gutes Cholesterin. Unter 3 ist optimal."
+  Amylase: "Enzym zur Stärkeverdauung. Erhöht bei Bauchspeicheldrüsenentzündung."
+  Pankreas-Amylase: "Pankreas-spezifische Amylase – genauer als die Gesamt-Amylase."
+  Lipase: "Fettverdauungsenzym der Bauchspeicheldrüse. Erhöht = Pankreatitis."
+  Quick: "Gerinnungstest – wie schnell das Blut gerinnt. Wichtig bei Blutverdünnern."
+  INR: "International normalisierter Gerinnungswert. Ziel bei Marcumar: 2.0–3.0."
+  aPTT: "Gerinnungszeit – testet den 'inneren' Gerinnungsweg."
+  TSH: "Schilddrüsen-Steuernhormon. Hoch = Unterfunktion, niedrig = Überfunktion."
+  PSA: "Prostata-spezifisches Antigen. Screening-Wert, steigt auch bei gutartiger Vergrößerung."
+  Anti-CCP: "Antikörper – sehr spezifisch für rheumatoide Arthritis."
+  Rheumafaktor: "Unspezifischer Antikörper – erhöht bei Rheuma, aber auch bei anderen Erkrankungen."
+  Eisen: "Für den Sauerstofftransport im Blut. Mangel = Müdigkeit, brüchige Nägel."
+  Ferritin: "Eisenspeicher – zeigt die Langzeitversorgung mit Eisen."
+
+
+# Krankenhausaufenthalte und relevante Ereignisse
+# Werden als vertikale Marker im Trend-Chart angezeigt
+ereignisse:
+
+  - von: "2018-01-26"
+    bis: "2018-02-20"
+    label: "KH Feldkirch"
+    typ: "krankenhaus"
+    farbe: "#ef4444"
+
+  - von: "2024-11-30"
+    bis: "2024-12-06"
+    label: "KH Dornbirn"
+    typ: "krankenhaus"
+    farbe: "#ef4444"
+
+  - von: "2024-02-08"
+    bis: "2024-02-08"
+    label: "KH Dornbirn"
+    typ: "krankenhaus"
+    farbe: "#ef4444"
+
+
+  - von: "2026-07-13"
+    bis: "2026-07-21"
+    label: "KH Feldkirch"
+    typ: "krankenhaus"
+    farbe: "#ef4444"    
+
+
+# Verknüpfte Laborwerte – werden als Multi-Chart angezeigt
+verknuepfungen:
+  - name: "Nierenfunktion"
+    beschreibung: "GFR wird aus Kreatinin berechnet. Sinkt die GFR, steigen Kreatinin und Harnstoff."
+    tests: ["GFR", "Kreatinin", "Harnstoff"]
+  - name: "Blutbild-Trias"
+    beschreibung: "Erythrozyten, Hämoglobin und Hämatokrit bewegen sich immer parallel – sinken alle bei Blutarmut."
+    tests: ["Erythrozyten", "Hämoglobin", "Hämatokrit"]
+  - name: "Lipid-Profil"
+    beschreibung: "HDL (gut) und LDL (schlecht) ergeben zusammen das Gesamt-Cholesterin. Triglyceride kommen aus der Nahrung."
+    tests: ["Cholesterin", "HDL", "LDL", "Triglyceride"]
+  - name: "Eisenstoffwechsel"
+    beschreibung: "Ferritin zeigt den Speicher, Eisen den aktuellen Wert. Mangel führt zu niedrigem Hämoglobin."
+    tests: ["Eisen", "Ferritin", "Hämoglobin"]
+  - name: "Leber-Enzyme"
+    beschreibung: "GOT+GPT zeigen Zellschäden, GGT reagiert auf Galle und Alkohol, Bilirubin zeigt den Abbau."
+    tests: ["GOT", "GPT", "GGT", "Bilirubin"]
+  - name: "Entzündungs-Kaskade"
+    beschreibung: "IL-6 steigt zuerst (Stunden), dann CRP (1-2 Tage), Leukozyten reagieren parallel."
+    tests: ["CRP", "Leukozyten", "Interleukin-6"]
+  - name: "Diabetes-Monitoring"
+    beschreibung: "Glucose zeigt den Moment, HbA1c den Durchschnitt der letzten 8-12 Wochen."
+    tests: ["Glucose", "HbA1c"]
+  - name: "Gerinnung"
+    beschreibung: "Quick und INR messen das Gleiche (Quick steigt = INR sinkt). aPTT testet einen anderen Weg."
+    tests: ["Quick", "INR", "aPTT"]
