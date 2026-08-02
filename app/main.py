@@ -64,3 +64,9 @@ app.include_router(labor_router)
 @app.get("/api/status")
 async def status():
     return {"status": "ok", "app": "hc_med"}
+
+
+@app.get("/api/patient")
+async def patient_info():
+    from app.api.labor import PATIENT_CONFIG
+    return PATIENT_CONFIG

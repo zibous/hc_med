@@ -67,7 +67,29 @@ export function renderCards(items, mode = "gruppe") {
 
   if (mode === "gruppe") {
     el.style.display = ""; // Grid zurücksetzen
-    el.innerHTML = items.map(g => {
+    el.style.gridTemplateColumns = ""; // Grid-Spalten zurücksetzen
+
+    // Nach Status sortieren: kritisch → auffällig → ok → gut
+    const statusOrder = { "kritisch": 0, "auffällig": 1, "ok": 2, "gut": 3 };
+    const sorted = [...items].sort((a, b) => (statusOrder[a.status] ?? 4) - (statusOrder[b.status] ?? 4));
+
+    // Nach Status gruppieren mit Überschriften
+    const STATUS_LABELS = {
+      kritisch: "🚨 Kritisch – Handlungsbedarf",
+      "auffällig": "⚠️ Auffällig – beobachten",
+      ok: "👍 Weitgehend OK",
+      gut: "✅ Alles im Normbereich",
+    };
+
+    let html = "";
+    let lastStatus = null;
+
+    sorted.forEach(g => {
+      if (g.status !== lastStatus) {
+        lastStatus = g.status;
+        html += `<div class="cards-section-header">${STATUS_LABELS[g.status] || g.status}</div>`;
+      }
+
       const icon = g.icon || GROUP_ICONS[g.name] || "📋";
       const color = g.farbe || GROUP_COLORS[g.name] || "#64748b";
       const st = STATUS_CONFIG[g.status] || STATUS_CONFIG.gut;
@@ -75,7 +97,7 @@ export function renderCards(items, mode = "gruppe") {
         `<span class="flag-item">${a.test_standard}: ${a.wert_norm} ${a.flag === "H" ? "↑" : "↓"}</span>`
       ).join("");
 
-      return `
+      html += `
         <div class="card" data-gruppe="${g.name}" style="border-top:3px solid ${color}">
           <div class="card-header-row">
             <div class="card-title">${icon} ${g.name}</div>
@@ -91,7 +113,9 @@ export function renderCards(items, mode = "gruppe") {
           ${auffaellige ? `<div class="card-flags">${auffaellige}</div>` : ""}
         </div>
       `;
-    }).join("");
+    });
+
+    el.innerHTML = html;
 
     el.querySelectorAll(".card").forEach(card => {
       card.addEventListener("click", () => navigate("gruppe", { gruppe: card.dataset.gruppe }));
@@ -185,24 +209,59 @@ export function renderCards(items, mode = "gruppe") {
 
   } else {
     // Test-Karten innerhalb einer Gruppe
+    el.style.display = "";
+    el.style.gridTemplateColumns = "";
     const tests = Object.entries(items);
-    el.innerHTML = tests.map(([name, data]) => {
-      const last = data.werte[data.werte.length - 1];
+
+    // Status pro Test berechnen und sortieren
+    const testsWithStatus = tests.map(([name, data]) => {
       const highCount = data.werte.filter(w => w.flag === "H").length;
       const lowCount = data.werte.filter(w => w.flag === "L").length;
       const total = data.werte.length;
       const pathRatio = (highCount + lowCount) / total;
-      const status = pathRatio === 0 ? "gut" : pathRatio < 0.2 ? "ok" : pathRatio < 0.4 ? "auffällig" : "kritisch";
+
+      // Aktueller Status: basierend auf den letzten 5 Werten
+      const recent = data.werte.slice(-5);
+      const recentHigh = recent.filter(w => w.flag === "H").length;
+      const recentLow = recent.filter(w => w.flag === "L").length;
+      const recentPath = (recentHigh + recentLow) / recent.length;
+      const status = recentPath === 0 ? "gut" : recentPath < 0.3 ? "ok" : recentPath < 0.6 ? "auffällig" : "kritisch";
+
+      // Historischer Hinweis
+      const histRatio = pathRatio;
+      const histHint = (histRatio > 0.15 && status === "gut") ? "Früher auffällig" : "";
+
+      return { name, data, status, highCount, lowCount, total, histHint };
+    });
+
+    const statusOrder = { "kritisch": 0, "auffällig": 1, "ok": 2, "gut": 3 };
+    testsWithStatus.sort((a, b) => (statusOrder[a.status] ?? 4) - (statusOrder[b.status] ?? 4));
+
+    const STATUS_LABELS = {
+      kritisch: "🚨 Kritisch",
+      "auffällig": "⚠️ Auffällig",
+      ok: "👍 Weitgehend OK",
+      gut: "✅ Im Normbereich",
+    };
+
+    let html = "";
+    let lastStatus = null;
+
+    testsWithStatus.forEach(({ name, data, status, highCount, lowCount, total, histHint }) => {
+      if (status !== lastStatus) {
+        lastStatus = status;
+        html += `<div class="cards-section-header">${STATUS_LABELS[status] || status}</div>`;
+      }
+
+      const last = data.werte[data.werte.length - 1];
       const st = STATUS_CONFIG[status];
       const canDrill = total >= 5;
 
-      // Werte für Sparkline
       const sparkVals = data.werte.map(w => {
         let v = String(w.wert).replace(",", ".").replace(/^[<>]/, "");
         return parseFloat(v) || 0;
       });
 
-      // Bei wenigen Werten (<5): alle Messungen inline anzeigen
       let detailHtml = "";
       if (!canDrill && total > 0) {
         detailHtml = `<div class="card-inline-values">
@@ -214,12 +273,13 @@ export function renderCards(items, mode = "gruppe") {
         </div>`;
       }
 
-      return `
+      html += `
         <div class="card ${canDrill ? '' : 'no-drill'}" data-test="${name}" data-can-drill="${canDrill}">
           <div class="card-header-row">
             <div class="card-title">${name}</div>
             <span class="status-pill" style="background:${st.bg};color:${st.color}">${st.label}</span>
           </div>
+          ${data.beschreibung ? `<div class="card-desc">${data.beschreibung}</div>` : ""}
           <div class="card-value-row">
             <span class="card-count">${last.wert}</span>
             <span class="card-unit">${data.einheit || ""}</span>
@@ -234,10 +294,13 @@ export function renderCards(items, mode = "gruppe") {
             ${highCount ? `<span class="flag-pill high">↑ ${highCount}× hoch</span>` : ""}
             ${lowCount ? `<span class="flag-pill low">↓ ${lowCount}× tief</span>` : ""}
             ${!highCount && !lowCount ? `<span class="flag-pill ok">✓ Alle im Normbereich</span>` : ""}
+            ${histHint ? `<span class="flag-pill hist">📋 ${histHint}</span>` : ""}
           </div>
         </div>
       `;
-    }).join("");
+    });
+
+    el.innerHTML = html;
 
     el.querySelectorAll(".card[data-can-drill='true']").forEach(card => {
       card.addEventListener("click", () => navigate("trend", { test: card.dataset.test, gruppe: state.gruppe }));

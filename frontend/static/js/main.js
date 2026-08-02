@@ -48,6 +48,13 @@ export async function loadView() {
           loadView();
         });
       });
+      // Bericht-Button
+      const reportBtn = document.createElement("a");
+      reportBtn.href = `api/bericht/charts?period=${period}&sort=${state.pathSortCol}&dir=${state.pathSortDir}`;
+      reportBtn.target = "_blank";
+      reportBtn.className = "report-btn";
+      reportBtn.textContent = "🖨️ Bericht drucken";
+      document.querySelector(".period-filter")?.appendChild(reportBtn);
     } else if (state.view === "gruppe") {
       const res = await fetch(`api/gruppe/${encodeURIComponent(state.gruppe)}`);
       const data = await res.json();
@@ -61,13 +68,20 @@ export async function loadView() {
       renderKPIs(null);
       renderCards(null);
       renderChart(data);
-      // Beschreibung + Referenzwerte + Verknüpfungs-Links
+      // Beschreibung + Referenzwerte + Bewertung + Verknüpfungs-Links
       let desc = data.beschreibung || "";
       if (data.normbereich) {
         desc += ` Referenzbereich: ${data.normbereich} ${data.einheit || ""}.`;
       }
-      document.getElementById("view-description").innerHTML = desc
-        + (data.verknuepfungen?.length ? `<br><span class="related-links">Zusammenhänge: ${data.verknuepfungen.map(v => `<a class="related-link" data-vk="${v}">${v}</a>`).join(", ")}</span>` : "");
+      // Aktuelle Bewertung basierend auf den letzten Werten
+      if (data.bewertung) {
+        desc += `<div class="trend-bewertung ${data.bewertung_status}">${data.bewertung}</div>`;
+        if (data.bewertung_empfehlung) {
+          desc += `<div class="empfehlung-box">💡 ${data.bewertung_empfehlung}</div>`;
+        }
+      }
+      desc += (data.verknuepfungen?.length ? `<br><span class="related-links">Zusammenhänge: ${data.verknuepfungen.map(v => `<a class="related-link" data-vk="${v}">${v}</a>`).join(", ")}</span>` : "");
+      document.getElementById("view-description").innerHTML = desc;
       // Click-Handler für Verknüpfungs-Links
       document.querySelectorAll(".related-link").forEach(link => {
         link.addEventListener("click", () => navigate("verknuepfung", { verknuepfung: link.dataset.vk }));
@@ -80,7 +94,11 @@ export async function loadView() {
       renderKPIs(null);
       renderCards(null);
       renderMultiChart(data);
-      document.getElementById("view-description").textContent = data.beschreibung || "";
+      let desc = data.beschreibung || "";
+      if (data.empfehlung) {
+        desc += `<div class="empfehlung-box">💡 <strong>Empfehlung:</strong> ${data.empfehlung}</div>`;
+      }
+      document.getElementById("view-description").innerHTML = desc;
     }
     renderBreadcrumb();
   } catch (err) {
@@ -89,5 +107,10 @@ export async function loadView() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Patient-Name laden
+  fetch("api/patient").then(r => r.json()).then(p => {
+    const el = document.getElementById("patient-name");
+    if (el && p.vorname) el.textContent = p.vorname + " " + p.nachname;
+  }).catch(() => {});
   loadView();
 });

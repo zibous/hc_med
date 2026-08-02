@@ -1,6 +1,12 @@
 # Labor Dashboard Konfiguration
 # Beschreibungen, Gruppen, Farben und Icons
 
+patient:
+  vorname: "Hans-Peter"
+  nachname: "Siebler"
+  geburtsdatum: "1955-12-16"
+  geschlecht: "m"
+
 gruppen:
   Blutbild:
     icon: "🩸"
@@ -104,58 +110,109 @@ gruppen:
       Weitere Laborwerte die keiner Hauptgruppe zugeordnet sind.
 
 tests:
-  Leukozyten: "Weiße Blutkörperchen – das Immunsystem. Erhöht bei Infekten, Stress oder nach OPs."
-  Erythrozyten: "Rote Blutkörperchen – transportieren Sauerstoff. Zu wenig = Blutarmut, Müdigkeit."
-  Hämoglobin: "Roter Blutfarbstoff – trägt den Sauerstoff. Niedrig = Anämie, hoch = Austrocknung."
-  Hämatokrit: "Anteil fester Bestandteile im Blut. Zeigt Verdünnung oder Eindickung."
-  MCV: "Größe der roten Blutkörperchen. Hilft die Art einer Blutarmut zu bestimmen."
-  MCH: "Hämoglobin pro rotem Blutkörperchen – wie gut sie beladen sind."
-  MCHC: "Konzentration des Hämoglobins in den roten Blutkörperchen."
-  RDW: "Größenverteilung der roten Blutkörperchen – erhöht bei Eisenmangel."
-  Thrombozyten: "Blutplättchen – wichtig für die Gerinnung. Zu wenig = Blutungsrisiko."
-  MPV: "Durchschnittliche Größe der Blutplättchen – jung und aktiv = größer."
-  CRP: "C-reaktives Protein – ein Entzündungsmarker. Steigt schnell bei Infekten und Gewebeschäden."
-  Interleukin-6: "Botenstoff der Entzündung – reagiert noch schneller als CRP."
-  Procalcitonin: "Erhöht bei bakteriellen Infekten. Normal bei Virusinfekten."
-  BSG 1h: "Blutsenkung nach 1 Stunde – unspezifischer Entzündungsmarker."
-  GOT: "Leberenzym (AST) – erhöht bei Leberschäden, auch bei Herzinfarkt."
-  GPT: "Leberenzym (ALT) – spezifischer für Leberzellschäden als GOT."
-  GGT: "Gamma-GT – empfindlicher Marker für Leber-/Gallenprobleme und Alkohol."
-  Alk. Phosphatase: "Alkalische Phosphatase – erhöht bei Gallenstau oder Knochenprozessen."
-  Bilirubin: "Abbauprodukt des Hämoglobins. Erhöht = Gelbsucht, Leberproblem oder Hämolyse."
-  LDH: "Unspezifisches Enzym – erhöht bei Zellzerfall (Leber, Blut, Muskel)."
-  Cholinesterase: "Von der Leber produziert. Erniedrigt bei schweren Leberschäden."
-  Kreatinin: "Abbauprodukt der Muskeln, von den Nieren ausgeschieden. Erhöht = Nierenschwäche."
-  GFR: "Glomeruläre Filtrationsrate – zeigt direkt wie gut die Nieren filtern. Sinkt mit dem Alter."
-  Harnstoff: "Eiweißabbauprodukt. Erhöht bei Nierenschwäche oder eiweißreicher Ernährung."
-  Harnsäure: "Endprodukt des Purinstoffwechsels. Zu hoch = Gichtrisiko."
-  Natrium: "Wichtigstes Elektrolyt für Wasserhaushalt und Nervenleitung."
-  Kalium: "Essenziell für Herzrhythmus und Muskeln. Zu hoch oder zu tief ist gefährlich."
-  Chlorid: "Elektrolyt – folgt meist dem Natrium. Wichtig für Säure-Basen-Haushalt."
-  Calcium: "Für Knochen, Muskeln und Nerven. Reguliert durch Vitamin D und Nebenschilddrüse."
-  Magnesium: "Muskel- und Nervenfunktion. Mangel führt zu Krämpfen und Herzrhythmusstörungen."
-  Phosphat: "Baustein für Knochen und Energiestoffwechsel (ATP)."
-  Glucose: "Nüchtern-Blutzucker – zeigt ob der Körper Zucker normal verarbeitet."
-  HbA1c: "Langzeit-Blutzucker (letzte 8-12 Wochen). Der wichtigste Diabetes-Wert."
-  Totalprotein: "Gesamteiweiß im Blut – niedrig bei Mangelernährung oder Leberproblemen."
-  Cholesterin: "Gesamtcholesterin – Baustein für Zellen, aber zu viel lagert sich in Gefäßen ab."
-  HDL: "Gutes Cholesterin – räumt Ablagerungen aus den Gefäßen. Je höher, desto besser."
-  LDL: "Schlechtes Cholesterin – lagert sich in Gefäßwänden ab. Sollte niedrig sein."
-  Triglyceride: "Blutfette aus der Nahrung. Erhöht bei fettreicher Ernährung und Übergewicht."
-  Quotient Chol/HDL: "Verhältnis Gesamt/HDL-Cholesterin. Unter 5 ist das Ziel."
-  Quotient LDL/HDL: "Verhältnis schlechtes/gutes Cholesterin. Unter 3 ist optimal."
-  Amylase: "Enzym zur Stärkeverdauung. Erhöht bei Bauchspeicheldrüsenentzündung."
-  Pankreas-Amylase: "Pankreas-spezifische Amylase – genauer als die Gesamt-Amylase."
-  Lipase: "Fettverdauungsenzym der Bauchspeicheldrüse. Erhöht = Pankreatitis."
-  Quick: "Gerinnungstest – wie schnell das Blut gerinnt. Wichtig bei Blutverdünnern."
-  INR: "International normalisierter Gerinnungswert. Ziel bei Marcumar: 2.0–3.0."
-  aPTT: "Gerinnungszeit – testet den 'inneren' Gerinnungsweg."
-  TSH: "Schilddrüsen-Steuernhormon. Hoch = Unterfunktion, niedrig = Überfunktion."
-  PSA: "Prostata-spezifisches Antigen. Screening-Wert, steigt auch bei gutartiger Vergrößerung."
-  Anti-CCP: "Antikörper – sehr spezifisch für rheumatoide Arthritis."
-  Rheumafaktor: "Unspezifischer Antikörper – erhöht bei Rheuma, aber auch bei anderen Erkrankungen."
-  Eisen: "Für den Sauerstofftransport im Blut. Mangel = Müdigkeit, brüchige Nägel."
-  Ferritin: "Eisenspeicher – zeigt die Langzeitversorgung mit Eisen."
+  # Blutbild
+  Leukozyten: "Weiße Blutkörperchen – das Immunsystem. Erhöht bei Infekten, Stress oder nach OPs. Bei Männern 60+ kann die Norm leicht höher sein (bis 10.5)."
+  Erythrozyten: "Rote Blutkörperchen – transportieren Sauerstoff. Männer haben natürlich höhere Werte als Frauen (4.5–5.9 vs. 4.0–5.2). Sinkt leicht im Alter."
+  Hämoglobin: "Roter Blutfarbstoff. Männer-Norm: 13.0–17.5 g/dL. Bei Männern 70+ kann 12.5 noch akzeptabel sein. Niedrig = Blutarmut, Müdigkeit."
+  Hämatokrit: "Anteil fester Bestandteile im Blut. Männer: 41–53%, steigt bei Dehydrierung. Im Alter tendenziell etwas niedriger."
+  MCV: "Größe der roten Blutkörperchen. Alters- und geschlechtsunabhängig. Hilft die Art einer Blutarmut zu bestimmen."
+  MCH: "Hämoglobin pro rotem Blutkörperchen. Altersunabhängig – zeigt wie gut die Zellen beladen sind."
+  MCHC: "Konzentration des Hämoglobins in den roten Blutkörperchen. Stabil über Alter und Geschlecht."
+  RDW: "Größenverteilung der roten Blutkörperchen. Erhöht bei Eisenmangel oder Vitaminmangel (B12/Folsäure)."
+  Thrombozyten: "Blutplättchen – wichtig für die Gerinnung. Geschlechts-/altersunabhängig. Unter 100: Blutungsrisiko prüfen."
+  MPV: "Durchschnittliche Größe der Blutplättchen. Jung und aktiv = größer. Altersunabhängig."
+  # Entzündung
+  CRP: "C-reaktives Protein – schneller Entzündungsmarker. Bei Männern 60+ kann Basiswert durch Übergewicht/Alter leicht erhöht sein (bis 0.5 noch normal)."
+  Interleukin-6: "Botenstoff der Entzündung – reagiert innerhalb Stunden. Steigt im Alter leicht an (Inflammaging)."
+  Procalcitonin: "Erhöht bei bakteriellen Infekten. Alters-/geschlechtsunabhängig. Normal bei Virusinfekten."
+  BSG 1h: "Blutsenkung – bei Männern 60+: Norm bis 20mm/h (steigt mit dem Alter). Unspezifisch aber zuverlässig."
+  # Leber
+  GOT: "Leberenzym (AST). Männer-Norm: <50 U/L. Erhöht bei Leberschäden, intensivem Sport oder Herzinfarkt."
+  GPT: "Leberenzym (ALT). Männer-Norm: <50 U/L. Spezifischer für Leberzellschäden als GOT. Sinkt leicht im Alter."
+  GGT: "Gamma-GT. Männer-Norm: <60 U/L (Frauen <40). Empfindlichster Marker für Leber/Galle und Alkohol."
+  Alk. Phosphatase: "Alkalische Phosphatase. Bei Männern 60+: 40–129 U/L. Erhöht bei Gallenstau oder Knochenprozessen."
+  Bilirubin: "Abbauprodukt des Hämoglobins. Geschlechtsunabhängig. Leicht erhöht (Gilbert-Syndrom) ist harmlos."
+  LDH: "Unspezifisches Enzym. Alters-/geschlechtsunabhängig. Erhöht bei Zellzerfall (Leber, Blut, Muskel)."
+  Cholinesterase: "Von der Leber produziert. Männer-Norm: 5300–12900 U/L. Erniedrigt bei schweren Leberschäden."
+  # Niere
+  Kreatinin: "Abbauprodukt der Muskeln. Männer-Norm höher (0.7–1.2) wegen mehr Muskelmasse. Bei Alter 70 und Training kann 1.1–1.2 noch normal sein."
+  GFR: "Glomeruläre Filtrationsrate. Sinkt natürlich ~1 mL/min pro Jahr ab 40. Bei Alter 70 ist GFR 60–80 altersentsprechend, kein Grund zur Panik."
+  Harnstoff: "Eiweißabbauprodukt. Männer tendenziell etwas höher. Steigt bei eiweißreicher Ernährung und Nierenschwäche."
+  Harnsäure: "Purinstoffwechsel. Männer-Norm: 3.4–7.0 mg/dL (Frauen niedriger). Gichtrisiko steigt mit Alter und Fleischkonsum."
+  # Elektrolyte
+  Natrium: "Wichtigstes Elektrolyt. Alters-/geschlechtsunabhängig. Im Alter Risiko für Hyponatriämie (Medikamente, wenig Trinken)."
+  Kalium: "Essentiell für Herzrhythmus. Altersunabhängig. Vorsicht bei Nierenschwäche + bestimmten Blutdruckmitteln (ACE-Hemmer)."
+  Chlorid: "Elektrolyt – folgt dem Natrium. Alters-/geschlechtsunabhängig."
+  Calcium: "Für Knochen und Nerven. Im Alter Vitamin-D-Mangel häufig → Calcium kann sinken. Osteoporose-Vorsorge beachten."
+  Magnesium: "Muskel- und Nervenfunktion. Im Alter häufiger Mangel (Medikamente, weniger Aufnahme). Krämpfe als Warnsignal."
+  Phosphat: "Baustein für Knochen und Energiestoffwechsel. Altersunabhängig."
+  # Stoffwechsel
+  Glucose: "Nüchtern-Blutzucker. Diabetesrisiko steigt mit dem Alter. Bei 69 Jahren: unter 100 optimal, 100–125 Prä-Diabetes."
+  HbA1c: "Langzeit-Blutzucker (8–12 Wochen). Bei Männern 70+: bis 6.5% wird teils akzeptiert. Unter 5.7% ist optimal."
+  HbA1c (IFCC): "Langzeit-Blutzucker in mmol/mol. Normal: 20–42. Bei älteren Patienten bis 48 teils akzeptabel."
+  Totalprotein: "Gesamteiweiß. Sinkt leicht im Alter. Niedrig bei Mangelernährung – bei Senioren auf ausreichende Eiweißzufuhr achten."
+  # Lipide
+  Cholesterin: "Gesamtcholesterin = HDL + LDL + (Triglyceride ÷ 5). Bei Männern 60+ ist <200 das Ziel. Ein hoher Gesamtwert kann durch hohe Triglyceride verursacht werden – dann sind HDL/LDL-Verhältnis und Triglyceride einzeln wichtiger als der Gesamtwert."
+  HDL: "Gutes Cholesterin. Männer typisch 40–60 mg/dL (Frauen höher). Sport und ungesättigte Fette erhöhen HDL."
+  LDL: "Schlechtes Cholesterin. Bei Männern mit kardiovaskulärem Risiko (Alter 70): Ziel <130, bei Vorerkrankung <100."
+  Non-HDL-Cholesterin: "Alles außer HDL. Einfacher Risiko-Marker. Bei Männern 60+ mit Risikofaktoren: Ziel unter 130."
+  Triglyceride: "Blutfette. Geschlechtsunabhängig, aber steigen mit Alter, Übergewicht und Alkohol. Nüchtern <150 optimal."
+  Quotient Chol/HDL: "Verhältnis Gesamt/HDL. Bei Männern unter 5 gut, unter 3.5 optimal. Steigt mit dem Alter."
+  Quotient LDL/HDL: "Verhältnis schlecht/gut. Unter 3 ist Ziel. Bei Männern 60+ besonders wichtig für Gefäßrisiko."
+  # Pankreas
+  Amylase: "Stärkeverdauungsenzym. Alters-/geschlechtsunabhängig. Erhöht bei Bauchspeicheldrüsenentzündung."
+  Pankreas-Amylase: "Pankreas-spezifisch. Genauer als Gesamt-Amylase. Altersunabhängig."
+  Lipase: "Fettverdauungsenzym. Alters-/geschlechtsunabhängig. Erhöht = Pankreatitis."
+  # Gerinnung
+  Quick: "Gerinnungstest. Alters-/geschlechtsunabhängig. Wichtig bei Blutverdünnern. 70–120% normal."
+  INR: "Internationaler Gerinnungswert. Bei Marcumar-Therapie: Ziel 2.0–3.0. Altersunabhängig."
+  aPTT: "Gerinnungszeit (innerer Weg). Altersunabhängig. Normal: 23–35 Sekunden."
+  # Schilddrüse
+  TSH: "Schilddrüsen-Steuerhormon. Im Alter leicht höher (bis 4.5 bei 60+). Hoch = Unterfunktion (müde, kalt)."
+  # Tumor-Marker
+  PSA: "Prostata-spezifisches Antigen. Nur bei Männern relevant. Altersabhängig: 60–69 Jahre: <4.0 normal. Steigt auch bei gutartiger Vergrößerung."
+  # Autoimmun
+  Anti-CCP: "Antikörper – sehr spezifisch für rheumatoide Arthritis. Alters-/geschlechtsunabhängig."
+  Rheumafaktor: "Unspezifischer Antikörper. Kann im Alter leicht positiv sein ohne Rheuma (bis 14 U/mL normal)."
+  Anti-Cardiolipin: "Antikörper gegen Zellmembranen. Altersunabhängig. Erhöht = Thromboserisiko."
+  # Eisen
+  Eisen: "Für Sauerstofftransport. Männer-Norm: 50–170 µg/dL. Im Alter kann Aufnahme sinken."
+  Ferritin: "Eisenspeicher. Männer-Norm: 30–300 ng/mL. Im Alter auf ausreichende Zufuhr achten (rotes Fleisch, Hülsenfrüchte)."
+  # Differentialblutbild
+  Neutrophile abs.: "Erste Abwehrlinie gegen Bakterien. Alters-/geschlechtsunabhängig. Norm: 1.5–6.7 G/L."
+  Neutrophile rel.: "Prozentualer Anteil der Neutrophilen. Norm 40–75%. Altersunabhängig."
+  Lymphozyten abs.: "Gezielte Immunabwehr (Viren, Antikörper). Im Alter leicht sinkend (Immunseneszenz)."
+  Lymphozyten rel.: "Prozentualer Anteil. Erhöht bei Virusinfekten. Im Alter tendenziell etwas niedriger."
+  Monozyten abs.: "Fresszellen. Altersunabhängig. Räumen Zelltrümmer und alternde Zellen auf."
+  Monozyten rel.: "Prozentualer Anteil der Monozyten. Norm 2–12%. Geschlechtsunabhängig."
+  Eosinophile abs.: "Erhöht bei Allergien und Parasitenbefall. Alters-/geschlechtsunabhängig."
+  Eosinophile rel.: "Prozentualer Anteil. Norm 0–7%. Saisonal erhöht bei Heuschnupfen."
+  Basophile abs.: "Seltenste weiße Blutzellen. Rolle bei Allergien. Altersunabhängig."
+  Basophile rel.: "Prozentualer Anteil. Norm 0–2%. Geschlechtsunabhängig."
+  Granulozyten rel.: "Prozentualer Anteil aller Granulozyten (Neutro + Eos + Baso). Norm 40–75%."
+  Granulozyten abs.: "Absolute Anzahl aller Granulozyten. Altersunabhängig."
+  # Körperdaten
+  Gewicht: "Körpergewicht. BMI-Ziel bei Männern 65+: 22–27 (etwas höher als bei Jüngeren, da leichtes Übergewicht im Alter schützend wirkt)."
+  BMI: "Body-Mass-Index. Für Männer 65+: 22–27 optimal (nicht zu dünn!). Unter 22 = Sarkopenie-Risiko."
+  Fettgehalt: "Körperfettanteil. Männer 60+: 13–25% ist akzeptabel. Unter 10% bei Senioren eher kritisch."
+  Fett: "Absolute Fettmasse in kg. Sollte nicht zu niedrig sein im Alter (Energiereserve)."
+  Muskelmasse: "Muskelmasse sinkt ab 50 um ~1–2% pro Jahr (Sarkopenie). Krafttraining ist die beste Gegenmaßnahme – auch mit 69."
+  Körperwasser: "Anteil Wasser. Sinkt im Alter (weniger Muskeln, weniger Durst). 55–65% optimal. Ausreichend trinken!"
+  Viszeralfett: "Bauchfett um die Organe. Level 1–12 normal, ab 13 erhöhtes Herz-Kreislauf-Risiko. Steigt mit dem Alter."
+  Fettfreie Masse: "Muskeln + Knochen + Organe + Wasser. Im Alter sinkend. Krafttraining und Eiweiß bremsen den Abbau."
+  Proteinanteil: "Eiweißanteil im Körper. Bei Männern 60+: 1.0–1.2g Eiweiß/kg/Tag empfohlen um Muskeln zu erhalten."
+  Knochenmasse: "Knochengewicht. Bei Männern stabiler als bei Frauen, aber ab 70 steigt Osteoporose-Risiko. Vitamin D + Calcium beachten."
+  Testosteron: "Männliches Sexualhormon. Sinkt ab 40 um ~1%/Jahr. Bei 69: 2.5–8.0 ng/mL normal. Symptome: Müdigkeit, weniger Muskeln."
+  Myoglobin: "Muskelprotein. Altersunabhängig. Erhöht nach intensivem Sport, Sturz oder Herzinfarkt."
+  # Gerinnung/Sonstige
+  Senkung: "Blutsenkung. Männer 60+: bis 20mm/h normal (steigt mit dem Alter). Unspezifisch aber bewährt."
+  Hyaline Zylinder: "Eiweißausgüsse in den Nieren. Altersunabhängig. Wenige normal, viele = Nierenstress."
+  Schleim: "Schleim im Urin. Altersunabhängig. Leicht erhöht meist harmlos (Probenverunreinigung)."
+  Plattenepithel.: "Epithelzellen im Urin. Zeigen ob Probe sauber gewonnen wurde. Altersunabhängig."
+  Spez. Gewicht: "Urin-Konzentration. Im Alter oft verdünnter (Niere konzentriert schlechter). 1015–1025 normal."
+  pH-Wert: "Säuregrad des Urins. Altersunabhängig. 5–8 normal, beeinflusst durch Ernährung."
+  Peroxide: "Oxidativer Stress. Steigt mit dem Alter. Antioxidantien (Gemüse, Beeren) können helfen."
+  Antioxid Kap.: "Antioxidative Kapazität. Im Alter oft reduziert. Vielfältige Ernährung unterstützt die Abwehr."
 
 
 # Krankenhausaufenthalte und relevante Ereignisse
@@ -214,3 +271,103 @@ verknuepfungen:
   - name: "Gerinnung"
     beschreibung: "Quick und INR messen das Gleiche (Quick steigt = INR sinkt). aPTT testet einen anderen Weg."
     tests: ["Quick", "INR", "aPTT"]
+  - name: "Gewicht & Stoffwechsel"
+    beschreibung: "Übergewicht erhöht Blutzucker und Blutfette. Gewichtsverlust verbessert oft alle Werte gleichzeitig."
+    tests: ["Gewicht", "BMI", "Glucose", "HbA1c", "Triglyceride"]
+  - name: "Bauchfett & Entzündung"
+    beschreibung: "Viszeralfett produziert Entzündungsstoffe. Weniger Bauchfett = niedrigeres CRP."
+    tests: ["Viszeralfett", "CRP", "Triglyceride"]
+  - name: "Muskeln & Nierenwerte"
+    beschreibung: "Kreatinin kommt aus den Muskeln – mehr Muskelmasse kann höhere Kreatinin-Werte erklären ohne dass die Niere schwächer ist."
+    tests: ["Muskelmasse", "Kreatinin", "GFR"]
+  - name: "Körperfett & Blutfette"
+    beschreibung: "Weniger Körperfett geht oft mit besserem HDL und niedrigeren Triglyceriden einher."
+    tests: ["Fettgehalt", "HDL", "LDL", "Cholesterin"]
+  - name: "Cholesterin-Aufschlüsselung"
+    beschreibung: "Cholesterin gesamt = HDL + LDL + (Triglyceride ÷ 5). Ein hoher Gesamtwert bei normalem LDL deutet auf hohe Triglyceride als Ursache hin – nicht auf verstopfte Gefäße."
+    tests: ["Cholesterin", "HDL", "LDL", "Triglyceride"]
+
+
+# Test-spezifische Empfehlungen bei auffälligen Werten
+# "erhöht" = Flag H, "erniedrigt" = Flag L
+# Dynamische Empfehlungen (mit Berechnungen) bleiben im Python-Code
+empfehlungen_tests:
+  Triglyceride:
+    erhöht: "Maßnahmen: 1) Alkohol meiden, 2) Zucker/Weißmehl reduzieren, 3) Omega-3 Fettsäuren (2g/Tag oder fetter Fisch 3×/Woche), 4) Ausdauersport (senkt Triglyceride um 20-30%). Kontrolle in 3 Monaten."
+  Leukozyten:
+    erhöht: "Dauerhaft erhöht. Mögliche Ursachen: chronische Entzündung, Rauchen, Stress, Medikamente. CRP und Differentialblutbild mit Arzt besprechen."
+  GFR:
+    erniedrigt: "Bei Alter 70 grenzwertig. Empfehlung: viel trinken (2L/Tag), Blutdruck kontrollieren, Eiweiß nicht übertreiben. Kontrolle alle 6 Monate."
+  CRP:
+    erhöht: "Falls kein akuter Infekt: chronische Ursachen prüfen (Viszeralfett, Autoimmun, Zähne). Bei KH-Aufenthalt erwartbar erhöht."
+  HbA1c:
+    erhöht: "Zeigt Prä-Diabetes. Maßnahmen: Zucker/Weißmehl reduzieren, nach Mahlzeiten 15min Spaziergang, Gewicht halten. Kontrolle in 3 Monaten."
+  HbA1c (IFCC):
+    erhöht: "Zeigt Prä-Diabetes (IFCC-Einheit). Gleichbedeutend mit HbA1c >5.7%. Lebensstil-Maßnahmen können Wert senken."
+  Harnsäure:
+    erhöht: "Gichtrisiko. Weniger Fleisch/Innereien/Hülsenfrüchte, viel Wasser trinken (2.5L), Alkohol (v.a. Bier) meiden."
+  Glucose:
+    erhöht: "Nüchternwert erhöht. Mögliche Ursachen: Prä-Diabetes, Stress, Medikamente. HbA1c zur Bestätigung prüfen."
+  Hämoglobin:
+    erniedrigt: "Blutarmut. Ursachen abklären: Eisenmangel, Blutung, Vitaminmangel (B12/Folsäure), chronische Erkrankung."
+  Hämatokrit:
+    erniedrigt: "Kann auf Blutarmut oder Überwässerung hindeuten. Zusammen mit Hämoglobin und Erythrozyten bewerten."
+  Thrombozyten:
+    erniedrigt: "Niedrige Blutplättchen. Bei <100: Blutungsrisiko prüfen. Mögliche Ursachen: Medikamente, Lebererkrankung, Autoimmun."
+  Quick:
+    erhöht: ">120% ist kein Problem – zeigt schnelle Gerinnung. Nur bei Blutverdünner-Therapie relevant (dann wäre es zu schnell)."
+  Kalium:
+    erhöht: "Gefährlich für das Herz. Kaliumreiche Lebensmittel reduzieren (Bananen, Nüsse, Trockenfrüchte). Nierenfunktion prüfen."
+    erniedrigt: "Kann Herzrhythmusstörungen verursachen. Kaliumreiche Ernährung, Medikamenten-Check (Diuretika?)."
+  Natrium:
+    erniedrigt: "Hyponatriämie – häufig bei älteren Patienten durch Medikamente oder zu viel Wasser. Trinkmenge und Medikamente prüfen."
+  Bilirubin:
+    erhöht: "Leicht erhöht ist oft harmlos (Gilbert-Syndrom bei 5-10% der Bevölkerung). Bei Gelbfärbung der Augen: Leber/Galle abklären."
+  PSA:
+    erhöht: "Erhöhter PSA muss nicht Krebs bedeuten. Auch gutartige Vergrößerung, Entzündung oder Radfahren können PSA erhöhen. Urologe konsultieren."
+
+
+# Test-spezifische Empfehlungen bei auffälligen Werten
+# Werden in der Trend-Ansicht und im Bericht angezeigt
+# "dynamisch: true" bedeutet der Code berechnet zusätzlich mit aktuellen Werten
+empfehlungen_tests:
+  Cholesterin:
+    bedingung: "erhöht"
+    dynamisch: true
+    text: "Gesamt = HDL + LDL + (Triglyceride÷5). Bei hohem Gesamtwert die Einzelwerte anschauen – entscheidend ist was genau erhöht ist (LDL, Triglyceride oder beides). Therapie mit Arzt besprechen."
+  Triglyceride:
+    bedingung: "erhöht"
+    text: "Maßnahmen: 1) Alkohol reduzieren/meiden, 2) Zucker und Weißmehl stark einschränken, 3) Omega-3 Fettsäuren (Fischöl 2g/Tag oder fetter Fisch 3×/Woche), 4) Regelmäßige Bewegung (senkt Triglyceride um 20-30%). Kontrolle in 3 Monaten."
+  Leukozyten:
+    bedingung: "erhöht"
+    text: "Dauerhaft erhöhte Leukozyten ohne akuten Infekt: mögliche Ursachen sind chronische Entzündung, Rauchen, Stress, Medikamente oder hämatologische Erkrankung. CRP und Differentialblutbild mit Arzt besprechen."
+  GFR:
+    bedingung: "erniedrigt"
+    text: "Bei Alter 70 ist leichte GFR-Einschränkung häufig. Maßnahmen: viel trinken (2L/Tag), Blutdruck gut einstellen, Eiweiß nicht übertreiben (0.8-1.0g/kg), nephrotoxische Medikamente meiden. Kontrolle alle 6 Monate."
+  CRP:
+    bedingung: "erhöht"
+    text: "Falls kein akuter Infekt vorliegt: chronische Ursachen prüfen – Viszeralfett, Zahnfleischentzündung, Autoimmunprozesse. Bei Krankenhausaufenthalt ist erhöhtes CRP erwartbar und normalisiert sich meist in 2-4 Wochen."
+  HbA1c:
+    bedingung: "erhöht"
+    text: "Zeigt Prä-Diabetes. Maßnahmen: Zucker und Weißmehl reduzieren, nach jeder Mahlzeit 15min bewegen (Spaziergang), Gewicht halten/reduzieren. Kontrolle in 3 Monaten. Bei >6.5% Diabetes-Diagnose möglich."
+  Harnsäure:
+    bedingung: "erhöht"
+    text: "Gichtrisiko erhöht. Maßnahmen: weniger Fleisch und Innereien, viel Wasser trinken (2.5L/Tag), Alkohol (v.a. Bier) meiden, Kirschen und Vitamin C können helfen. Bei Gichtanfall sofort zum Arzt."
+  Hämoglobin:
+    bedingung: "erniedrigt"
+    text: "Mögliche Blutarmut. Ursachen abklären: Eisenmangel (Ferritin prüfen), B12/Folsäure-Mangel, chronische Erkrankung, Blutungsquelle. Bei KH-Aufenthalt oft durch Blutverlust/Verdünnung bedingt."
+  Thrombozyten:
+    bedingung: "erniedrigt"
+    text: "Niedrige Thrombozyten können durch EDTA-Aggregation (Laborfehler), Medikamente, Autoimmun oder Knochenmark bedingt sein. Bei deiner Vorgeschichte Citrat-Röhrchen anfordern für korrekte Messung."
+  Quick:
+    bedingung: "erhöht"
+    text: "Quick >120% ist meist unbedenklich und zeigt eine gute Gerinnung. Nur bei Blutverdünner-Therapie (Marcumar) ist der Wert relevant – dann INR beachten."
+  Hämatokrit:
+    bedingung: "erniedrigt"
+    text: "Niedriger Hämatokrit deutet auf Verdünnung oder Blutarmut. Zusammen mit Hämoglobin und Erythrozyten beurteilen. Bei KH-Aufenthalt häufig durch Infusionen bedingt."
+  Kalium:
+    bedingung: "erhöht"
+    text: "Erhöhtes Kalium kann gefährlich sein (Herzrhythmusstörungen). Häufige Ursachen: Nierenschwäche, ACE-Hemmer/Sartane, kaliumreiche Ernährung. EKG und Nierenwerte kontrollieren."
+  Natrium:
+    bedingung: "erniedrigt"
+    text: "Niedriges Natrium im Alter oft durch Medikamente (Diuretika), zu viel Wasser trinken oder SIADH. Symptome: Schwindel, Verwirrtheit. Trinkmenge und Medikamente mit Arzt prüfen."

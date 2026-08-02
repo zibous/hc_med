@@ -14,7 +14,7 @@ export function renderBreadcrumb() {
   if (state.gruppe && state.view !== "pathologisch") {
     crumbs.push({ label: state.gruppe, view: "gruppe", params: { gruppe: state.gruppe } });
   }
-  if (state.view === "trend" && state.test) {
+  if (state.test && (state.view === "trend" || state.view === "verknuepfung")) {
     crumbs.push({ label: state.test, view: "trend", params: { test: state.test, gruppe: state.gruppe } });
   }
   if (state.view === "verknuepfung" && state.verknuepfung) {

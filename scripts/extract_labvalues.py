@@ -17,10 +17,15 @@ from pathlib import Path
 
 BEFUNDE_DIR = Path(__file__).parent.parent / "data" / "befunde"
 OUTPUT_FILE = BEFUNDE_DIR / "laborwerte_gesamt.csv"
+CONFIG_PATH = Path(__file__).parent.parent / "data" / "labor_config.yaml"
 
-# Patient-Daten
-PATIENT_GEBURTSDATUM = date(1955, 12, 16)
-PATIENT_GESCHLECHT = "m"
+import yaml
+_config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+_patient = _config.get("patient", {})
+
+# Patient-Daten aus Config
+PATIENT_GEBURTSDATUM = date(*[int(x) for x in _patient.get("geburtsdatum", "1955-12-16").split("-")])
+PATIENT_GESCHLECHT = _patient.get("geschlecht", "m")
 
 
 # ─── Testnamen-Normalisierung ──────────────────────────────────────────────────
@@ -56,6 +61,10 @@ TEST_ALIASES: dict[str, str] = {
     "neutrophile absolut": "Neutrophile abs.",
     "neutroph. gran. abs.": "Neutrophile abs.",
     "neutroph. gran. rel.": "Neutrophile rel.",
+    "neutrophile abs": "Neutrophile abs.",
+    "neutrophile abs.": "Neutrophile abs.",
+    "granulocytes": "Granulozyten rel.",
+    "index ldl/hdl": "Quotient LDL/HDL",
     "gran.aut.": "Granulozyten rel.",
     "granul.abs": "Granulozyten abs.",
     "lymphocyten %": "Lymphozyten rel.",
@@ -127,6 +136,8 @@ TEST_ALIASES: dict[str, str] = {
     "glukose": "Glucose",
     "hba1c (ngsp)": "HbA1c",
     "hba1c (ifcc)": "HbA1c (IFCC)",
+    "hbalc (ngsp)": "HbA1c",
+    "hbalc (ifcc)": "HbA1c (IFCC)",
     "hba1c": "HbA1c",
     "totalprotein": "Totalprotein",
     "g.eiweiss": "Totalprotein",
@@ -1164,20 +1175,27 @@ def main():
             age = calculate_age_at_date(row["Datum"])
             row["Alter"] = str(age) if age else ""
 
-        # Ungültige Werte filtern (Parser-Artefakte wie "1)", "fl", "10^9/l")
+        # Ungültige Werte filtern (Parser-Artefakte)
+        BLACKLIST = {"hans-peter", "spez. untersuchung", "arztbrief", "text blutbild", "letzte bearbeitung"}
+        # Körperdaten werden aus hc_scale importiert, nicht aus Befunden
+        KOERPERDATEN_BLACKLIST = {"gewicht", "fettgehalt", "fett", "bmi", "muskelmasse"}
         clean_results = []
         for row in results:
+            # Testname-Blacklist
+            if any(bl in row["Test_Standard"].lower() for bl in BLACKLIST):
+                continue
+            # Körperdaten aus Befunden überspringen (kommen aus hc_scale)
+            if row["Test_Standard"].lower() in KOERPERDATEN_BLACKLIST:
+                continue
             wert_clean = row["Wert_Norm"].replace("<", "").replace(">", "").strip()
             if not wert_clean:
                 continue
-            # Muss mit Ziffer oder Punkt starten UND nur numerische Zeichen + Punkt enthalten
             if wert_clean[0].isdigit() or wert_clean[0] == ".":
-                # Prüfe ob es wirklich eine Zahl ist (keine "1)" oder "10^9/l")
                 try:
                     float(wert_clean)
                     clean_results.append(row)
                 except ValueError:
-                    pass  # "1)", "10^9/l", "0.0-0.0" etc. → rausfiltern
+                    pass
         results = clean_results
 
         file_results.append((filepath.name, fmt, results))
@@ -1201,8 +1219,8 @@ def main():
 
     with LaborDB() as db:
         patient_id = db.get_or_create_patient(
-            vorname="Hans-Peter",
-            nachname="Siebler",
+            vorname=_patient.get("vorname", ""),
+            nachname=_patient.get("nachname", ""),
             geburtsdatum=PATIENT_GEBURTSDATUM,
             geschlecht=PATIENT_GESCHLECHT,
         )

@@ -128,8 +128,10 @@ labor-befunde: ## Alle importierten Befund-Dateien anzeigen
 labor-reset: ## Datenbank löschen und neu aufbauen
 	@echo "⚠️  Lösche $(DB_FILE)..."
 	@rm -f $(DB_FILE)
-	@echo "🔬 Reimport..."
+	@echo "🔬 Reimport Laborwerte..."
 	@python3 $(SCRIPT)
+	@echo "⚖️  Import Körperdaten (hc_scale)..."
+	@python3 scripts/import_scale.py
 	@echo "🔍 Validierung..."
 	@python3 scripts/validate_labor.py
 

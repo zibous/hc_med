@@ -5,7 +5,7 @@ export function renderChart(data) {
   const card = document.getElementById("chartCard");
   const canvas = document.getElementById("mainChart");
 
-  if (!data) {
+  if (!data || !data.werte || data.werte.length === 0) {
     card.style.display = "none";
     return;
   }
@@ -59,9 +59,9 @@ export function renderChart(data) {
     fill: true,
     tension: 0.25,
     pointBackgroundColor: pointColors,
-    pointRadius: 5,
-    pointHoverRadius: 7,
-    borderWidth: 2.5,
+    pointRadius: values.length > 50 ? 0 : values.length > 20 ? 2 : 4,
+    pointHoverRadius: values.length > 50 ? 3 : 5,
+    borderWidth: values.length > 50 ? 1.2 : 1.8,
   }];
 
   // Norm-Band als Annotation-Datasets
@@ -265,9 +265,9 @@ export function renderMultiChart(data) {
       backgroundColor: color + "15",
       fill: false,
       tension: 0.25,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      borderWidth: 2.5,
+      pointRadius: values.filter(v => v !== null).length > 50 ? 0 : 3,
+      pointHoverRadius: 4,
+      borderWidth: 1.5,
       spanGaps: true,
       yAxisID: testNames.length <= 2 ? (i === 0 ? "y" : "y1") : "y",
     });
