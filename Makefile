@@ -196,6 +196,20 @@ git-update: git-status ## Git Update durchführen
 	git commit -m "Update am $$(date +'%Y-%m-%d %H:%M')" || true
 	git push -u origin main
 
+git-release: git-status ## Neues Versions-Tag automatisch berechnen, erstellen und zu Forgejo pushen
+	git add -A
+	git commit -m "Release-Vorbereitung am $$(date +'%Y-%m-%d %H:%M')" || true
+	git push origin main
+	@LAST_TAG=$$(git describe --tags --abbrev=0 2>/dev/null || echo "v2.1.0"); \
+	NEXT_TAG=$$(echo $$LAST_TAG | awk -F. '{print $$1"."$$2"."$$3+1}'); \
+	echo "🍏 Letzte Version war: $$LAST_TAG"; \
+	echo "⚡ Berechnete neue Version: $$NEXT_TAG"; \
+	echo "📦 Erstelle Git-Tag $$NEXT_TAG mit aktuellem Zeitstempel..."; \
+	git tag -a $$NEXT_TAG -m "Automatisches Release $$NEXT_TAG am $$(date +'%Y-%m-%d %H:%M') via Makefile"; \
+	git push origin $$NEXT_TAG; \
+	echo "🎉 Version $$NEXT_TAG erfolgreich an Forgejo übermittelt!"
+
+
 # ---------------------------------------------------------
 # Help
 # ---------------------------------------------------------

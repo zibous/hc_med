@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Laborbericht – {{ now }}</title>
+<style>
+    body { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 11px; color: #1a1a1a; margin: 1cm; line-height: 1.4; }
+    h1 { font-size: 18px; margin-bottom: 4px; }
+    h2 { font-size: 14px; margin-top: 24px; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    .meta { color: #666; font-size: 10px; margin-bottom: 16px; }
+    .kpi-row { display: flex; gap: 24px; margin-bottom: 16px; }
+    .kpi { padding: 8px 12px; background: #f8f9fa; border-radius: 6px; }
+    .kpi-label { font-size: 9px; color: #666; text-transform: uppercase; }
+    .kpi-value { font-size: 16px; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 16px; }
+    th { text-align: left; padding: 6px 8px; background: #f0f0f0; border-bottom: 2px solid #ddd; font-size: 9px; text-transform: uppercase; }
+    td { padding: 5px 8px; border-bottom: 1px solid #eee; }
+    .group-row td { background: #f8f9fa; padding-top: 10px; }
+    .high { color: #dc2626; }
+    .low { color: #2563eb; }
+    .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 9px; color: #999; }
+    @media print { body { margin: 1.5cm; } .no-print { display: none; } }
+    .print-btn { position: fixed; top: 16px; right: 16px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+<button class="print-btn no-print" onclick="window.print()">🖨️ Als PDF drucken</button>
+
+<h1>Laborbericht</h1>
+<div class="meta">
+    Patient: {{ patient.vorname }} {{ patient.nachname }} · geb. {{ patient.geburtsdatum }} · männlich<br>
+    Erstellt: {{ now }} · Zeitraum: {{ period_label }} · Datenquelle: {{ total }} Messwerte ({{ zeitraum_von }} bis {{ zeitraum_bis }})
+</div>
+
+<div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Messwerte gesamt</div><div class="kpi-value">{{ total }}</div></div>
+    <div class="kpi"><div class="kpi-label">Auffällige Werte</div><div class="kpi-value" style="color:#dc2626">{{ path_total }}</div></div>
+    <div class="kpi"><div class="kpi-label">Im Normbereich</div><div class="kpi-value" style="color:#059669">{{ total - path_total }} ({{ norm_pct }}%)</div></div>
+</div>
+
+<h2>⚠️ Auffällige Werte ({{ period_label }})</h2>
+<table>
+    <thead><tr><th>Datum</th><th>Test</th><th>Wert</th><th>Norm</th><th>Status</th><th>Hinweis</th></tr></thead>
+    <tbody>
+    {% for gruppe, items in gruppen_path.items() | sort %}
+        <tr class="group-row"><td colspan="6"><strong>{{ gruppe }}</strong></td></tr>
+        {% for r in items %}
+        <tr>
+            <td>{{ r.datum }}</td>
+            <td>{{ r.test_standard }}</td>
+            <td><strong>{{ r.wert_norm }}</strong> {{ r.einheit_norm or "" }}</td>
+            <td>{{ r.normbereich or "" }}</td>
+            <td class="{{ 'high' if r.flag == 'H' else 'low' }}">{{ "↑ erhöht" if r.flag == "H" else "↓ erniedrigt" }}</td>
+            <td>{{ beschreibungen.get(r.test_standard, "")[:80] }}</td>
+        </tr>
+        {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>
+
+<h2>📋 Aktuelle Werte (alle Tests, letzter Messwert)</h2>
+<table>
+    <thead><tr><th>Test</th><th>Wert</th><th>Norm</th><th>Datum</th><th>Status</th></tr></thead>
+    <tbody>
+    {% set ns = namespace(current_gruppe="") %}
+    {% for r in alle_aktuell %}
+        {% if r.gruppe != ns.current_gruppe %}
+            {% set ns.current_gruppe = r.gruppe %}
+            <tr class="group-row"><td colspan="5"><strong>{{ r.gruppe }}</strong></td></tr>
+        {% endif %}
+        <tr class="{{ 'high' if r.flag == 'H' else 'low' if r.flag == 'L' else '' }}">
+            <td>{{ r.test_standard }}</td>
+            <td><strong>{{ r.wert_norm }}</strong> {{ r.einheit_norm or "" }}</td>
+            <td>{{ r.normbereich or "" }}</td>
+            <td>{{ r.datum }}</td>
+            <td>{{ r.flag or "✓" }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="footer">
+    Dieser Bericht wurde automatisch erstellt und ersetzt keine ärztliche Diagnose.<br>
+    Labor Dashboard · hc_med · Erstellt am {{ now }}
+</div>
+</body>
+</html>

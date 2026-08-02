@@ -1,0 +1,137 @@
+"""API: /bericht und /bericht/charts – Arztberichte als druckfertiges HTML."""
+
+import json
+from datetime import datetime
+from pathlib import Path
+
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+from app.config.settings import PATIENT_CONFIG, TEST_DESCRIPTIONS
+from app.core.empfehlungen import get_test_empfehlung
+from app.infrastructure.database import get_db
+
+router = APIRouter(prefix="/api", tags=["labor"])
+
+TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+
+PERIOD_LABELS = {"1m": "Letzter Monat", "6m": "Letzte 6 Monate", "1y": "Letztes Jahr", "all": "Gesamter Zeitraum"}
+
+
+def _period_filter(query: str, period: str) -> str:
+    """Fügt eine Datums-Filterbedingung zur Query hinzu."""
+    if period == "1m":
+        return query + " AND datum >= date('now', '-1 month')"
+    elif period == "6m":
+        return query + " AND datum >= date('now', '-6 months')"
+    elif period == "1y":
+        return query + " AND datum >= date('now', '-1 year')"
+    return query
+
+
+@router.get("/bericht/charts", response_class=HTMLResponse)
+async def bericht_charts(request: Request, period: str = "1m", sort: str = "datum", dir: int = -1):
+    """Arztbericht mit Verlaufs-Charts pro auffälligem Test."""
+    conn = get_db()
+    try:
+        query = "SELECT DISTINCT test_standard, gruppe FROM laborwerte WHERE flag IN ('H','L')"
+        query = _period_filter(query, period)
+        test_names = [(r[0], r[1]) for r in conn.execute(query).fetchall()]
+
+        tests_data = []
+        for test, gruppe in sorted(test_names):
+            rows = conn.execute(
+                "SELECT datum, wert_norm, einheit_norm, normbereich, flag FROM laborwerte WHERE test_standard=? ORDER BY datum",
+                (test,),
+            ).fetchall()
+            if not rows:
+                continue
+
+            norm = next((r["normbereich"] for r in rows if r["normbereich"] and any(c.isdigit() for c in r["normbereich"])), "")
+
+            recent = rows[-5:] if len(rows) >= 5 else rows
+            recent_ratio = sum(1 for r in recent if r["flag"] in ("H", "L")) / len(recent)
+            last = rows[-1]
+
+            if recent_ratio == 0:
+                bew, bew_cls = f"✅ Im Normbereich ({last['wert_norm']} {last['einheit_norm'] or ''})", "gut"
+            elif recent_ratio < 0.5:
+                bew, bew_cls = f"⚠️ Teilweise auffällig – letzter Wert: {last['wert_norm']} {last['einheit_norm'] or ''}", "warn"
+            else:
+                bew, bew_cls = f"🚨 Kritisch – letzter Wert: {last['wert_norm']} {last['einheit_norm'] or ''} (Norm: {norm})", "crit"
+
+            tests_data.append({
+                "name": test, "gruppe": gruppe,
+                "beschreibung": TEST_DESCRIPTIONS.get(test, ""),
+                "einheit": rows[0]["einheit_norm"] or "", "norm": norm,
+                "bewertung": bew, "bewertung_cls": bew_cls,
+                "empfehlung": get_test_empfehlung(test, last["wert_norm"], last["flag"], norm, conn),
+                "labels": [r["datum"] for r in rows],
+                "values": [r["wert_norm"] for r in rows],
+                "flags": [r["flag"] for r in rows],
+            })
+    finally:
+        conn.close()
+
+    # Sortierung
+    sort_keys = {
+        "datum": lambda t: t["labels"][-1] if t["labels"] else "",
+        "gruppe": lambda t: t.get("gruppe", ""),
+        "test_standard": lambda t: t["name"],
+        "wert_norm": lambda t: float(str(t["values"][-1]).replace(",", ".").replace("<", "").replace(">", "") or "0") if t["values"] else 0,
+        "flag": lambda t: t["bewertung_cls"],
+    }
+    tests_data.sort(key=sort_keys.get(sort, sort_keys["datum"]), reverse=(dir == -1))
+
+    return templates.TemplateResponse("bericht_charts.html", {
+        "request": request,
+        "now": datetime.now().strftime("%d.%m.%Y %H:%M"),
+        "period_label": PERIOD_LABELS.get(period, period),
+        "patient": PATIENT_CONFIG,
+        "tests_data": tests_data,
+        "charts_json": json.dumps(tests_data, ensure_ascii=False),
+    })
+
+
+@router.get("/bericht", response_class=HTMLResponse)
+async def bericht(request: Request, period: str = "1m"):
+    """Arztbericht als druckfertiges HTML (Tabellen-Format)."""
+    conn = get_db()
+    try:
+        query = "SELECT datum, gruppe, test_standard, wert_norm, einheit_norm, normbereich, flag FROM laborwerte WHERE flag IN ('H', 'L')"
+        query = _period_filter(query, period)
+        query += " ORDER BY gruppe, test_standard, datum DESC"
+        path_rows = conn.execute(query).fetchall()
+
+        alle_aktuell = conn.execute("""
+            SELECT l.gruppe, l.test_standard, l.wert_norm, l.einheit_norm, l.normbereich, l.flag, l.datum
+            FROM laborwerte l
+            WHERE l.datum = (SELECT MAX(l2.datum) FROM laborwerte l2 WHERE l2.test_standard = l.test_standard)
+            GROUP BY l.test_standard ORDER BY l.gruppe, l.test_standard
+        """).fetchall()
+
+        total = conn.execute("SELECT COUNT(*) FROM laborwerte").fetchone()[0]
+        path_total = conn.execute("SELECT COUNT(*) FROM laborwerte WHERE flag IN ('H','L')").fetchone()[0]
+        zeitraum = conn.execute("SELECT MIN(datum), MAX(datum) FROM laborwerte").fetchone()
+    finally:
+        conn.close()
+
+    # Gruppieren
+    gruppen_path = {}
+    for r in path_rows:
+        gruppen_path.setdefault(r["gruppe"], []).append(dict(r))
+
+    return templates.TemplateResponse("bericht_tabelle.html", {
+        "request": request,
+        "now": datetime.now().strftime("%d.%m.%Y %H:%M"),
+        "period_label": PERIOD_LABELS.get(period, period),
+        "patient": PATIENT_CONFIG,
+        "total": total, "path_total": path_total,
+        "norm_pct": round((total - path_total) / total * 100) if total > 0 else 100,
+        "zeitraum_von": zeitraum[0], "zeitraum_bis": zeitraum[1],
+        "gruppen_path": gruppen_path,
+        "alle_aktuell": [dict(r) for r in alle_aktuell],
+        "beschreibungen": TEST_DESCRIPTIONS,
+    })

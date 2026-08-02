@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Laborbericht mit Verlauf – {{ now }}</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 11px; color: #1a1a1a; margin: 1.5cm; line-height: 1.4; }
+    h1 { font-size: 18px; margin-bottom: 4px; }
+    .meta { color: #666; font-size: 10px; margin-bottom: 20px; }
+    .test-section { page-break-inside: avoid; margin-bottom: 24px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+    .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .test-name { font-size: 14px; font-weight: 700; }
+    .test-desc { font-size: 10px; color: #666; margin-bottom: 8px; }
+    .bewertung { font-size: 11px; font-weight: 500; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; display: inline-block; }
+    .bewertung.gut { background: #dcfce7; color: #166534; }
+    .bewertung.warn { background: #fef3c7; color: #92400e; }
+    .bewertung.crit { background: #fee2e2; color: #991b1b; }
+    .chart-container { height: 160px; margin: 8px 0 0 0; }
+    .stats { display: flex; gap: 16px; font-size: 10px; color: #666; margin-top: 28px; padding-top: 6px; border-top: 1px solid #eee; }
+    .print-btn { position: fixed; top: 16px; right: 16px; padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; z-index: 100; }
+    @media print {
+        body { margin: 0.5cm; font-size: 10px; }
+        .print-btn { display: none; }
+        .test-section { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; }
+        .chart-container { height: 150px; }
+    }
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">🖨️ Als PDF drucken</button>
+
+<h1>🩸 Laborbericht – Auffällige Werte mit Verlauf</h1>
+<div class="meta">
+    Patient: {{ patient.vorname }} {{ patient.nachname }} · geb. {{ patient.geburtsdatum }} · männlich<br>
+    Zeitraum: {{ period_label }} · Erstellt: {{ now }} · {{ tests_data | length }} auffällige Tests
+</div>
+
+<div id="report"></div>
+
+<script>
+const tests = {{ charts_json | safe }};
+const container = document.getElementById('report');
+
+tests.forEach((t, idx) => {
+    const values = t.values.map(v => {
+        let raw = String(v).replace(',','.').replace(/^[<>]/,'');
+        return parseFloat(raw) || null;
+    });
+
+    const section = document.createElement('div');
+    section.className = 'test-section';
+    section.innerHTML = `
+        <div class="test-header">
+            <span class="test-name">${t.name} (${t.einheit})</span>
+            <span>Norm: ${t.norm || '–'}</span>
+        </div>
+        <div class="test-desc">${t.beschreibung}</div>
+        <div class="bewertung ${t.bewertung_cls}">${t.bewertung}</div>
+        ${t.empfehlung ? '<div style="font-size:10px;color:#166534;background:#dcfce7;padding:6px 10px;border-radius:4px;margin-bottom:8px;">💡 '+t.empfehlung+'</div>' : ''}
+        <div class="chart-container"><canvas id="chart${idx}"></canvas></div>
+        <div class="stats" id="stats${idx}"></div>
+    `;
+    container.appendChild(section);
+
+    // Statistik
+    const numVals = values.filter(v => v !== null);
+    if (numVals.length > 0) {
+        const mn = Math.min(...numVals);
+        const mx = Math.max(...numVals);
+        const avg = numVals.reduce((a,b) => a+b, 0) / numVals.length;
+        const latest = numVals[numVals.length - 1];
+        const first = numVals[0];
+        const pct = first !== 0 ? ((latest - first) / first * 100).toFixed(0) : 0;
+        let trend = Math.abs(pct) < 5 ? '→ Stabil' : (pct > 0 ? '↑ +'+pct+'%' : '↓ '+pct+'%');
+        const trendColor = Math.abs(pct) < 5 ? '#059669' : (pct > 0 ? '#d97706' : '#2563eb');
+        const fy = t.labels[0] ? t.labels[0].slice(0,4) : '';
+        const ly = t.labels[t.labels.length-1] ? t.labels[t.labels.length-1].slice(0,4) : '';
+
+        document.getElementById('stats'+idx).innerHTML =
+            '<span><b>Min:</b> '+mn.toFixed(1)+' '+t.einheit+'</span>' +
+            '<span><b>Max:</b> '+mx.toFixed(1)+' '+t.einheit+'</span>' +
+            '<span><b>Ø:</b> '+avg.toFixed(1)+' '+t.einheit+'</span>' +
+            '<span><b>Aktuell:</b> '+latest.toFixed(1)+' '+t.einheit+'</span>' +
+            '<span style="color:'+trendColor+'"><b>Trend ('+fy+'→'+ly+'):</b> '+trend+'</span>';
+    }
+
+    const pointColors = t.flags.map(f => f === 'H' ? '#dc2626' : f === 'L' ? '#2563eb' : '#059669');
+
+    const datasets = [{
+        label: t.name, data: values, borderColor: '#059669',
+        backgroundColor: 'rgba(5,150,105,0.05)', fill: true, tension: 0.25,
+        pointBackgroundColor: pointColors, pointRadius: values.length > 30 ? 0 : 3, borderWidth: 1.5,
+    }];
+
+    let normMin = null, normMax = null;
+    if (t.norm) {
+        const range = t.norm.match(/^([\d.]+)\s*-\s*([\d.]+)$/);
+        if (range) { normMin = parseFloat(range[1]); normMax = parseFloat(range[2]); }
+        const lt = t.norm.match(/^[<]\s*-?\s*([\d.]+)$/);
+        if (lt) { normMax = parseFloat(lt[1]); }
+        const gt = t.norm.match(/^[>]\s*-?\s*([\d.]+)$/);
+        if (gt) { normMin = parseFloat(gt[1]); }
+        const dm = t.norm.match(/^-\s*([\d.]+)$/);
+        if (dm && !range) { normMax = parseFloat(dm[1]); }
+    }
+    if (normMax) datasets.push({ label:'Norm', data: Array(values.length).fill(normMax), borderColor:'rgba(220,38,38,0.3)', borderDash:[4,4], borderWidth:1, pointRadius:0 });
+    if (normMin) datasets.push({ label:'Norm', data: Array(values.length).fill(normMin), borderColor:'rgba(220,38,38,0.3)', borderDash:[4,4], borderWidth:1, pointRadius:0 });
+
+    new Chart(document.getElementById('chart'+idx), {
+        type: 'line', data: { labels: t.labels, datasets },
+        options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            plugins: { legend: { display: false }, title: { display: false } },
+            scales: {
+                x: { ticks: { maxTicksLimit: 8, font: { size: 9 } }, grid: { display: false } },
+                y: { ticks: { font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>

@@ -371,3 +371,18 @@ empfehlungen_tests:
   Natrium:
     bedingung: "erniedrigt"
     text: "Niedriges Natrium im Alter oft durch Medikamente (Diuretika), zu viel Wasser trinken oder SIADH. Symptome: Schwindel, Verwirrtheit. Trinkmenge und Medikamente mit Arzt prüfen."
+
+
+# Bewertungstexte – werden für Gruppen und Trends verwendet
+bewertungen:
+  gruppe:
+    gut: "Alle Werte im Normbereich – keine Auffälligkeiten."
+    gut_leicht: "Insgesamt gute Werte, vereinzelt leichte Abweichungen."
+    ok: "Einige Werte leicht außerhalb der Norm – im Auge behalten."
+    auffällig: "Mehrere Werte auffällig – beim nächsten Arztbesuch ansprechen."
+    kritisch: "Viele Werte außerhalb der Norm – ärztliche Abklärung empfohlen."
+  trend:
+    gut: "✅ Aktuell unauffällig – letzter Wert {wert} {einheit} im Normbereich."
+    auffällig: "⚠️ Teilweise auffällig – letzter Wert {wert} {einheit}{flag_text}. Beim nächsten Termin ansprechen."
+    kritisch: "🚨 Kritisch – letzter Wert {wert} {einheit}{flag_text}. Norm: {norm}. Ärztliche Abklärung empfohlen."
+    historisch: "Historisch {count}× außerhalb der Norm (von {total} Messungen)."

@@ -55,10 +55,24 @@ async def home(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
 
-# API Router
-from app.api.labor import router as labor_router  # noqa: E402
+# API Routers
+from app.api.overview import router as overview_router  # noqa: E402
+from app.api.gruppe import router as gruppe_router  # noqa: E402
+from app.api.trend import router as trend_router  # noqa: E402
+from app.api.verknuepfung import router as verknuepfung_router  # noqa: E402
+from app.api.tests_router import router as tests_router  # noqa: E402
+from app.api.kpidata import router as kpidata_router  # noqa: E402
+from app.api.bericht import router as bericht_router  # noqa: E402
+from app.api.pathologisch import router as pathologisch_router  # noqa: E402
 
-app.include_router(labor_router)
+app.include_router(overview_router)
+app.include_router(gruppe_router)
+app.include_router(trend_router)
+app.include_router(verknuepfung_router)
+app.include_router(tests_router)
+app.include_router(kpidata_router)
+app.include_router(bericht_router)
+app.include_router(pathologisch_router)
 
 
 @app.get("/api/status")
@@ -68,5 +82,5 @@ async def status():
 
 @app.get("/api/patient")
 async def patient_info():
-    from app.api.labor import PATIENT_CONFIG
+    from app.config.settings import PATIENT_CONFIG
     return PATIENT_CONFIG
