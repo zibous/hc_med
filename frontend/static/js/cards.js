@@ -186,6 +186,9 @@ export function renderCards(items, mode = "gruppe") {
           state.pathSortDir = sortDir;
           localStorage.setItem("lab_state", JSON.stringify(state));
           renderTable(data, sortCol, sortDir);
+          // Bericht-Link aktualisieren
+          const btn = document.querySelector(".report-btn");
+          if (btn) btn.href = `api/bericht/charts?period=${state.pathPeriod || 'all'}&sort=${sortCol}&dir=${sortDir}`;
         });
       });
 

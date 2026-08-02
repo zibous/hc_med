@@ -13,7 +13,7 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 │  │  Befund-TXT  │────▶│  Parser      │────▶│  SQLite (labor.db)     │   │
 │  │  PDF → Text  │     │  7 Formate   │     │  1300+ Messwerte       │   │
 │  │  hc_scale DB │     │  Validierung │     │  Normalisiert          │   │
-│  └──────────────┘     └──────────────┘     └───────────┬────────────┘   │
+│  └──────────────┘     └──────────────┘     └────────────┬───────────┘   │
 │                                                         │               │
 │                                                         ▼               │
 │                              ┌───────────────────────────────────┐      │
@@ -175,7 +175,8 @@ make jsbuild          # JS/CSS bundeln (esbuild via Docker)
 make jsclean          # Bundles entfernen
 
 # Git
-make git-update       # Commit + Push zu Forgejo
+make git-update        # Commit + Push zu Forgejo
+make git-release       # Commit + Push zu Forgejo
 ```
 
 ## Neue Befunde hinzufügen

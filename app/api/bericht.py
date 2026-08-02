@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.config.settings import PATIENT_CONFIG, TEST_DESCRIPTIONS
 from app.core.empfehlungen import get_test_empfehlung
+from app.core.vergleich import berechne_vorjahresvergleich
 from app.infrastructure.database import get_db
 
 router = APIRouter(prefix="/api", tags=["labor"])
@@ -18,6 +19,48 @@ TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "tem
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 PERIOD_LABELS = {"1m": "Letzter Monat", "6m": "Letzte 6 Monate", "1y": "Letztes Jahr", "all": "Gesamter Zeitraum"}
+
+
+def _build_zusammenfassung(tests_data: list) -> dict:
+    """Erstellt eine Zusammenfassung für den Berichtskopf."""
+    kritisch = [t for t in tests_data if t["bewertung_cls"] == "crit"]
+    auffaellig = [t for t in tests_data if t["bewertung_cls"] == "warn"]
+    gut = [t for t in tests_data if t["bewertung_cls"] == "gut"]
+
+    # Gesamtbewertung
+    if kritisch:
+        status = "kritisch"
+        status_text = "Ärztliche Besprechung empfohlen"
+        status_icon = "🚨"
+    elif auffaellig:
+        status = "auffällig"
+        status_text = "Einige Werte beobachten"
+        status_icon = "⚠️"
+    else:
+        status = "gut"
+        status_text = "Alle Werte unauffällig"
+        status_icon = "✅"
+
+    # Wichtigste Punkte (max 5)
+    punkte = []
+    for t in kritisch[:3]:
+        punkte.append(f"🚨 {t['name']}: {t['bewertung']}")
+        if t.get("empfehlung"):
+            punkte.append(f"   💡 {t['empfehlung'][:150]}")
+    for t in auffaellig[:3]:
+        if len(punkte) < 8:
+            punkte.append(f"⚠️ {t['name']}: letzter Wert {t['values'][-1]} {t['einheit']} (Norm: {t['norm']})")
+
+    return {
+        "status": status,
+        "status_text": status_text,
+        "status_icon": status_icon,
+        "kritisch_count": len(kritisch),
+        "auffaellig_count": len(auffaellig),
+        "gut_count": len(gut),
+        "total": len(tests_data),
+        "punkte": punkte,
+    }
 
 
 def _period_filter(query: str, period: str) -> str:
@@ -92,6 +135,8 @@ async def bericht_charts(request: Request, period: str = "1m", sort: str = "datu
         "patient": PATIENT_CONFIG,
         "tests_data": tests_data,
         "charts_json": json.dumps(tests_data, ensure_ascii=False),
+        "zusammenfassung": _build_zusammenfassung(tests_data),
+        "vergleich": berechne_vorjahresvergleich(get_db()),
     })
 
 

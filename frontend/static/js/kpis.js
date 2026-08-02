@@ -8,7 +8,7 @@ const BEWERTUNG_STYLES = {
   kritisch: { icon: "🚨", color: "var(--red)" },
 };
 
-export function renderKPIs(kpis, gruppen) {
+export function renderKPIs(kpis, gruppen, vergleich) {
   const el = document.getElementById("kpis");
   if (!kpis) { el.innerHTML = ""; return; }
 
@@ -76,6 +76,16 @@ export function renderKPIs(kpis, gruppen) {
       <div class="kpi-value-text" style="font-size:1.4rem">${criticalHtml}</div>
       <div class="kpi-sub">${critical.length} von ${(gruppen||[]).length} Gruppen</div>
     </div>
+    ${vergleich ? `<div class="kpi kpi-wide">
+      <div class="kpi-label">Vergleich zum Vorjahr</div>
+      <div class="kpi-value-text">
+        ${vergleich.verbessert?.length ? `<span style="color:var(--green)">↑ Verbessert (${vergleich.verbessert.length}): ${vergleich.verbessert.slice(0,4).map(v => v.test).join(', ')}</span>` : ''}
+        ${vergleich.verbessert?.length && vergleich.verschlechtert?.length ? ' · ' : ''}
+        ${vergleich.verschlechtert?.length ? `<span style="color:var(--red)">↓ Verschlechtert (${vergleich.verschlechtert.length}): ${vergleich.verschlechtert.slice(0,4).map(v => v.test).join(', ')}</span>` : ''}
+        ${!vergleich.verbessert?.length && !vergleich.verschlechtert?.length ? '<span style="color:var(--green)">→ Alle Werte stabil</span>' : ''}
+      </div>
+      <div class="kpi-sub">${vergleich.stabil_count || 0} Tests unverändert</div>
+    </div>` : ''}
   `;
 
   // Klick auf Gruppen-Links

@@ -138,6 +138,29 @@ labor-reset: ## Datenbank löschen und neu aufbauen
 labor-validate: ## Laborwerte auf Plausibilität prüfen
 	@python3 scripts/validate_labor.py
 
+labor-luecken: ## Fehlende Jahre und Jahre mit wenig Daten anzeigen
+	@echo "📊 Datenabdeckung pro Jahr:"
+	@echo ""
+	@sqlite3 -header -column $(DB_FILE) "\
+		SELECT substr(datum,1,4) AS jahr, COUNT(*) AS messwerte, \
+		       COUNT(DISTINCT test_standard) AS tests, \
+		       COUNT(DISTINCT substr(datum,1,7)) AS monate \
+		FROM laborwerte \
+		WHERE gruppe != 'Körperdaten' \
+		GROUP BY jahr ORDER BY jahr;"
+	@echo ""
+	@echo "⚠️  Fehlende oder schwache Jahre (< 20 Laborwerte):"
+	@python3 -c "\
+	import sqlite3; \
+	conn = sqlite3.connect('$(DB_FILE)'); \
+	rows = dict(conn.execute(\"SELECT substr(datum,1,4), COUNT(*) FROM laborwerte WHERE gruppe != 'Körperdaten' GROUP BY 1\").fetchall()); \
+	first = int(min(rows.keys())); last = int(max(rows.keys())); \
+	missing = [str(y) for y in range(first, last+1) if str(y) not in rows]; \
+	weak = [f'{y} ({rows[str(y)]} Werte)' for y in range(first, last+1) if str(y) in rows and rows[str(y)] < 20]; \
+	print(f'  Fehlend: {', '.join(missing) if missing else 'Keine'}'); \
+	print(f'  Wenig Daten: {', '.join(weak) if weak else 'Keine'}'); \
+	conn.close()"
+
 # ---------------------------------------------------------
 # Build (JS/CSS Bundling)
 # ---------------------------------------------------------

@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from app.config.settings import GROUP_CONFIG, GROUP_DESCRIPTIONS
+from app.core.vergleich import berechne_vorjahresvergleich
 from app.infrastructure.database import get_db
 
 router = APIRouter(prefix="/api", tags=["labor"])
@@ -70,6 +71,9 @@ async def overview():
                 "jahres_trend": [r["n"] for r in jahres_trend],
             })
 
+        # Vorjahresvergleich
+        vergleich = berechne_vorjahresvergleich(conn)
+
         return {
             "kpis": {
                 "messwerte": total,
@@ -79,6 +83,7 @@ async def overview():
                 "zeitraum_bis": zeitraum[1],
             },
             "gruppen": gruppen,
+            "vergleich": vergleich,
         }
     finally:
         conn.close()

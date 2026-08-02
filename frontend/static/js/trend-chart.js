@@ -172,16 +172,44 @@ function renderChartStats(container, values, data) {
   const latest = numericVals[numericVals.length - 1];
   const first = numericVals[0];
 
-  // Trend berechnen
+  // Trend berechnen: Durchschnitt letzte 12 Monate vs. vorherige 12 Monate
   let trendText, trendColor;
-  const diff = latest - first;
-  const pct = first !== 0 ? ((diff / first) * 100).toFixed(0) : 0;
-  if (Math.abs(pct) < 5) {
-    trendText = "→ Stabil"; trendColor = "var(--green)";
-  } else if (diff > 0) {
-    trendText = `↑ Steigend (+${pct}%)`; trendColor = "var(--orange)";
+  const trendNow = new Date();
+  const trend1yAgo = new Date(trendNow.getFullYear() - 1, trendNow.getMonth(), trendNow.getDate()).toISOString().slice(0,10);
+  const trend2yAgo = new Date(trendNow.getFullYear() - 2, trendNow.getMonth(), trendNow.getDate()).toISOString().slice(0,10);
+
+  const recentVals = [], olderVals = [];
+  data.werte.forEach((w, i) => {
+    if (values[i] === null) return;
+    if (w.datum >= trend1yAgo) recentVals.push(values[i]);
+    else if (w.datum >= trend2yAgo) olderVals.push(values[i]);
+  });
+
+  if (recentVals.length > 0 && olderVals.length > 0) {
+    const avgR = recentVals.reduce((a,b) => a+b, 0) / recentVals.length;
+    const avgO = olderVals.reduce((a,b) => a+b, 0) / olderVals.length;
+    const pct = avgO !== 0 ? ((avgR - avgO) / avgO * 100).toFixed(0) : 0;
+    // Nur farbig warnen wenn aktueller Wert auffällig ist (Flag H oder L)
+    const lastFlag = data.werte[data.werte.length-1]?.flag;
+    const isAuffaellig = lastFlag === "H" || lastFlag === "L";
+    if (Math.abs(pct) < 5) { trendText = "→ Stabil"; trendColor = "var(--green)"; }
+    else if (pct > 0) { trendText = `↑ +${pct}%`; trendColor = isAuffaellig ? "var(--orange)" : "var(--text-muted)"; }
+    else { trendText = `↓ ${pct}%`; trendColor = isAuffaellig ? "var(--accent)" : "var(--text-muted)"; }
   } else {
-    trendText = `↓ Fallend (${pct}%)`; trendColor = "var(--accent)";
+    // Nicht genug Daten für 12-Monats-Vergleich
+    if (numericVals.length < 3) {
+      trendText = "— Zu wenig Daten"; trendColor = "var(--text-muted)";
+    } else {
+      // Fallback: letzte 3 Werte vs. erste 3 Werte
+      const lastThree = numericVals.slice(-3).reduce((a,b) => a+b, 0) / 3;
+      const firstThree = numericVals.slice(0,3).reduce((a,b) => a+b, 0) / 3;
+      const pct = firstThree !== 0 ? ((lastThree - firstThree) / firstThree * 100).toFixed(0) : 0;
+      const lastFlag = data.werte[data.werte.length-1]?.flag;
+      const isAuffaellig = lastFlag === "H" || lastFlag === "L";
+      if (Math.abs(pct) < 10) { trendText = "→ Stabil"; trendColor = "var(--green)"; }
+      else if (pct > 0) { trendText = `↑ +${pct}%`; trendColor = isAuffaellig ? "var(--orange)" : "var(--text-muted)"; }
+      else { trendText = `↓ ${pct}%`; trendColor = isAuffaellig ? "var(--accent)" : "var(--text-muted)"; }
+    }
   }
 
   // Bestehende Stats entfernen
@@ -208,7 +236,7 @@ function renderChartStats(container, values, data) {
       <div class="chart-stat-value">${latest.toFixed(1)} ${data.einheit || ""}</div>
     </div>
     <div class="chart-stat">
-      <div class="chart-stat-label">Trend (${data.werte[0]?.datum?.slice(0,4)} → ${data.werte[data.werte.length-1]?.datum?.slice(0,4)})</div>
+      <div class="chart-stat-label">Trend (12 Monate)</div>
       <div class="chart-stat-value" style="color:${trendColor}">${trendText}</div>
     </div>
   `;
