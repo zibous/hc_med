@@ -1,6 +1,6 @@
 # hc_med – Laborwerte Dashboard
 
-Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extraktion aus verschiedenen Befund-Formaten, SQLite-Datenbank und interaktivem Web-Dashboard.
+Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extraktion aus verschiedenen Befund-Formaten, SQLite-Datenbank, interaktivem Web-Dashboard und druckbarem Arztbericht.
 
 ## Übersicht
 
@@ -11,27 +11,22 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 │                                                                         │
 │  ┌──────────────┐     ┌──────────────┐     ┌────────────────────────┐   │
 │  │  Befund-TXT  │────▶│  Parser      │────▶│  SQLite (labor.db)     │   │
-│  │  PDF → Text  │     │  6 Formate   │     │  629+ Messwerte        │   │
-│  │  OCR-Scans   │     │  Validierung │     │  Normalisiert          │   │
+│  │  PDF → Text  │     │  7 Formate   │     │  1300+ Messwerte       │   │
+│  │  hc_scale DB │     │  Validierung │     │  Normalisiert          │   │
 │  └──────────────┘     └──────────────┘     └───────────┬────────────┘   │
 │                                                         │               │
 │                                                         ▼               │
 │                              ┌───────────────────────────────────┐      │
 │                              │  FastAPI Backend (Port 5065)      │      │
-│                              │  /api/overview                    │      │
-│                              │  /api/gruppe/{name}               │      │
-│                              │  /api/trend/{test}                │      │
-│                              │  /api/verknuepfung/{name}         │      │
-│                              │  /api/pathologisch                │      │
-│                              │  /api/kpidata                     │      │
+│                              │  8 Router-Module (je <150 Zeilen) │      │
+│                              │  Bewertung + Empfehlungen (Core)  │      │
 │                              └───────────────┬───────────────────┘      │
 │                                              │                          │
 │                                              ▼                          │
 │                              ┌───────────────────────────────────┐      │
 │                              │  Frontend (Chart.js + ES6)        │      │
 │                              │  Übersicht → Gruppe → Trend       │      │
-│                              │  Verknüpfungen (Multi-Chart)      │      │
-│                              │  Auffällige Werte (sortierbar)    │      │
+│                              │  Verknüpfungen · Arztbericht      │      │
 │                              └───────────────────────────────────┘      │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -40,147 +35,51 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 ## Datenverarbeitung – Pipeline
 
 ```
-  data/befunde/*.txt
+  data/befunde/*.txt + hc_scale DB
         │
         ▼
 ┌───────────────────────────────────────────────────────┐
-│  1. FORMAT-ERKENNUNG (detect_format)                  │
-│                                                       │
-│  "Laborbefund vom..."  ──▶  freetext                  │
-│  "Parameter;Einheit;Referenz;18.10.13..."  ──▶ pivot  │
-│  "Tag;Test;Norm;..."  ──▶  csv                        │
-│  "Test  Norm  Erst-Wert..."  ──▶  table               │
-│  Tab + "Kürzel  Bezeichnung"  ──▶  tab                │
-│  "Kürzel Bezeichnung" (Spaces)  ──▶  kuerzel_space    │
-│  "Analyse  Ergebnis  Einheit"  ──▶  pdf_text          │
-└───────────────────────┬───────────────────────────────┘
-                        │
-                        ▼
-┌───────────────────────────────────────────────────────┐
+│  1. FORMAT-ERKENNUNG (7 Formate automatisch)          │
 │  2. PARSING (pro Format ein Parser)                   │
-│                                                       │
-│  Ergebnis pro Zeile:                                  │
-│  { Datum, Test, Wert, Einheit, Normbereich, Flag }    │
-└───────────────────────┬───────────────────────────────┘
-                        │
-                        ▼
-┌───────────────────────────────────────────────────────┐
-│  3. NORMALISIERUNG                                    │
-│                                                       │
-│  ┌─ Testname ─────────────────────────────────────┐   │
-│  │  "GOT (ASAT)" / "AST(GOT)" / "ASAT"  →  "GOT"  │   │
-│  │  "HB" / "Hämoglobin" / "HGB"  →  "Hämoglobin"  │   │
-│  │  Längster Match zuerst (spezifisch vor allg.)  │   │
-│  └────────────────────────────────────────────────┘   │
-│                                                       │
-│  ┌─ Einheiten ────────────────────────────────────┐   │
-│  │  g/L_ → g/dL (÷10)  für Hämoglobin             │   │
-│  │  L/L  → %    (×100)  für Hämatokrit            │   │
-│  │  KU/l → U/L  (×1000) für Cholinesterase        │   │
-│  │  G/L  → 10^9/L       für Leukozyten            │   │
-│  └────────────────────────────────────────────────┘   │
-│                                                       │
-│  ┌─ Korrekturen ──────────────────────────────────┐   │
-│  │  rel/abs Zuordnung anhand Einheit (% vs G/L)   │   │
-│  │  HbA1c >15 → HbA1c (IFCC) mmol/mol             │   │
-│  │  Hämoglobin pg → MCH                           │   │
-│  │  Nicht-numerische Artefakte ("1)") → filtern   │   │
-│  └────────────────────────────────────────────────┘   │
-│                                                       │
-│  ┌─ Metadaten ────────────────────────────────────┐   │
-│  │  Gruppe zuordnen (Blutbild, Niere, Lipide...)  │   │
-│  │  Alter zum Messzeitpunkt berechnen             │   │
-│  └────────────────────────────────────────────────┘   │
-└───────────────────────┬───────────────────────────────┘
-                        │
-                        ▼
-┌───────────────────────────────────────────────────────┐
-│  4. VALIDIERUNG (validate_labor.py)                   │
-│                                                       │
-│  • Plausibilitäts-Ranges pro Test (min/max)           │
-│  • Erkennung nicht-numerischer Werte                  │
-│  • Report: ✅ Plausibel / ❌ Außerhalb / ⚠️ Fehler     │
-└───────────────────────┬───────────────────────────────┘
-                        │
-                        ▼
-┌───────────────────────────────────────────────────────┐
-│  5. AUSGABE                                           │
-│                                                       │
-│  ┌─ SQLite DB (data/labor.db) ────────────────────┐   │
-│  │  patienten: Stammdaten                         │   │
-│  │  befunde: Quelldateien + Import-Metadaten      │   │
-│  │  laborwerte: Normalisierte Messwerte           │   │
-│  │  Views: v_zeitreihe, v_aktuell, v_pathologisch │   │
-│  └────────────────────────────────────────────────┘   │
-│                                                       │
-│  ┌─ CSV (data/befunde/laborwerte_gesamt.csv) ─────┐   │
-│  │  Semikolon-getrennt, für Excel/Numbers         │   │
-│  └────────────────────────────────────────────────┘   │
+│  3. NORMALISIERUNG (Testnamen, Einheiten, rel/abs)    │
+│  4. VALIDIERUNG (Plausibilitäts-Ranges)               │
+│  5. AUSGABE → SQLite + CSV                            │
 └───────────────────────────────────────────────────────┘
 ```
 
-## Dashboard – Navigation
+## App-Architektur (Clean Architecture)
 
 ```
-┌─────────────────────────────────────────────────┐
-│  ÜBERSICHT                                      │
-│  KPIs: Messwerte | Befunde | Auffällig | Zeitr. │
-│  Handlungsbedarf: [Klickbare Gruppen]           │
-│                                                 │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐          │
-│  │Blutbild │  │ Entzünd │  │  Niere  │  ...     │
-│  │ Status  │  │ Status  │  │ Status  │          │
-│  │Sparkline│  │Sparkline│  │Sparkline│          │
-│  └────┬────┘  └────┬────┘  └────┬────┘          │
-└───────┼────────────┼────────────┼───────────────┘
-        │            │            │
-        ▼            ▼            ▼
-┌─────────────────────────────────────────────────┐
-│  GRUPPE (z.B. Niere)                            │
-│  Beschreibung + KPIs (OK/Auffällig/Einschätzung)│
-│                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
-│  │Kreatinin │  │  GFR     │  │Harnstoff │       │
-│  │ 1.12     │  │  66      │  │  34      │       │
-│  │▶ Trend   │  │▶ Trend   │  │ 4 Werte  │       │
-│  └────┬─────┘  └────┬─────┘  └──────────┘       │
-└───────┼──────────────┼──────────────────────────┘
-        │              │    (< 5 Messungen:
-        ▼              ▼     inline-Anzeige)
-┌─────────────────────────────────────────────────┐
-│  TREND-CHART (z.B. GFR)                         │
-│  Beschreibung + Referenzbereich                 │
-│  Zusammenhänge: [Nierenfunktion]                │
-│                                                 │
-│  ┌─────────────────────────────────────┐        │
-│  │  Chart (Line + Norm-Band + Marker)  │        │
-│  │  ████████████████████████████████   │        │
-│  │  ─ ─ ─ Norm oben ─ ─ ─ ─ ─ ─ ─      │        │
-│  │  ─ ─ ─ Norm unten ─ ─ ─ ─ ─ ─       │        │
-│  │  ▬▬▬ KH-Aufenthalt (rot, unten)     │        │
-│  └─────────────────────────────────────┘        │
-│  Min | Max | Durchschnitt | Aktuell | Trend     │
-└─────────────────────────────────────────────────┘
-        │
-        ▼ (Klick "Zusammenhänge")
-┌─────────────────────────────────────────────────┐
-│  MULTI-CHART (z.B. Nierenfunktion)              │
-│  GFR + Kreatinin + Harnstoff übereinander       │
-│  Gemeinsame Zeitachse, Legende, 2 Y-Achsen      │
-└─────────────────────────────────────────────────┘
+app/
+├── main.py                      # FastAPI App, Logging, Lifespan, Router-Registry
+├── api/                         # Router (je ein Endpoint-Bereich)
+│   ├── overview.py              (84 Z.)  /overview
+│   ├── gruppe.py                (66 Z.)  /gruppe/{name}
+│   ├── trend.py                 (70 Z.)  /trend/{test}
+│   ├── verknuepfung.py          (56 Z.)  /verknuepfungen, /verknuepfung/{name}
+│   ├── pathologisch.py          (77 Z.)  /pathologisch
+│   ├── bericht.py               (137 Z.) /bericht, /bericht/charts
+│   ├── kpidata.py               (52 Z.)  /kpidata (für dbo)
+│   └── tests_router.py          (20 Z.)  /tests
+├── config/
+│   └── settings.py              (18 Z.)  YAML-Config laden
+├── core/                        # Business Logic
+│   ├── bewertung.py             (75 Z.)  Bewertungslogik (Texte aus YAML)
+│   └── empfehlungen.py          (233 Z.) Empfehlungslogik (Verknüpfungen)
+└── infrastructure/
+    └── database.py              (18 Z.)  SQLite-Zugriff
 ```
 
-## Projektstruktur
+## Projektstruktur (komplett)
 
 ```
 hc_med/
-├── app/
-│   ├── main.py                  # FastAPI App + Logging + Lifespan
-│   └── api/
-│       └── labor.py             # REST-Endpunkte (Overview, Trend, Verknüpfung...)
+├── app/                         # Backend (FastAPI)
 ├── frontend/
 │   ├── templates/
-│   │   └── index.html           # SPA-Shell
+│   │   ├── index.html           # Dashboard SPA-Shell
+│   │   ├── bericht_charts.html  # Arztbericht mit Charts (Jinja2)
+│   │   └── bericht_tabelle.html # Arztbericht Tabellen (Jinja2)
 │   └── static/
 │       ├── css/
 │       │   ├── theme.css        # Shared HomeApps Theme (Dark/Light)
@@ -189,86 +88,121 @@ hc_med/
 │           ├── main.js          # Entry, View-Routing, API-Calls
 │           ├── state.js         # Navigation State (localStorage)
 │           ├── kpis.js          # KPI-Kacheln
-│           ├── cards.js         # Gruppen/Test-Karten + Pathologisch-Tabelle
-│           ├── trend-chart.js   # Trend-Chart + Multi-Chart (Chart.js)
+│           ├── cards.js         # Gruppen/Test-Karten + Tabelle
+│           ├── trend-chart.js   # Trend + Multi-Chart (Chart.js)
 │           ├── breadcrumb.js    # Drill-down Navigation
 │           └── theme-init.js    # Dark/Light Toggle
 ├── scripts/
-│   ├── extract_labvalues.py     # Haupt-Parser (6 Formate + Normalisierung)
-│   ├── labor_db.py              # SQLite DB-Modul (Schema, Import, Export)
+│   ├── extract_labvalues.py     # Parser (7 Formate + Normalisierung)
+│   ├── labor_db.py              # SQLite DB-Modul (Schema, Import)
+│   ├── import_scale.py          # Körperdaten aus hc_scale
 │   └── validate_labor.py        # Plausibilitätsprüfung
 ├── data/
 │   ├── labor.db                 # SQLite Datenbank (generiert)
-│   ├── labor_config.yaml        # Gruppen, Tests, Ereignisse, Verknüpfungen
-│   └── befunde/                 # Quelldateien (*.txt, *.pdf)
+│   ├── labor_config.yaml        # Zentrale Config (Gruppen, Tests, Empfehlungen)
+│   └── befunde/                 # Quelldateien (*.txt)
 ├── docs/
-│   └── nginx_hc_med.conf        # Nginx Reverse-Proxy Config
+│   └── nginx_hc_med.conf        # Nginx Config (Auth + Proxy)
 ├── Dockerfile                   # python:3.12-slim, Port 5065
 ├── docker-compose.yml           # Host 8065 → Container 5065
-├── Makefile                     # dev, labor-reset, labor-validate, jsbuild...
+├── Makefile                     # dev, labor-reset, jsbuild...
 └── requirements.txt             # fastapi, uvicorn, jinja2, pyyaml
 ```
 
 ## Konfiguration (data/labor_config.yaml)
 
+Zentrale Konfig-Datei – alle Texte, Beschreibungen und Empfehlungen:
+
 ```yaml
-gruppen:
-  Niere:
-    icon: "💧"
-    farbe: "#06b6d4"
-    beschreibung: "Die Nieren filtern Abfallstoffe..."
-
-tests:
-  GFR: "Glomeruläre Filtrationsrate – zeigt wie gut die Nieren filtern."
-
-ereignisse:
-  - von: "2018-01-26"
-    bis: "2018-03-01"
-    label: "KH Feldkirch"
-    typ: "krankenhaus"
-    farbe: "#ef4444"
-
-verknuepfungen:
-  - name: "Nierenfunktion"
-    beschreibung: "GFR wird aus Kreatinin berechnet."
-    tests: ["GFR", "Kreatinin", "Harnstoff"]
+patient:                    # Stammdaten
+gruppen:                    # Gruppen-Icons, Farben, Beschreibungen
+tests:                      # Test-Beschreibungen (Alter/Geschlecht-Kontext)
+ereignisse:                 # KH-Aufenthalte (Marker im Chart)
+verknuepfungen:             # Zusammenhänge zwischen Tests
+empfehlungen_tests:         # Test-spezifische Empfehlungen
+bewertungen:                # Bewertungstexte (Gruppe + Trend)
 ```
 
-## Befund-Formate (automatisch erkannt)
+## Dashboard – Navigation
 
-| Format | Beispiel | Erkennung |
-|--------|----------|-----------|
-| **freetext** | KH-Befunde 2018, 2024, 2026 | "Laborbefund vom DD.MM.YYYY" |
-| **pivot** | laborwerte_2013-2029.txt | "Parameter;Einheit;Referenz;DD.MM.YY;..." |
-| **csv** | 2025-01-06 Laborbefund.txt | "Tag;Test;Norm;Erst-Wert;..." |
-| **table** | 2024-12-06 | "Test  Norm  Erst-Wert  ...  Einheit" |
-| **tab** | Arztpraxis Zünd (2025-07) | Tab + "Kürzel\tBezeichnung\tWert" |
-| **kuerzel_space** | OCR-Scans 2019 | "KREA Kreatinin 1.01 mg/dl" |
-| **pdf_text** | Aus PDF extrahiert | "Analyse  Ergebnis  Einheit  Referenz" |
+```
+ÜBERSICHT (KPIs + Gruppen sortiert nach Status)
+    │
+    ├── Klick Gruppe ──▶ GRUPPEN-DETAIL (Tests mit Sparklines, Bewertung)
+    │       │
+    │       └── Klick Test ──▶ TREND-CHART (Norm-Band, Marker, Empfehlung)
+    │               │
+    │               └── Klick Zusammenhang ──▶ MULTI-CHART (mehrere Tests)
+    │
+    ├── Klick "Auffällige Werte" ──▶ TABELLE (sortierbar, filterbar)
+    │       │
+    │       └── Klick Zeile ──▶ TREND-CHART
+    │
+    └── Klick "Bericht drucken" ──▶ ARZTBERICHT (HTML/PDF mit Charts)
+```
+
+## Features
+
+- **7 Befund-Formate** automatisch erkannt und geparst
+- **Körperdaten** aus Mi Scale Waage (hc_scale Integration)
+- **Normalisierung** (Testnamen, Einheiten, HbA1c NGSP/IFCC)
+- **Validierung** mit medizinischen Plausibilitäts-Ranges
+- **Bewertung** aktuell (letzte 5 Werte) + historisch
+- **Alters-/Geschlechtskontext** in allen Beschreibungen (Mann, 70+)
+- **Verknüpfungen** mit Multi-Charts und personalisierten Empfehlungen
+- **Krankenhaus-Marker** im Verlaufs-Chart
+- **Druckbarer Arztbericht** (PDF via Browser-Druckdialog)
+- **KPI-Integration** ins übergeordnete DBO-Dashboard
+- **Dark/Light Theme** (shared mit allen HomeApps Dashboards)
+- **State-Persistenz** (Refresh behält aktuelle View)
+- **Nginx Auth** (extern: Basic Auth, LAN: offen, DBO: offen)
 
 ## Makefile-Befehle
 
 ```bash
-make dev              # Server starten (uvicorn, Port 5065)
-make labor-reset      # DB löschen + neu importieren + validieren
-make labor-validate   # Plausibilitätsprüfung
-make labor-trend TEST=CRP  # Trend im Terminal anzeigen
-make labor-stats      # Statistik-Übersicht
+# Server
+make dev              # Uvicorn starten (Port 5065, --reload)
 make up               # Docker Container starten
 make restart          # Docker Container neustarten
+
+# Daten
+make labor-reset      # DB löschen + Befunde parsen + Scale-Import + Validierung
+make labor-validate   # Nur Plausibilitätsprüfung
+make labor-trend TEST=CRP  # Trend im Terminal
+
+# Build
 make jsbuild          # JS/CSS bundeln (esbuild via Docker)
+make jsclean          # Bundles entfernen
+
+# Git
+make git-update       # Commit + Push zu Forgejo
 ```
 
 ## Neue Befunde hinzufügen
 
-1. Textdatei in `data/befunde/` ablegen
-2. Format: Eines der 7 erkannten Formate (oder Freitext bereinigen)
-3. `make labor-reset` auf dem Server ausführen
-4. Dashboard zeigt neue Werte automatisch
+1. Textdatei in `data/befunde/` ablegen (Format: `YYYY-MM-DD_laborbefund_quelle.txt`)
+2. Auf dem Server: `make labor-reset`
+3. Dashboard zeigt neue Werte automatisch
+
+## Nginx (extern + Auth)
+
+```bash
+# Passwort-Datei erstellen
+printf "%s\n%s\n" \
+  "peter:$(openssl passwd -apr1 'passwort1')" \
+  "reni:$(openssl passwd -apr1 'passwort2')" \
+  | sudo tee nginx/includes/.htpasswd_hcmed
+
+# Config: siehe docs/nginx_hc_med.conf
+# LAN (10.1.1.x): kein Login
+# Extern: Basic Auth
+# /api/kpidata: immer offen (für DBO)
+```
 
 ## Technologie
 
-- **Backend**: Python 3.12, FastAPI, SQLite, Jinja2
+- **Backend**: Python 3.12, FastAPI, SQLite, Jinja2, PyYAML
 - **Frontend**: Vanilla JS (ES6 Modules), Chart.js, CSS Custom Properties
-- **Theme**: HomeApps Unified Theme (Dark/Light, shared mit allen Dashboards)
-- **Deploy**: Docker oder direkt uvicorn, Nginx Reverse-Proxy
+- **Theme**: HomeApps Unified Theme (Dark/Light)
+- **Deploy**: Docker oder direkt Uvicorn, Nginx Reverse-Proxy
+- **Daten**: hc_scale (Waage), Laborbefund-Textdateien (7 Formate)
