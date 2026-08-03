@@ -173,6 +173,8 @@ jsbuild: ## 🔧 Komprimiert JS und CSS parallel über Docker – maximal optimi
 		npx esbuild frontend/static/css/style.css --bundle --minify --sourcemap --outfile=frontend/static/css/style.bundle.css"
 	@echo "✅ Fertig!"
 
+deploy: jsbuild restart ## 🚀 Build + Restart in einem Schritt
+
 jsclean: ## 🔧 Komprimiert JS und CSS entfernen
 	@echo "🧼 Bereinige produktive Build-Dateien..."
 	@rm -f frontend/static/js/main.bundle.js

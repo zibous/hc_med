@@ -169,6 +169,12 @@ tests:
   aPTT: "Gerinnungszeit (innerer Weg). Altersunabhängig. Normal: 23–35 Sekunden."
   # Schilddrüse
   TSH: "Schilddrüsen-Steuerhormon. Im Alter leicht höher (bis 4.5 bei 60+). Hoch = Unterfunktion (müde, kalt)."
+  T3 Frei: "Freies Trijodthyronin – aktives Schilddrüsenhormon. Reguliert Stoffwechsel und Energieverbrauch."
+  T4 Frei: "Freies Thyroxin – Speicherform des Schilddrüsenhormons. Wird bei Bedarf in T3 umgewandelt."
+  Calcitonin: "Aus der Schilddrüse – senkt den Calciumspiegel. Tumormarker für medulläres Schilddrüsenkarzinom."
+  PTH: "Parathormon – reguliert Calcium und Phosphat. Hoch = Nebenschilddrüsen-Überfunktion oder Vitamin-D-Mangel."
+  TG-AK: "Thyreoglobulin-Antikörper – erhöht bei Autoimmunerkrankungen der Schilddrüse (Hashimoto, M. Basedow)."
+  TPO-AK: "Thyreoperoxidase-Antikörper – spezifischster Marker für Hashimoto-Thyreoiditis."
   # Tumor-Marker
   PSA: "Prostata-spezifisches Antigen. Nur bei Männern relevant. Altersabhängig: 60–69 Jahre: <4.0 normal. Steigt auch bei gutartiger Vergrößerung."
   # Autoimmun
@@ -292,45 +298,6 @@ verknuepfungen:
 
 
 # Test-spezifische Empfehlungen bei auffälligen Werten
-# "erhöht" = Flag H, "erniedrigt" = Flag L
-# Dynamische Empfehlungen (mit Berechnungen) bleiben im Python-Code
-empfehlungen_tests:
-  Triglyceride:
-    erhöht: "Maßnahmen: 1) Alkohol meiden, 2) Zucker/Weißmehl reduzieren, 3) Omega-3 Fettsäuren (2g/Tag oder fetter Fisch 3×/Woche), 4) Ausdauersport (senkt Triglyceride um 20-30%). Kontrolle in 3 Monaten."
-  Leukozyten:
-    erhöht: "Dauerhaft erhöht. Mögliche Ursachen: chronische Entzündung, Rauchen, Stress, Medikamente. CRP und Differentialblutbild mit Arzt besprechen."
-  GFR:
-    erniedrigt: "Bei Alter 70 grenzwertig. Empfehlung: viel trinken (2L/Tag), Blutdruck kontrollieren, Eiweiß nicht übertreiben. Kontrolle alle 6 Monate."
-  CRP:
-    erhöht: "Falls kein akuter Infekt: chronische Ursachen prüfen (Viszeralfett, Autoimmun, Zähne). Bei KH-Aufenthalt erwartbar erhöht."
-  HbA1c:
-    erhöht: "Zeigt Prä-Diabetes. Maßnahmen: Zucker/Weißmehl reduzieren, nach Mahlzeiten 15min Spaziergang, Gewicht halten. Kontrolle in 3 Monaten."
-  HbA1c (IFCC):
-    erhöht: "Zeigt Prä-Diabetes (IFCC-Einheit). Gleichbedeutend mit HbA1c >5.7%. Lebensstil-Maßnahmen können Wert senken."
-  Harnsäure:
-    erhöht: "Gichtrisiko. Weniger Fleisch/Innereien/Hülsenfrüchte, viel Wasser trinken (2.5L), Alkohol (v.a. Bier) meiden."
-  Glucose:
-    erhöht: "Nüchternwert erhöht. Mögliche Ursachen: Prä-Diabetes, Stress, Medikamente. HbA1c zur Bestätigung prüfen."
-  Hämoglobin:
-    erniedrigt: "Blutarmut. Ursachen abklären: Eisenmangel, Blutung, Vitaminmangel (B12/Folsäure), chronische Erkrankung."
-  Hämatokrit:
-    erniedrigt: "Kann auf Blutarmut oder Überwässerung hindeuten. Zusammen mit Hämoglobin und Erythrozyten bewerten."
-  Thrombozyten:
-    erniedrigt: "Niedrige Blutplättchen. Bei <100: Blutungsrisiko prüfen. Mögliche Ursachen: Medikamente, Lebererkrankung, Autoimmun."
-  Quick:
-    erhöht: ">120% ist kein Problem – zeigt schnelle Gerinnung. Nur bei Blutverdünner-Therapie relevant (dann wäre es zu schnell)."
-  Kalium:
-    erhöht: "Gefährlich für das Herz. Kaliumreiche Lebensmittel reduzieren (Bananen, Nüsse, Trockenfrüchte). Nierenfunktion prüfen."
-    erniedrigt: "Kann Herzrhythmusstörungen verursachen. Kaliumreiche Ernährung, Medikamenten-Check (Diuretika?)."
-  Natrium:
-    erniedrigt: "Hyponatriämie – häufig bei älteren Patienten durch Medikamente oder zu viel Wasser. Trinkmenge und Medikamente prüfen."
-  Bilirubin:
-    erhöht: "Leicht erhöht ist oft harmlos (Gilbert-Syndrom bei 5-10% der Bevölkerung). Bei Gelbfärbung der Augen: Leber/Galle abklären."
-  PSA:
-    erhöht: "Erhöhter PSA muss nicht Krebs bedeuten. Auch gutartige Vergrößerung, Entzündung oder Radfahren können PSA erhöhen. Urologe konsultieren."
-
-
-# Test-spezifische Empfehlungen bei auffälligen Werten
 # Werden in der Trend-Ansicht und im Bericht angezeigt
 # "dynamisch: true" bedeutet der Code berechnet zusätzlich mit aktuellen Werten
 empfehlungen_tests:
@@ -349,7 +316,7 @@ empfehlungen_tests:
     text: "Bei Alter 70 ist leichte GFR-Einschränkung häufig. Maßnahmen: viel trinken (2L/Tag), Blutdruck gut einstellen, Eiweiß nicht übertreiben (0.8-1.0g/kg), nephrotoxische Medikamente meiden. Kontrolle alle 6 Monate."
   CRP:
     bedingung: "erhöht"
-    text: "Falls kein akuter Infekt vorliegt: chronische Ursachen prüfen – Viszeralfett, Zahnfleischentzündung, Autoimmunprozesse. Bei Krankenhausaufenthalt ist erhöhtes CRP erwartbar und normalisiert sich meist in 2-4 Wochen."
+    text: "Falls kein akuter Infekt vorliegt: chronische Ursachen prüfen – Viszeralfett, Zahnfleischentzündung, Autoimmunprozesse."
   HbA1c:
     bedingung: "erhöht"
     text: "Zeigt Prä-Diabetes. Maßnahmen: Zucker und Weißmehl reduzieren, nach jeder Mahlzeit 15min bewegen (Spaziergang), Gewicht halten/reduzieren. Kontrolle in 3 Monaten. Bei >6.5% Diabetes-Diagnose möglich."
@@ -370,10 +337,22 @@ empfehlungen_tests:
     text: "Niedriger Hämatokrit deutet auf Verdünnung oder Blutarmut. Zusammen mit Hämoglobin und Erythrozyten beurteilen. Bei KH-Aufenthalt häufig durch Infusionen bedingt."
   Kalium:
     bedingung: "erhöht"
-    text: "Erhöhtes Kalium kann gefährlich sein (Herzrhythmusstörungen). Häufige Ursachen: Nierenschwäche, ACE-Hemmer/Sartane, kaliumreiche Ernährung. EKG und Nierenwerte kontrollieren."
+    text: "Erhöhtes Kalium kann gefährlich sein (Herzrhythmusstörungen). Häufige Ursachen: Nierenschwäche, ACE-Hemmer/Sartane, kaliumreiche Ernährung. EKG und Nierenwerte kontrollieren. Hinweis: Auch erniedrigtes Kalium ist gefährlich (Diuretika?) – kaliumreiche Ernährung dann wichtig."
   Natrium:
     bedingung: "erniedrigt"
     text: "Niedriges Natrium im Alter oft durch Medikamente (Diuretika), zu viel Wasser trinken oder SIADH. Symptome: Schwindel, Verwirrtheit. Trinkmenge und Medikamente mit Arzt prüfen."
+  HbA1c (IFCC):
+    bedingung: "erhöht"
+    text: "Zeigt Prä-Diabetes (IFCC-Einheit). Gleichbedeutend mit HbA1c >5.7%. Lebensstil-Maßnahmen (Zucker reduzieren, Bewegung) können den Wert senken."
+  Glucose:
+    bedingung: "erhöht"
+    text: "Nüchternwert erhöht. Mögliche Ursachen: Prä-Diabetes, Stress, Medikamente (z.B. Cortison). HbA1c zur Bestätigung prüfen. Bei >126 mg/dL Diabetes-Diagnose möglich."
+  Bilirubin:
+    bedingung: "erhöht"
+    text: "Leicht erhöht ist oft harmlos (Gilbert-Syndrom bei 5-10% der Bevölkerung). Bei Gelbfärbung der Augen oder Haut: Leber/Galle abklären."
+  PSA:
+    bedingung: "erhöht"
+    text: "Erhöhter PSA muss nicht Krebs bedeuten. Auch gutartige Prostatavergrößerung, Entzündung oder Radfahren können PSA erhöhen. Urologe konsultieren, Verlauf wichtiger als Einzelwert."
 
 
 # Bewertungstexte – werden für Gruppen und Trends verwendet
@@ -418,6 +397,12 @@ kurznamen:
   Quick: "Gerinnungswert"
   INR: "Gerinnungswert"
   TSH: "Schilddrüse"
+  T3 Frei: "Aktives SD-Hormon"
+  T4 Frei: "SD-Hormon (Speicher)"
+  Calcitonin: "Calcium-Regulation"
+  PTH: "Nebenschilddrüse"
+  TG-AK: "SD-Antikörper"
+  TPO-AK: "Hashimoto-Marker"
   PSA: "Prostata-Wert"
   Natrium: "Mineralstoff"
   Kalium: "Herzrhythmus-Mineral"

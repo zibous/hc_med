@@ -70,6 +70,7 @@ body {
 .kpi-value-text { font-size: 1.4rem; font-weight: 600; line-height: 1.5; }
 .kpi-sub { font-size: 1.1rem; color: var(--text-muted); margin-top: .3rem; }
 .kpi-wide { grid-column: 1 / -1; }
+.kpi-half { grid-column: span 2; }
 .kpi-value.blue { color: var(--accent); }
 .kpi-value.green { color: var(--green); }
 .kpi-value.red { color: var(--red); }
@@ -265,11 +266,118 @@ body {
 }
 .print-btn:hover { background: var(--accent); color: #fff; }
 
+/* Favoriten-Stern */
+.fav-star {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer; padding: .2rem;
+  border-radius: 4px; transition: transform .15s ease;
+  vertical-align: middle; margin-right: .3rem;
+}
+.fav-star:hover { transform: scale(1.25); }
+.fav-star.active svg { filter: drop-shadow(0 0 3px rgba(245,158,11,.4)); }
+.trend-star-row { display: inline-flex; align-items: center; margin-right: .4rem; vertical-align: middle; }
+
+/* Gefäß-Score Card (Apple Health Style) */
+.gefaess-score-card {
+  padding: 1.4rem; border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--border);
+  margin-bottom: 1.2rem;
+}
+.score-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: .8rem;
+}
+.score-label { font-size: 1.2rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+.score-value { font-size: 2.2rem; font-weight: 800; }
+.score-bar {
+  display: flex; gap: 4px; margin-bottom: .6rem; height: 10px;
+}
+.score-seg {
+  flex: 1; border-radius: 5px; transition: background .3s;
+}
+.score-seg.filled { background: var(--red); }
+.score-seg.empty { background: rgba(128,128,128,.15); }
+.score-status { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
+.score-faktoren { display: flex; flex-direction: column; gap: .5rem; }
+.score-faktor {
+  display: flex; align-items: center; gap: .8rem;
+  font-size: 1.15rem; padding: .4rem .6rem; border-radius: 6px;
+}
+.score-faktor.aktiv { background: rgba(239,68,68,.06); }
+.score-faktor-name { flex: 1; color: var(--text-muted); }
+.score-faktor.aktiv .score-faktor-name { color: var(--red); font-weight: 600; }
+.score-faktor-wert { font-weight: 600; min-width: 4rem; text-align: right; }
+.score-faktor.aktiv .score-faktor-wert { color: var(--red); }
+.score-faktor-dots { display: flex; gap: 3px; }
+.score-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(128,128,128,.2);
+}
+.score-dot.active { background: var(--red); }
+
+/* Vergleich Pivot-Tabelle */
+.vgl-table {
+  width: 100%; border-collapse: collapse; font-size: 1.25rem;
+}
+.vgl-table th {
+  text-align: left; padding: .8rem 1rem; border-bottom: 2px solid var(--border);
+  font-weight: 700; color: var(--text-muted); font-size: 1.15rem;
+  white-space: nowrap;
+}
+.vgl-table td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); }
+.vgl-row:hover { background: rgba(128,128,128,.06); }
+.vgl-gruppe { font-size: 1.15rem; white-space: nowrap; }
+.vgl-test { min-width: 10rem; }
+.vgl-aktuell { font-size: 1.3rem; white-space: nowrap; }
+.vgl-aktuell.high { color: var(--red); }
+.vgl-aktuell.low { color: var(--accent); }
+.vgl-cell { white-space: nowrap; font-size: 1.2rem; }
+.vgl-cell.empty { color: var(--text-muted); }
+.vgl-cell.verschlechtert, .vgl-cell.neu_auffällig { background: rgba(239,68,68,.06); }
+.vgl-cell.verbessert, .vgl-cell.normalisiert { background: rgba(16,185,129,.06); }
+.vgl-wert { margin-right: .3rem; }
+.vgl-flag { font-weight: 700; margin-right: .2rem; }
+.vgl-pct { font-size: 1.05rem; opacity: .7; margin-right: .3rem; }
+.vgl-icon { font-weight: 700; }
+.vgl-legende {
+  display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+  font-size: 1.2rem; padding: .6rem 0;
+}
+
+/* Favoriten-Karte (Startseite) */
+.favoriten-karte {
+  padding: 1.6rem; border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  box-shadow: var(--shadow-sm); margin-bottom: 2rem;
+}
+.fav-karte-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1rem;
+}
+.fav-karte-title { font-size: 1.5rem; font-weight: 700; }
+.fav-karte-count { font-size: 1.2rem; color: var(--text-muted); }
+.fav-items {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: .8rem;
+}
+.fav-item {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .8rem 1.2rem; border-radius: 8px;
+  background: rgba(128,128,128,.04); transition: background .15s;
+}
+.fav-item:hover { background: rgba(128,128,128,.1); }
+.fav-test { font-size: 1.3rem; font-weight: 600; flex: 1; }
+.fav-wert { font-size: 1.4rem; font-weight: 700; }
+.fav-wert.high { color: var(--red); }
+.fav-wert.low { color: var(--accent); }
+.fav-einheit { font-size: 1.15rem; color: var(--text-muted); }
+
 /* Print Styles */
 @media print {
   @page { margin: 1.5cm; }
   body { background: #fff !important; color: #000 !important; font-size: 11pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .header, .footer, .breadcrumb-row, .help-btn, .print-btn { display: none !important; }
+  .header, .footer, .breadcrumb-row, .help-btn, .print-btn, .favoriten-karte { display: none !important; }
   .container { padding: 0 !important; }
 
   /* Print Header – wird per JS eingefügt */
@@ -295,4 +403,14 @@ body {
   .empfehlung-box { color: #1e293b !important; border-color: #059669 !important; background: #f0fdf4 !important; font-size: 10pt; }
   .empfehlung-liste li { color: #1e293b; margin-bottom: .3rem; }
   .view-description { color: #374151 !important; font-size: 10pt; }
+
+  /* Vergleich-Tabelle Print */
+  .vgl-table { font-size: 9pt; }
+  .vgl-table th { font-size: 8pt; padding: .4rem .5rem; }
+  .vgl-table td { padding: .4rem .5rem; }
+  .vgl-legende { font-size: 8pt; margin-bottom: .8rem; }
+  .path-list, .cards { background: #fff !important; box-shadow: none !important; }
+  .vgl-cell.verschlechtert, .vgl-cell.neu_auffällig { background: #fef2f2 !important; }
+  .vgl-cell.verbessert, .vgl-cell.normalisiert { background: #f0fdf4 !important; }
+  .vgl-row:hover { background: none !important; }
 }

@@ -25,7 +25,7 @@ const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matc
 if (savedTheme) {
   setTheme(savedTheme);
 } else {
-  setTheme(systemPrefersDark ? 'dark' : 'light');
+  setTheme('dark');
 }
 
 // 2. EVENT-DELEGATION (Fängt den Klick ab, sobald das Element im Footer existiert)

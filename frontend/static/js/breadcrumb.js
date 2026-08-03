@@ -8,8 +8,20 @@ export function renderBreadcrumb() {
   if (state.view === "pathologisch") {
     crumbs.push({ label: "⚠️ Auffällige Werte", view: "pathologisch" });
   }
+  if (state.view === "vergleich") {
+    crumbs.push({ label: "📊 Mehrjahresvergleich", view: "vergleich" });
+  }
+  if (state.view === "favoriten") {
+    crumbs.push({ label: "⭐ Favoriten", view: "favoriten" });
+  }
   if (state.view === "trend" && state.fromPath === "pathologisch") {
     crumbs.push({ label: "⚠️ Auffällige Werte", view: "pathologisch" });
+  }
+  if (state.view === "trend" && state.fromPath === "vergleich") {
+    crumbs.push({ label: "📊 Mehrjahresvergleich", view: "vergleich" });
+  }
+  if (state.view === "trend" && state.fromPath === "favoriten") {
+    crumbs.push({ label: "⭐ Favoriten", view: "favoriten" });
   }
   if (state.gruppe && state.view !== "pathologisch") {
     crumbs.push({ label: state.gruppe, view: "gruppe", params: { gruppe: state.gruppe } });

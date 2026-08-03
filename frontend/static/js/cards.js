@@ -1,5 +1,6 @@
 // cards.js – Gruppen- und Test-Karten rendern
 import { state, navigate } from "./state.js";
+import { starIconHtml, bindStarHandlers } from "./favoriten.js";
 
 const GROUP_ICONS = {
   Blutbild: "🩸", Differentialblutbild: "🔬", Entzündung: "🔥",
@@ -223,16 +224,24 @@ export function renderCards(items, mode = "gruppe") {
       const total = data.werte.length;
       const pathRatio = (highCount + lowCount) / total;
 
-      // Aktueller Status: basierend auf den letzten 5 Werten
-      const recent = data.werte.slice(-5);
-      const recentHigh = recent.filter(w => w.flag === "H").length;
-      const recentLow = recent.filter(w => w.flag === "L").length;
-      const recentPath = (recentHigh + recentLow) / recent.length;
-      const status = recentPath === 0 ? "gut" : recentPath < 0.3 ? "ok" : recentPath < 0.6 ? "auffällig" : "kritisch";
+      // Aktueller Status: primär am letzten Wert orientiert
+      const last = data.werte[data.werte.length - 1];
+      const lastFlag = last?.flag || "";
+      let status;
+      if (!lastFlag) {
+        // Letzter Wert OK – letzte 3 prüfen für Stabilität
+        const recent3 = data.werte.slice(-3);
+        const r3Path = recent3.filter(w => w.flag === "H" || w.flag === "L").length;
+        status = r3Path === 0 ? "gut" : "ok";
+      } else {
+        // Letzter Wert auffällig – letzte 3 prüfen für Schwere
+        const recent3 = data.werte.slice(-3);
+        const r3Path = recent3.filter(w => w.flag === "H" || w.flag === "L").length;
+        status = r3Path >= 3 ? "kritisch" : r3Path >= 2 ? "auffällig" : "auffällig";
+      }
 
       // Historischer Hinweis
-      const histRatio = pathRatio;
-      const histHint = (histRatio > 0.15 && status === "gut") ? "Früher auffällig" : "";
+      const histHint = (pathRatio > 0.15 && status === "gut") ? "Früher auffällig" : "";
 
       return { name, data, status, highCount, lowCount, total, histHint };
     });
@@ -279,7 +288,7 @@ export function renderCards(items, mode = "gruppe") {
       html += `
         <div class="card ${canDrill ? '' : 'no-drill'}" data-test="${name}" data-can-drill="${canDrill}">
           <div class="card-header-row">
-            <div class="card-title">${name}</div>
+            <div class="card-title">${starIconHtml(name)} ${name}</div>
             <span class="status-pill" style="background:${st.bg};color:${st.color}">${st.label}</span>
           </div>
           ${data.kurzname ? `<div class="card-kurzname">${data.kurzname}</div>` : ''}
@@ -305,6 +314,9 @@ export function renderCards(items, mode = "gruppe") {
     });
 
     el.innerHTML = html;
+
+    // Favoriten-Sterne Handler
+    bindStarHandlers(el);
 
     el.querySelectorAll(".card[data-can-drill='true']").forEach(card => {
       card.addEventListener("click", () => navigate("trend", { test: card.dataset.test, gruppe: state.gruppe }));

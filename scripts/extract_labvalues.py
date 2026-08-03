@@ -107,6 +107,7 @@ TEST_ALIASES: dict[str, str] = {
     "alt(gpt)": "GPT",
     "ggt": "GGT",
     "gamma-gt": "GGT",
+    "gamma-glutaminyltransferase": "GGT",
     "ggt-37": "GGT",
     "alk.phos.": "Alk. Phosphatase",
     "alk.phosphatase (ap)": "Alk. Phosphatase",
@@ -178,6 +179,8 @@ TEST_ALIASES: dict[str, str] = {
     "anti-ccp": "Anti-CCP",
     "anti-cardiolipin ak (aca)": "Anti-Cardiolipin",
     "anti-ß2-glycoprotein ak": "Anti-β2-Glycoprotein",
+    "la-screen": "La-Screen",
+    "la-confirm": "La-Confirm",
 }
 
 
@@ -948,6 +951,13 @@ GROUP_RULES: list[tuple[str, str]] = [
     ("aptt", "Gerinnung"),
     # Schilddrüse
     ("tsh", "Schilddrüse"),
+    ("t3", "Schilddrüse"),
+    ("t4", "Schilddrüse"),
+    ("calcitonin", "Schilddrüse"),
+    ("pth", "Schilddrüse"),
+    ("tg-ak", "Schilddrüse"),
+    ("tpo-ak", "Schilddrüse"),
+    ("thyreoglobulin", "Schilddrüse"),
     # Tumor-Marker
     ("psa", "Tumor-Marker"),
     # Autoimmun
@@ -958,11 +968,15 @@ GROUP_RULES: list[tuple[str, str]] = [
     ("rheumafaktor", "Autoimmun"),
     ("ana ", "Autoimmun"),
     ("anca", "Autoimmun"),
-    # Sonstige
-    ("myoglobin", "Sonstige"),
+    ("la-screen", "Autoimmun"),
+    ("la-confirm", "Autoimmun"),
+    ("lupus", "Autoimmun"),
+    # Sonstige / Spezial
+    ("myoglobin", "Blutbild"),
     ("eisen", "Blutbild"),
     ("ferritin", "Blutbild"),
     ("senkung", "Entzündung"),
+    ("gamma-glutamyl", "Leber"),
     ("testosteron", "Hormone"),
     ("peroxide", "Sonstige"),
     ("antioxid", "Sonstige"),
@@ -1065,10 +1079,63 @@ def calculate_age_at_date(measurement_date: str) -> int | None:
         return None
 
 
+def parse_simple_csv(filepath: Path) -> list[dict]:
+    """Parse das einfache CSV-Format (Vorlage für Numbers/Excel).
+
+    Header: Gruppe;Test;Wert;Einheit;Normbereich;Flag
+    Datum wird aus dem Dateinamen extrahiert (YYYY-MM-DD_...).
+    Leere Wert-Felder werden übersprungen.
+    """
+    results = []
+    text = filepath.read_text(encoding="utf-8", errors="replace")
+
+    # Datum aus Dateinamen
+    date_match = re.search(r"(\d{4})-(\d{2})-(\d{2})", filepath.name)
+    if not date_match:
+        return results
+    file_date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
+
+    lines = text.splitlines()
+    for line in lines:
+        line = line.strip()
+        # Header und leere Zeilen überspringen
+        if not line or line.startswith("Gruppe;Test") or line.startswith("#"):
+            continue
+
+        parts = line.split(";")
+        if len(parts) < 3:
+            continue
+
+        test = parts[1].strip() if len(parts) > 1 else ""
+        wert = parts[2].strip() if len(parts) > 2 else ""
+        einheit = parts[3].strip() if len(parts) > 3 else ""
+        norm = parts[4].strip() if len(parts) > 4 else ""
+        flag = parts[5].strip() if len(parts) > 5 else ""
+
+        # Leere Werte überspringen
+        if not wert or not test:
+            continue
+
+        results.append({
+            "Datum": file_date,
+            "Test": test,
+            "Wert": wert.replace(",", "."),
+            "Einheit": einheit,
+            "Normbereich": norm,
+            "Flag": flag,
+        })
+
+    return results
+
+
 def detect_format(filepath: Path) -> str:
     """Erkennt das Format einer Befund-Datei."""
     text = filepath.read_text(encoding="utf-8", errors="replace")
     first_lines = text[:500]
+
+    # Einfaches CSV-Format (Vorlage): "Gruppe;Test;Wert;Einheit;Normbereich;Flag"
+    if first_lines.startswith("Gruppe;Test;Wert"):
+        return "simple_csv"
 
     # Pivot-Format: Header beginnt mit "Parameter;Einheit;Referenz;" gefolgt von Datumsspalten
     if first_lines.startswith("Parameter;") and "Referenz" in first_lines:
@@ -1105,7 +1172,9 @@ def main():
     all_results: list[dict] = []
     file_results: list[tuple[str, str, list[dict]]] = []  # (filename, format, results)
 
-    txt_files = sorted(BEFUNDE_DIR.glob("*.txt"))
+    txt_files = sorted(BEFUNDE_DIR.glob("*.txt")) + sorted(BEFUNDE_DIR.glob("*.csv"))
+    # Output-Datei und Vorlage ausschließen
+    txt_files = [f for f in txt_files if f.name not in ("laborwerte_gesamt.csv", "VORLAGE_laborbefund.csv")]
 
     if not txt_files:
         print(f"Keine .txt-Dateien gefunden in {BEFUNDE_DIR}")
@@ -1115,7 +1184,9 @@ def main():
         fmt = detect_format(filepath)
         print(f"  {filepath.name} -> Format: {fmt}")
 
-        if fmt == "csv":
+        if fmt == "simple_csv":
+            results = parse_simple_csv(filepath)
+        elif fmt == "csv":
             results = parse_csv_format(filepath)
         elif fmt == "pivot":
             results = parse_pivot_format(filepath)
@@ -1297,6 +1368,16 @@ def main():
     print("\n  Gruppen-Verteilung:")
     for group, count in sorted(groups.items()):
         print(f"    {group}: {count}")
+
+    # Warnung: Tests die in "Sonstige" gelandet sind (fehlende Gruppen-Zuordnung)
+    sonstige_tests = sorted(set(
+        r["Test_Standard"] for r in all_results if r["Gruppe"] == "Sonstige"
+    ))
+    if sonstige_tests:
+        print(f"\n  ⚠️  Ohne Gruppen-Zuordnung → 'Sonstige' ({len(sonstige_tests)} Tests):")
+        for t in sonstige_tests:
+            print(f"    - {t}")
+        print("    → GROUP_RULES in extract_labvalues.py ergänzen um zuzuordnen")
 
     normalized = sum(1 for r in all_results if r["Test_Standard"] != r["Test"])
     converted = sum(1 for r in all_results if r["Wert_Norm"] != r["Wert"])

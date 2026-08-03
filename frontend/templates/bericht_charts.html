@@ -41,7 +41,7 @@
 {% if zusammenfassung %}
 <div style="border:2px solid {% if zusammenfassung.status == 'kritisch' %}#dc2626{% elif zusammenfassung.status == 'auffällig' %}#d97706{% else %}#059669{% endif %}; border-radius:8px; padding:16px; margin-bottom:24px; page-break-inside:avoid;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <span style="font-size:1.1rem; font-weight:700;">{{ zusammenfassung.status_icon }} Zusammenfassung: {{ zusammenfassung.status_text }}</span>
+        <span style="font-size:1.1rem; font-weight:700;">{{ zusammenfassung.status_icon }} Zusammenfassung {{ zusammenfassung.status_text }}</span>
         <span style="font-size:0.8rem; color:#666;">{{ zusammenfassung.kritisch_count }} kritisch · {{ zusammenfassung.auffaellig_count }} auffällig · {{ zusammenfassung.gut_count }} aktuell OK</span>
     </div>
     <div style="font-size:0.85rem; line-height:1.6;">

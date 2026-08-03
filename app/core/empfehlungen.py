@@ -254,9 +254,9 @@ def _empfehlung_gefaesse(get_latest):
     if hdl and hdl < 40: risiko += 1
 
     if risiko >= 5:
-        e.append(f"⚠️ Erhöhtes Gefäßrisiko (Score {risiko}/8). Mehrere Risikofaktoren zusammen wirken sich stärker aus als einzeln.")
+        pass  # Score-Anzeige erfolgt über die Score-Card im Frontend
     elif risiko >= 3:
-        e.append(f"Mäßig erhöhtes Gefäßrisiko (Score {risiko}/8). Einzelne Werte beobachten.")
+        pass  # Score-Anzeige erfolgt über die Score-Card im Frontend
     else:
         e.append(f"Geringes Gefäßrisiko (Score {risiko}/8) – gut!")
 

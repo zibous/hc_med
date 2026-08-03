@@ -18,6 +18,10 @@ export const state = {
 export function navigate(view, params = {}) {
   if (view === "trend" && state.view === "pathologisch") {
     state.fromPath = "pathologisch";
+  } else if (view === "trend" && state.view === "vergleich") {
+    state.fromPath = "vergleich";
+  } else if (view === "trend" && state.view === "favoriten") {
+    state.fromPath = "favoriten";
   } else if (view !== "trend" && view !== "verknuepfung") {
     state.fromPath = null;
   }

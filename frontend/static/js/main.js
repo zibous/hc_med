@@ -4,6 +4,8 @@ import { renderKPIs } from "./kpis.js";
 import { renderCards } from "./cards.js";
 import { renderChart, renderMultiChart, renderRadarChart } from "./trend-chart.js";
 import { renderBreadcrumb } from "./breadcrumb.js";
+import { loadFavoritenListe, renderFavoritenKarte, starIconHtml, bindStarHandlers, renderFavoritenDetail } from "./favoriten.js";
+import { renderVergleich } from "./vergleich.js";
 
 function cleanupRadar() {
   const r1 = document.getElementById("radarEmpfehlungRow");
@@ -16,44 +18,107 @@ function renderRadarWithEmpfehlung(data) {
   // Bestehenden Container entfernen
   cleanupRadar();
 
+  // Prüfen ob Radar sinnvoll ist (nur für Gefäßgesundheit)
+  const hasEnoughTests = data.gefaess_score && data.tests && Object.keys(data.tests).length >= 3;
+
   const container = document.createElement("div");
   container.id = "radarEmpfehlungRow";
   container.className = "radar-empfehlung-row";
 
-  // Radar-Seite
-  const radarCol = document.createElement("div");
-  radarCol.className = "radar-col";
-  radarCol.innerHTML = `<canvas id="radarCanvas"></canvas>`;
-  container.appendChild(radarCol);
+  // Radar-Seite nur wenn genug Tests
+  if (hasEnoughTests) {
+    const radarCol = document.createElement("div");
+    radarCol.className = "radar-col";
+    radarCol.id = "radarCol";
+    radarCol.innerHTML = `<canvas id="radarCanvas"></canvas>`;
+    container.appendChild(radarCol);
+  }
 
   // Empfehlung-Seite
   if (data.empfehlung) {
     const empCol = document.createElement("div");
     empCol.className = "empfehlung-col";
+
+    // Gefäß-Score Bar (Apple Health Style)
+    let scoreHtml = "";
+    if (data.gefaess_score) {
+      const gs = data.gefaess_score;
+      const segments = [];
+      for (let i = 0; i < gs.max; i++) {
+        const filled = i < gs.score;
+        segments.push(`<div class="score-seg ${filled ? "filled" : "empty"}"></div>`);
+      }
+      const statusLabel = gs.score >= 5 ? "Erhöhtes Risiko" : gs.score >= 3 ? "Mäßiges Risiko" : "Geringes Risiko";
+      const statusColor = gs.score >= 5 ? "var(--red)" : gs.score >= 3 ? "var(--orange)" : "var(--green)";
+
+      const faktorenHtml = gs.faktoren.map(f => {
+        const dots = [];
+        for (let i = 0; i < f.max; i++) {
+          dots.push(`<span class="score-dot ${i < f.punkte ? "active" : ""}"></span>`);
+        }
+        return `<div class="score-faktor ${f.aktiv ? "aktiv" : ""}">
+          <span class="score-faktor-name">${f.name}</span>
+          <span class="score-faktor-wert">${f.wert}</span>
+          <span class="score-faktor-dots">${dots.join("")}</span>
+        </div>`;
+      }).join("");
+
+      scoreHtml = `<div class="gefaess-score-card">
+        <div class="score-header">
+          <span class="score-label">Gefäßrisiko</span>
+          <span class="score-value" style="color:${statusColor}">${gs.score}/${gs.max}</span>
+        </div>
+        <div class="score-bar">${segments.join("")}</div>
+        <div class="score-status" style="color:${statusColor}">${statusLabel}</div>
+        <div class="score-faktoren">${faktorenHtml}</div>
+      </div>`;
+    }
+
     const items = data.empfehlung.split(" · ").map(e => `<li>${e}</li>`).join("");
-    empCol.innerHTML = `<div class="empfehlung-box"><strong>💡 Empfehlung:</strong><ol class="empfehlung-liste">${items}</ol></div>`;
+    empCol.innerHTML = `${scoreHtml}<div class="empfehlung-box"><strong>💡 Empfehlung:</strong><ol class="empfehlung-liste">${items}</ol></div>`;
     container.appendChild(empCol);
   }
+
+  // Nur einfügen wenn es Inhalt gibt
+  if (container.children.length === 0) return;
 
   // Nach dem Chart-Card einfügen
   const chartCard = document.getElementById("chartCard");
   chartCard.parentNode.insertBefore(container, chartCard.nextSibling);
 
-  // Radar rendern (nutzt das Canvas im neuen Container)
-  renderRadarChart(data);
+  // Radar rendern (nur wenn Canvas vorhanden)
+  if (hasEnoughTests) {
+    renderRadarChart(data);
+    // Wenn Radar-Canvas leer geblieben ist (Chart.js hat keine Instanz drauf), entfernen
+    const radarCol = document.getElementById("radarCol");
+    if (radarCol) {
+      const canvas = radarCol.querySelector("canvas");
+      // Chart.js setzt width/height auf dem Canvas wenn es zeichnet
+      if (canvas && canvas.width === 0) {
+        radarCol.remove();
+      }
+    }
+  }
 }
 
 export async function loadView() {
   try {
+    // Favoriten-Karte entfernen (wird nur in Overview neu gerendert)
+    const favKarte = document.getElementById("favoriten-karte");
+    if (favKarte) favKarte.remove();
+
+    // Radar/Empfehlung-Row immer bereinigen (wird nur in Verknüpfung neu erstellt)
+    cleanupRadar();
+
     if (state.view === "overview") {
       const res = await fetch("api/overview");
       const data = await res.json();
       renderKPIs(data.kpis, data.gruppen, data.vergleich, data.gefaess);
       renderCards(data.gruppen);
       renderChart(null);
-      // Radar entfernen falls vorhanden
-      cleanupRadar();
       document.getElementById("view-description").textContent = "";
+      // Favoriten-Karte anzeigen
+      await renderFavoritenKarte();
       // Untertitel mit aktuellem Zeitraum
       const sub = document.getElementById("subtitle");
       if (sub && data.kpis) {
@@ -95,6 +160,39 @@ export async function loadView() {
       reportBtn.className = "report-btn";
       reportBtn.textContent = "🖨️ Bericht drucken";
       document.querySelector(".period-filter")?.appendChild(reportBtn);
+    } else if (state.view === "vergleich") {
+      const res = await fetch("api/vergleich");
+      const data = await res.json();
+      renderKPIs(null);
+      renderChart(null);
+      renderVergleich(data);
+      document.getElementById("view-description").innerHTML =
+        `<div style="display:flex;align-items:center;gap:1rem;">
+          <span style="flex:1;color:var(--text-muted)">Zeigt Tests mit signifikanter Veränderung (>5%) gegenüber früheren Werten. Klick auf eine Zeile für den Verlauf.</span>
+          <button class="print-btn" onclick="window.print()">🖨️ Drucken</button>
+        </div>`;
+      // Print-Header befüllen
+      const ph = document.querySelector(".print-header");
+      if (ph) {
+        ph.querySelector("h1").textContent = "Mehrjahresvergleich – Laborwerte";
+        const patEl = document.getElementById("patient-name");
+        document.getElementById("print-patient").textContent = patEl ? patEl.textContent : "";
+        document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
+      }
+    } else if (state.view === "favoriten") {
+      renderKPIs(null);
+      renderChart(null);
+      await renderFavoritenDetail();
+      document.getElementById("view-description").innerHTML =
+        `<span style="color:var(--text-muted)">Deine markierten Laborwerte im Überblick. Klick auf eine Zeile für den Verlauf.</span>`;
+      // Print-Header befüllen
+      const ph2 = document.querySelector(".print-header");
+      if (ph2) {
+        ph2.querySelector("h1").textContent = "Favoriten – Laborwerte";
+        const patEl2 = document.getElementById("patient-name");
+        document.getElementById("print-patient").textContent = patEl2 ? patEl2.textContent : "";
+        document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
+      }
     } else if (state.view === "gruppe") {
       const res = await fetch(`api/gruppe/${encodeURIComponent(state.gruppe)}`);
       const data = await res.json();
@@ -108,8 +206,9 @@ export async function loadView() {
       renderKPIs(null);
       renderCards(null);
       renderChart(data);
-      // Beschreibung + Referenzwerte + Bewertung + Verknüpfungs-Links
-      let desc = data.beschreibung || "";
+      // Stern-Toggle + Beschreibung + Referenzwerte + Bewertung + Verknüpfungs-Links
+      let desc = `<span class="trend-star-row">${starIconHtml(data.test)}</span>`;
+      desc += data.beschreibung || "";
       if (data.normbereich) {
         desc += ` Referenzbereich: ${data.normbereich} ${data.einheit || ""}.`;
       }
@@ -122,6 +221,8 @@ export async function loadView() {
       }
       desc += (data.verknuepfungen?.length ? `<br><span class="related-links">Zusammenhänge: ${data.verknuepfungen.map(v => `<a class="related-link" data-vk="${v}">${v}</a>`).join(", ")}</span>` : "");
       document.getElementById("view-description").innerHTML = desc;
+      // Stern-Handler für Favoriten-Toggle
+      bindStarHandlers(document.getElementById("view-description"));
       // Click-Handler für Verknüpfungs-Links
       document.querySelectorAll(".related-link").forEach(link => {
         link.addEventListener("click", () => navigate("verknuepfung", { verknuepfung: link.dataset.vk }));
@@ -161,7 +262,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Patient-Name laden
   fetch("api/patient").then(r => r.json()).then(p => {
     const el = document.getElementById("patient-name");
-    if (el && p.vorname) el.textContent = p.vorname + " " + p.nachname;
+    // if (el && p.vorname) el.textContent = p.vorname + " " + p.nachname;
+    el.textContent = "Auswertung"
   }).catch(() => {});
-  loadView();
+  // Favoriten-Liste vorladen (für Stern-Status in Test-Karten)
+  loadFavoritenListe().then(() => loadView());
 });

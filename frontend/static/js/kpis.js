@@ -76,7 +76,7 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
       <div class="kpi-value-text" style="font-size:1.4rem">${criticalHtml}</div>
       <div class="kpi-sub">${critical.length} von ${(gruppen||[]).length} Gruppen</div>
     </div>
-    ${vergleich ? `<div class="kpi kpi-wide">
+    ${vergleich ? `<div class="kpi kpi-half kpi-clickable" id="kpi-vergleich" style="cursor:pointer">
       <div class="kpi-label">Vergleich zum Vorjahr</div>
       <div class="kpi-value-text">
         ${vergleich.verbessert?.length ? `<span style="color:var(--green)">↑ Verbessert (${vergleich.verbessert.length}): ${vergleich.verbessert.slice(0,4).map(v => v.test).join(', ')}</span>` : ''}
@@ -84,9 +84,9 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
         ${vergleich.verschlechtert?.length ? `<span style="color:var(--red)">↓ Verschlechtert (${vergleich.verschlechtert.length}): ${vergleich.verschlechtert.slice(0,4).map(v => v.test).join(', ')}</span>` : ''}
         ${!vergleich.verbessert?.length && !vergleich.verschlechtert?.length ? '<span style="color:var(--green)">→ Alle Werte stabil</span>' : ''}
       </div>
-      <div class="kpi-sub">${vergleich.stabil_count || 0} Tests unverändert</div>
+      <div class="kpi-sub">${vergleich.stabil_count || 0} Tests unverändert · Klick für Mehrjahresvergleich →</div>
     </div>` : ''}
-    ${gefaess ? `<div class="kpi kpi-wide kpi-clickable" id="kpi-gefaess" style="cursor:pointer; border-left:3px solid ${gefaess.status === 'kritisch' ? 'var(--red)' : gefaess.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
+    ${gefaess ? `<div class="kpi kpi-half kpi-clickable" id="kpi-gefaess" style="cursor:pointer; border-left:3px solid ${gefaess.status === 'kritisch' ? 'var(--red)' : gefaess.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
       <div class="kpi-label">🫀 Gefäßgesundheit (Arterien-Risiko)</div>
       <div class="kpi-value-text">
         <span style="color:${gefaess.status === 'kritisch' ? 'var(--red)' : gefaess.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
@@ -114,5 +114,10 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
   // Klick auf Gefäßgesundheit
   document.getElementById("kpi-gefaess")?.addEventListener("click", () => {
     navigate("verknuepfung", { verknuepfung: "Gefäßgesundheit" });
+  });
+
+  // Klick auf Vergleich
+  document.getElementById("kpi-vergleich")?.addEventListener("click", () => {
+    navigate("vergleich", {});
   });
 }

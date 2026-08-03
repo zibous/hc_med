@@ -30,7 +30,7 @@ def _build_zusammenfassung(tests_data: list) -> dict:
     # Gesamtbewertung
     if kritisch:
         status = "kritisch"
-        status_text = "Ärztliche Besprechung empfohlen"
+        status_text = "Laborwerte"
         status_icon = "🚨"
     elif auffaellig:
         status = "auffällig"

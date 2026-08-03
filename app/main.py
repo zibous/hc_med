@@ -64,6 +64,8 @@ from app.api.tests_router import router as tests_router  # noqa: E402
 from app.api.kpidata import router as kpidata_router  # noqa: E402
 from app.api.bericht import router as bericht_router  # noqa: E402
 from app.api.pathologisch import router as pathologisch_router  # noqa: E402
+from app.api.favoriten import router as favoriten_router  # noqa: E402
+from app.api.vergleich import router as vergleich_router  # noqa: E402
 
 app.include_router(overview_router)
 app.include_router(gruppe_router)
@@ -73,6 +75,8 @@ app.include_router(tests_router)
 app.include_router(kpidata_router)
 app.include_router(bericht_router)
 app.include_router(pathologisch_router)
+app.include_router(favoriten_router)
+app.include_router(vergleich_router)
 
 
 @app.get("/api/status")
