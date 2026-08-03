@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from app.config.settings import KURZNAMEN
 from app.infrastructure.database import get_db
 
 router = APIRouter(prefix="/api", tags=["labor"])
@@ -65,6 +66,7 @@ async def pathologisch(period: str = "all"):
                 "datum": r["datum"],
                 "gruppe": r["gruppe"],
                 "test_standard": r["test_standard"],
+                "kurzname": KURZNAMEN.get(r["test_standard"], ""),
                 "wert_norm": r["wert_norm"],
                 "einheit_norm": r["einheit_norm"],
                 "normbereich": r["normbereich"],

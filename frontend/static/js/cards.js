@@ -166,7 +166,7 @@ export function renderCards(items, mode = "gruppe") {
               <tr class="path-row" data-test="${r.test_standard}" data-gruppe="${r.gruppe}">
                 <td>${r.datum}</td>
                 <td><span style="color:${GROUP_COLORS[r.gruppe] || '#64748b'}">${r.gruppe}</span></td>
-                <td><strong>${r.test_standard}</strong></td>
+                <td><strong>${r.test_standard}</strong>${r.kurzname ? `<br><span class="card-kurzname">${r.kurzname}</span>` : ''}</td>
                 <td>${r.wert_norm} ${r.einheit_norm || ""}</td>
                 <td style="color:var(--text-muted)">${r.normbereich || ""}</td>
                 <td><span class="flag-pill ${r.flag === 'H' ? 'high' : 'low'}">${r.flag === 'H' ? '↑ hoch' : '↓ tief'}</span></td>
@@ -282,6 +282,7 @@ export function renderCards(items, mode = "gruppe") {
             <div class="card-title">${name}</div>
             <span class="status-pill" style="background:${st.bg};color:${st.color}">${st.label}</span>
           </div>
+          ${data.kurzname ? `<div class="card-kurzname">${data.kurzname}</div>` : ''}
           ${data.beschreibung ? `<div class="card-desc">${data.beschreibung}</div>` : ""}
           <div class="card-value-row">
             <span class="card-count">${last.wert}</span>

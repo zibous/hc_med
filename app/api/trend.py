@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 
-from app.config.settings import TEST_DESCRIPTIONS, EREIGNISSE, VERKNUEPFUNGEN
+from app.config.settings import TEST_DESCRIPTIONS, EREIGNISSE, VERKNUEPFUNGEN, KURZNAMEN
 from app.core.empfehlungen import get_test_empfehlung
 from app.core.bewertung import bewerte_trend
 from app.infrastructure.database import get_db
@@ -56,6 +56,7 @@ async def trend(test: str):
 
         return {
             "test": test,
+            "kurzname": KURZNAMEN.get(test, ""),
             "beschreibung": TEST_DESCRIPTIONS.get(test, ""),
             "einheit": rows[0]["einheit_norm"],
             "normbereich": normbereich,

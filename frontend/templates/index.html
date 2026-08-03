@@ -6,8 +6,9 @@
   <title>Labor Dashboard</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E🩸%3C/text%3E%3C/svg%3E">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="static/css/theme.css">
-  <link rel="stylesheet" href="static/css/style.css">
+  <!-- <link rel="stylesheet" href="static/css/theme.css">
+  <link rel="stylesheet" href="static/css/style.css"> -->
+  <link rel="stylesheet" href="static/css/style.bundle.css">
 </head>
 <body>
 
@@ -38,8 +39,23 @@
   </header>
 
   <main class="container">
-    <!-- Breadcrumb -->
-    <nav id="breadcrumb" class="breadcrumb"></nav>
+    <!-- Print-Header (nur beim Drucken sichtbar) -->
+    <div class="print-header" style="display:none;">
+      <h1>Gefäßgesundheit – Risikoprofil</h1>
+      <div class="print-meta">
+        <span id="print-patient"></span> · Erstellt am <span id="print-date"></span>
+      </div>
+    </div>
+    <!-- Breadcrumb + Hilfe -->
+    <div class="breadcrumb-row">
+      <nav id="breadcrumb" class="breadcrumb"></nav>
+      <button id="helpBtn" class="help-btn" title="Bedienungsanleitung">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>Hilfe</span>
+      </button>
+    </div>
 
     <!-- Gruppen-Beschreibung (nur in Drilldown sichtbar) -->
     <div id="view-description" class="view-description"></div>
@@ -61,8 +77,52 @@
     <span style="margin:0 8px; color:var(--border);">|</span>
     <span id="themeToggleFooter" style="cursor:pointer; font-weight:500;">🌓 Design wechseln</span>
   </footer>
-
+<!-- 
   <script src="static/js/theme-init.js?v=2"></script>
   <script type="module" src="static/js/main.js?v=2"></script>
+
+  <!-- Hilfe-Modal -->
+  <div id="helpModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" id="helpClose">✕</button>
+      <h2>📖 Bedienungsanleitung</h2>
+      <div class="modal-body">
+        <h3>🏠 Übersicht</h3>
+        <p>Die Startseite zeigt alle Labor-Gruppen sortiert nach Dringlichkeit. Oben sind KPIs mit Gesamtbewertung und Vorjahresvergleich.</p>
+
+        <h3>🔍 Navigation (Drilldown)</h3>
+        <p><strong>Gruppe klicken</strong> → zeigt alle Tests dieser Gruppe mit Sparklines und Bewertung.<br>
+        <strong>Test klicken</strong> (≥5 Messungen) → öffnet den Verlaufs-Chart mit Normband und Statistik.<br>
+        <strong>Breadcrumb</strong> oben → jederzeit zurück navigieren.</p>
+
+        <h3>📊 Trend-Chart</h3>
+        <p>Zeigt den Verlauf über alle Jahre. Orange gestrichelte Linien = Normbereich. Rote Punkte = erhöht, blaue = erniedrigt. Roter Balken unten = Krankenhausaufenthalt.</p>
+
+        <h3>🔗 Zusammenhänge</h3>
+        <p>Unter dem Chart erscheinen klickbare Links zu verwandten Tests. Multi-Chart zeigt mehrere Tests übereinander mit Empfehlung.</p>
+
+        <h3>⚠️ Auffällige Werte</h3>
+        <p>Klick auf "Auffällige Werte" in den KPIs → sortierbare Tabelle. Filter: Alle / Letztes Jahr / 6 Monate / Letzter Monat. Klick auf Spaltenheader zum Sortieren.</p>
+
+        <h3>🖨️ Arztbericht</h3>
+        <p>In der Auffällige-Werte-Ansicht: Button "Bericht drucken" → öffnet druckfertigen Bericht mit Charts, Empfehlungen und Zusammenfassung. Im Browser Cmd+P → als PDF speichern.</p>
+
+        <h3>🌓 Design</h3>
+        <p>Dark/Light Theme umschalten: Footer → "Design wechseln".</p>
+
+        <h3>🔄 Daten aktualisieren</h3>
+        <p>Neue Befund-Datei in <code>data/befunde/</code> ablegen, dann auf dem Server: <code>make labor-reset</code></p>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('helpBtn').onclick = () => document.getElementById('helpModal').classList.remove('hidden');
+    document.getElementById('helpClose').onclick = () => document.getElementById('helpModal').classList.add('hidden');
+    document.getElementById('helpModal').onclick = (e) => { if (e.target.id === 'helpModal') e.target.classList.add('hidden'); };
+  </script> -->
+
+  <script src="static/js/theme-init.js"></script>
+  <script type="module" src="static/js/main.bundle.js"></script>
+
 </body>
 </html>

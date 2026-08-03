@@ -8,7 +8,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from app.config.settings import PATIENT_CONFIG, TEST_DESCRIPTIONS
+from app.config.settings import PATIENT_CONFIG, TEST_DESCRIPTIONS, KURZNAMEN
 from app.core.empfehlungen import get_test_empfehlung
 from app.core.vergleich import berechne_vorjahresvergleich
 from app.infrastructure.database import get_db
@@ -44,12 +44,16 @@ def _build_zusammenfassung(tests_data: list) -> dict:
     # Wichtigste Punkte (max 5)
     punkte = []
     for t in kritisch[:3]:
-        punkte.append(f"🚨 {t['name']}: {t['bewertung']}")
+        kurzname = KURZNAMEN.get(t["name"], "")
+        prefix = f"{kurzname} " if kurzname else ""
+        punkte.append(f"🚨 {prefix}{t['name']}: {t['bewertung']}")
         if t.get("empfehlung"):
             punkte.append(f"   💡 {t['empfehlung'][:150]}")
     for t in auffaellig[:3]:
         if len(punkte) < 8:
-            punkte.append(f"⚠️ {t['name']}: letzter Wert {t['values'][-1]} {t['einheit']} (Norm: {t['norm']})")
+            kurzname = KURZNAMEN.get(t["name"], "")
+            prefix = f"{kurzname} " if kurzname else ""
+            punkte.append(f"⚠️ {prefix}{t['name']}: letzter Wert {t['values'][-1]} {t['einheit']} (Norm: {t['norm']})")
 
     return {
         "status": status,

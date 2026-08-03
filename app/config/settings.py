@@ -14,5 +14,6 @@ EREIGNISSE = _config.get("ereignisse", [])
 VERKNUEPFUNGEN = _config.get("verknuepfungen", [])
 PATIENT_CONFIG = _config.get("patient", {})
 EMPFEHLUNGEN_TESTS = _config.get("empfehlungen_tests", {})
+KURZNAMEN = _config.get("kurznamen", {})
 
 GROUP_DESCRIPTIONS = {k: v.get("beschreibung", "").strip() for k, v in GROUP_CONFIG.items()}

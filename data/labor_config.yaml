@@ -286,6 +286,9 @@ verknuepfungen:
   - name: "Cholesterin-Aufschlüsselung"
     beschreibung: "Cholesterin gesamt = HDL + LDL + (Triglyceride ÷ 5). Ein hoher Gesamtwert bei normalem LDL deutet auf hohe Triglyceride als Ursache hin – nicht auf verstopfte Gefäße."
     tests: ["Cholesterin", "HDL", "LDL", "Triglyceride"]
+  - name: "Gefäßgesundheit"
+    beschreibung: "Diese Werte bestimmen zusammen das Risiko für Arteriosklerose (verstopfte Arterien), Herzinfarkt und Schlaganfall. Die Kombination ist entscheidender als einzelne Werte."
+    tests: ["LDL", "HDL", "Triglyceride", "CRP", "HbA1c", "Harnsäure"]
 
 
 # Test-spezifische Empfehlungen bei auffälligen Werten
@@ -386,3 +389,99 @@ bewertungen:
     auffällig: "⚠️ Teilweise auffällig – letzter Wert {wert} {einheit}{flag_text}. Beim nächsten Termin ansprechen."
     kritisch: "🚨 Kritisch – letzter Wert {wert} {einheit}{flag_text}. Norm: {norm}. Ärztliche Abklärung empfohlen."
     historisch: "Historisch {count}× außerhalb der Norm (von {total} Messungen)."
+
+
+# Laien-freundliche Kurznamen für den Bericht
+# Werden in der Zusammenfassung vor dem Testnamen angezeigt
+kurznamen:
+  CRP: "Entzündungsmarker"
+  GFR: "Nierenfilterleistung"
+  Leukozyten: "Immunsystem"
+  Cholesterin: "Gefäßschutz-Wert"
+  HDL: "Gutes Cholesterin"
+  LDL: "Schlechtes Cholesterin"
+  Triglyceride: "Blutfette"
+  Harnsäure: "Gicht-Risikowert"
+  HbA1c: "Langzeit-Blutzucker"
+  HbA1c (IFCC): "Langzeit-Blutzucker (IFCC)"
+  Glucose: "Nüchtern-Blutzucker"
+  Kreatinin: "Nieren-Laborwert"
+  Harnstoff: "Nieren-Abfallstoff"
+  GOT: "Leber-Enzym"
+  GPT: "Leber-Enzym"
+  GGT: "Leber/Galle-Marker"
+  Bilirubin: "Gallenfarbstoff"
+  Hämoglobin: "Roter Blutfarbstoff"
+  Hämatokrit: "Blutdicke"
+  Erythrozyten: "Rote Blutkörperchen"
+  Thrombozyten: "Blutplättchen"
+  Quick: "Gerinnungswert"
+  INR: "Gerinnungswert"
+  TSH: "Schilddrüse"
+  PSA: "Prostata-Wert"
+  Natrium: "Mineralstoff"
+  Kalium: "Herzrhythmus-Mineral"
+  Calcium: "Knochen-Mineral"
+  Eisen: "Sauerstoff-Transporter"
+  Ferritin: "Eisenspeicher"
+  # Differentialblutbild
+  Neutrophile abs.: "Bakterien-Abwehr"
+  Neutrophile rel.: "Bakterien-Abwehr (%)"
+  Lymphozyten abs.: "Viren-Abwehr"
+  Lymphozyten rel.: "Viren-Abwehr (%)"
+  Monozyten abs.: "Fresszellen"
+  Monozyten rel.: "Fresszellen (%)"
+  Eosinophile abs.: "Allergie-Zellen"
+  Eosinophile rel.: "Allergie-Zellen (%)"
+  Basophile abs.: "Allergie-Zellen (selten)"
+  Basophile rel.: "Allergie-Zellen (selten, %)"
+  Granulozyten rel.: "Abwehrzellen gesamt (%)"
+  Granulozyten abs.: "Abwehrzellen gesamt"
+  # Stoffwechsel
+  Totalprotein: "Gesamteiweiß"
+  # Gerinnung
+  aPTT: "Gerinnungszeit"
+  # Körperdaten
+  Gewicht: "Körpergewicht"
+  BMI: "Body-Mass-Index"
+  Fettgehalt: "Körperfett"
+  Muskelmasse: "Muskeln"
+  Körperwasser: "Wasseranteil"
+  Viszeralfett: "Bauchfett"
+  Fettfreie Masse: "Magermasse"
+  Proteinanteil: "Eiweiß im Körper"
+  Knochenmasse: "Knochen"
+  # Leber
+  Alk. Phosphatase: "Knochen/Galle-Enzym"
+  LDH: "Zellzerfall-Marker"
+  Cholinesterase: "Leber-Produktionswert"
+  # Pankreas
+  Amylase: "Bauchspeicheldrüse"
+  Pankreas-Amylase: "Bauchspeicheldrüse (spezifisch)"
+  Lipase: "Fettverdauung"
+  # Elektrolyte
+  Chlorid: "Salz-Mineral"
+  Magnesium: "Muskel-Mineral"
+  Phosphat: "Knochen-Mineral"
+  # Blutbild
+  MCV: "Blutzellen-Größe"
+  MCH: "Blutzellen-Beladung"
+  MCHC: "Blutzellen-Konzentration"
+  RDW: "Blutzellen-Verteilung"
+  MPV: "Plättchen-Größe"
+  # Sonstige
+  Rheumafaktor: "Rheuma-Marker"
+  Anti-CCP: "Rheuma-Antikörper"
+
+
+# Fallback-Normbereiche wenn im Befund kein Referenzwert steht
+# Format: "min-max" oder "<max" oder ">min"
+fallback_normbereiche:
+  INR: "0.8-1.3"
+  HDL: ">40"
+  LDL: "<150"
+  Non-HDL-Cholesterin: "<160"
+  Cholesterin: "<200"
+  Triglyceride: "<200"
+  Quotient Chol/HDL: "0.0-5.0"
+  Quotient LDL/HDL: "0.0-3.0"

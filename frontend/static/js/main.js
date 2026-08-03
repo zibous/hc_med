@@ -2,17 +2,57 @@
 import { state, navigate } from "./state.js";
 import { renderKPIs } from "./kpis.js";
 import { renderCards } from "./cards.js";
-import { renderChart, renderMultiChart } from "./trend-chart.js";
+import { renderChart, renderMultiChart, renderRadarChart } from "./trend-chart.js";
 import { renderBreadcrumb } from "./breadcrumb.js";
+
+function cleanupRadar() {
+  const r1 = document.getElementById("radarEmpfehlungRow");
+  if (r1) r1.remove();
+  const r2 = document.getElementById("radarCard");
+  if (r2) r2.remove();
+}
+
+function renderRadarWithEmpfehlung(data) {
+  // Bestehenden Container entfernen
+  cleanupRadar();
+
+  const container = document.createElement("div");
+  container.id = "radarEmpfehlungRow";
+  container.className = "radar-empfehlung-row";
+
+  // Radar-Seite
+  const radarCol = document.createElement("div");
+  radarCol.className = "radar-col";
+  radarCol.innerHTML = `<canvas id="radarCanvas"></canvas>`;
+  container.appendChild(radarCol);
+
+  // Empfehlung-Seite
+  if (data.empfehlung) {
+    const empCol = document.createElement("div");
+    empCol.className = "empfehlung-col";
+    const items = data.empfehlung.split(" · ").map(e => `<li>${e}</li>`).join("");
+    empCol.innerHTML = `<div class="empfehlung-box"><strong>💡 Empfehlung:</strong><ol class="empfehlung-liste">${items}</ol></div>`;
+    container.appendChild(empCol);
+  }
+
+  // Nach dem Chart-Card einfügen
+  const chartCard = document.getElementById("chartCard");
+  chartCard.parentNode.insertBefore(container, chartCard.nextSibling);
+
+  // Radar rendern (nutzt das Canvas im neuen Container)
+  renderRadarChart(data);
+}
 
 export async function loadView() {
   try {
     if (state.view === "overview") {
       const res = await fetch("api/overview");
       const data = await res.json();
-      renderKPIs(data.kpis, data.gruppen, data.vergleich);
+      renderKPIs(data.kpis, data.gruppen, data.vergleich, data.gefaess);
       renderCards(data.gruppen);
       renderChart(null);
+      // Radar entfernen falls vorhanden
+      cleanupRadar();
       document.getElementById("view-description").textContent = "";
       // Untertitel mit aktuellem Zeitraum
       const sub = document.getElementById("subtitle");
@@ -94,11 +134,22 @@ export async function loadView() {
       renderKPIs(null);
       renderCards(null);
       renderMultiChart(data);
-      let desc = data.beschreibung || "";
-      if (data.empfehlung) {
-        desc += `<div class="empfehlung-box">💡 <strong>Empfehlung:</strong> ${data.empfehlung}</div>`;
-      }
+      // Beschreibung oben + Drucken-Button rechts
+      let desc = `<div style="display:flex;align-items:center;gap:1rem;">`;
+      desc += `<span style="flex:1">${data.beschreibung || ""}</span>`;
+      desc += `<button class="print-btn" onclick="window.print()">🖨️ Drucken</button>`;
+      desc += `</div>`;
       document.getElementById("view-description").innerHTML = desc;
+      // Radar + Empfehlung nebeneinander
+      renderRadarWithEmpfehlung(data);
+      // Print-Header befüllen
+      const ph = document.querySelector(".print-header");
+      if (ph) {
+        ph.querySelector("h1").textContent = data.name + " – Risikoprofil";
+        const patEl = document.getElementById("patient-name");
+        document.getElementById("print-patient").textContent = patEl ? patEl.textContent : "";
+        document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
+      }
     }
     renderBreadcrumb();
   } catch (err) {

@@ -245,7 +245,8 @@ function renderChartStats(container, values, data) {
 
 
 // Multi-Chart: Mehrere Tests übereinander mit gleicher Zeitachse
-const MULTI_COLORS = ["#34d399", "#60a5fa", "#f97316", "#a78bfa", "#fb7185", "#fbbf24"];
+// Kontraststarke Palette für dunklen UND hellen Hintergrund
+const MULTI_COLORS = ["#34d399", "#60a5fa", "#fb923c", "#f472b6", "#facc15", "#22d3ee"];
 
 export function renderMultiChart(data) {
   const card = document.getElementById("chartCard");
@@ -257,7 +258,6 @@ export function renderMultiChart(data) {
   }
 
   card.style.display = "block";
-  // Canvas neu erstellen (falls Stats drin waren)
   const existingStats = card.querySelector(".chart-stats");
   if (existingStats) existingStats.remove();
 
@@ -270,13 +270,32 @@ export function renderMultiChart(data) {
   Object.values(data.tests).forEach(t => t.werte.forEach(w => allDates.add(w.datum)));
   const labels = [...allDates].sort();
 
+  // Tests in zwei Gruppen teilen: "groß" (>50 typischer Wert) und "klein" (<50)
+  const testNames = Object.keys(data.tests);
+  const groupLeft = []; // große Werte → linke Y-Achse
+  const groupRight = []; // kleine Werte → rechte Y-Achse
+
+  testNames.forEach(name => {
+    const t = data.tests[name];
+    const vals = t.werte.map(w => parseFloat(String(w.wert).replace(",", ".").replace(/^[<>]/, "")) || 0);
+    const median = vals.sort((a, b) => a - b)[Math.floor(vals.length / 2)] || 0;
+    if (median > 20) {
+      groupLeft.push(name);
+    } else {
+      groupRight.push(name);
+    }
+  });
+
+  // Falls alle in einer Gruppe landen, keine zweite Achse
+  const useDualAxis = groupLeft.length > 0 && groupRight.length > 0;
+
   // Datasets pro Test
   const datasets = [];
-  const testNames = Object.keys(data.tests);
 
   testNames.forEach((name, i) => {
     const t = data.tests[name];
     const color = MULTI_COLORS[i % MULTI_COLORS.length];
+    const isRight = useDualAxis && groupRight.includes(name);
 
     // Werte auf die gemeinsame Zeitachse mappen
     const valueMap = {};
@@ -294,10 +313,11 @@ export function renderMultiChart(data) {
       fill: false,
       tension: 0.25,
       pointRadius: values.filter(v => v !== null).length > 50 ? 0 : 3,
-      pointHoverRadius: 4,
-      borderWidth: 1.5,
+      pointHoverRadius: 5,
+      borderWidth: 2.5,
+      borderDash: isRight ? [6, 3] : [],
       spanGaps: true,
-      yAxisID: testNames.length <= 2 ? (i === 0 ? "y" : "y1") : "y",
+      yAxisID: isRight ? "y1" : "y",
     });
   });
 
@@ -306,22 +326,33 @@ export function renderMultiChart(data) {
   // Achsen-Config
   const scales = {
     x: {
-      ticks: { color: isDark ? "#94a3b8" : "#64748b", maxTicksLimit: 8, font: { size: 11 } },
+      ticks: { color: isDark ? "#e2e8f0" : "#64748b", maxTicksLimit: 8, font: { size: 11 } },
       grid: { display: false },
     },
     y: {
       position: "left",
-      ticks: { color: MULTI_COLORS[0], font: { size: 11 } },
-      grid: { color: isDark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)" },
+      ticks: { color: isDark ? "#e2e8f0" : "#64748b", font: { size: 11 } },
+      grid: { color: isDark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)" },
+      title: {
+        display: useDualAxis,
+        text: groupLeft.join(", "),
+        color: isDark ? "#e2e8f0" : "#64748b",
+        font: { size: 10 },
+      },
     },
   };
 
-  // Zweite Y-Achse nur bei 2 Tests (unterschiedliche Einheiten)
-  if (testNames.length === 2) {
+  if (useDualAxis) {
     scales.y1 = {
       position: "right",
-      ticks: { color: MULTI_COLORS[1], font: { size: 11 } },
+      ticks: { color: isDark ? "#e2e8f0" : "#64748b", font: { size: 11 } },
       grid: { display: false },
+      title: {
+        display: true,
+        text: groupRight.join(", "),
+        color: isDark ? "#e2e8f0" : "#64748b",
+        font: { size: 10 },
+      },
     };
   }
 
@@ -336,13 +367,18 @@ export function renderMultiChart(data) {
         legend: {
           display: true,
           position: "top",
-          labels: { color: isDark ? "#e2e8f0" : "#1e293b", font: { size: 12 }, usePointStyle: true },
+          labels: {
+            color: isDark ? "#e2e8f0" : "#1e293b",
+            font: { size: 13, weight: "600" },
+            usePointStyle: true,
+            padding: 16,
+          },
         },
         title: {
           display: true,
-          text: data.name,
-          color: isDark ? "#f1f5f9" : "#1e293b",
-          font: { size: 16, weight: "600" },
+          text: data.name + (useDualAxis ? "  (gestrichelt = rechte Achse)" : ""),
+          color: isDark ? "#e2e8f0" : "#1e293b",
+          font: { size: 15, weight: "600" },
           align: "start",
         },
         tooltip: {
@@ -361,4 +397,153 @@ export function renderMultiChart(data) {
   // Stats entfernen falls vorhanden
   const existing = card.querySelector(".chart-stats");
   if (existing) existing.remove();
+}
+
+
+// Radar-Chart: Aktueller Risiko-Snapshot für Verknüpfungen
+let radarInstance = null;
+
+export function renderRadarChart(data) {
+  if (!data || !data.tests || Object.keys(data.tests).length < 3) return;
+
+  const canvas = document.getElementById("radarCanvas");
+  if (!canvas) return;
+
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  const testNames = Object.keys(data.tests);
+
+  // Pro Test: letzten Wert als % vom Norm-Maximum berechnen
+  const radarData = [];
+  const radarLabels = [];
+
+  for (const name of testNames) {
+    const t = data.tests[name];
+    if (!t.werte || t.werte.length === 0) continue;
+
+    const lastWert = t.werte[t.werte.length - 1];
+    const raw = String(lastWert.wert).replace(",", ".").replace(/^[<>]\s*/, "");
+    const val = parseFloat(raw);
+    if (isNaN(val)) continue;
+
+    // Normbereich parsen
+    let normMax = null;
+    if (t.normbereich) {
+      const norm = t.normbereich.trim();
+      const range = norm.match(/^([\d.]+)\s*-\s*([\d.]+)$/);
+      if (range) normMax = parseFloat(range[2]);
+      const lt = norm.match(/^[<]\s*-?\s*([\d.]+)$/);
+      if (lt) normMax = parseFloat(lt[1]);
+      const dashMax = norm.match(/^-\s*([\d.]+)$/);
+      if (dashMax && !range) normMax = parseFloat(dashMax[1]);
+    }
+
+    // Wert als % der oberen Norm (100% = Normgrenze)
+    let pct = normMax && normMax > 0 ? (val / normMax) * 100 : 50;
+    // HDL ist invers – höher ist besser
+    if (name === "HDL" && normMax) {
+      pct = Math.min(150, (val / 60) * 100);
+    }
+    pct = Math.min(200, Math.max(0, pct)); // Clamp 0-200
+
+    radarLabels.push(name);
+    radarData.push(Math.round(pct));
+  }
+
+  if (radarLabels.length < 3) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (radarInstance) radarInstance.destroy();
+
+  radarInstance = new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: radarLabels,
+      datasets: [
+        {
+          label: "Aktuell (% der Norm)",
+          data: radarData,
+          borderColor: isDark ? "#60a5fa" : "#3b82f6",
+          backgroundColor: isDark ? "rgba(96,165,250,.15)" : "rgba(59,130,246,.1)",
+          borderWidth: 2,
+          pointBackgroundColor: radarData.map(v =>
+            v > 120 ? (isDark ? "#f87171" : "#dc2626") :
+            v > 100 ? (isDark ? "#fbbf24" : "#d97706") :
+            (isDark ? "#34d399" : "#059669")
+          ),
+          pointRadius: 5,
+          pointHoverRadius: 7,
+        },
+        {
+          label: "Normgrenze (100%)",
+          data: Array(radarLabels.length).fill(100),
+          borderColor: isDark ? "rgba(251,146,60,.5)" : "rgba(234,88,12,.4)",
+          backgroundColor: "transparent",
+          borderWidth: 1.5,
+          borderDash: [5, 3],
+          pointRadius: 0,
+          pointHoverRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      animation: { duration: 500 },
+      plugins: {
+        legend: {
+          display: true,
+          position: "bottom",
+          labels: {
+            color: isDark ? "#e2e8f0" : "#1e293b",
+            font: { size: 12, weight: "500" },
+            usePointStyle: true,
+          },
+        },
+        title: {
+          display: true,
+          text: "Risiko-Profil (aktueller Stand)",
+          color: isDark ? "#e2e8f0" : "#1e293b",
+          font: { size: 14, weight: "600" },
+        },
+        tooltip: {
+          backgroundColor: isDark ? "rgba(15,23,42,.95)" : "rgba(255,255,255,.95)",
+          titleColor: isDark ? "#fff" : "#1e293b",
+          bodyColor: isDark ? "#e2e8f0" : "#475569",
+          borderColor: isDark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)",
+          borderWidth: 1,
+          callbacks: {
+            label: function(ctx) {
+              if (ctx.datasetIndex === 1) return "  Normgrenze: 100%";
+              const v = ctx.parsed.r;
+              const status = v > 120 ? "⚠️ deutlich erhöht" : v > 100 ? "⬆ leicht erhöht" : "✓ normal";
+              return `  ${ctx.label}: ${v}% ${status}`;
+            },
+          },
+        },
+      },
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: Math.max(150, ...radarData.map(v => Math.min(v + 20, 200))),
+          ticks: {
+            color: isDark ? "#94a3b8" : "#64748b",
+            backdropColor: "transparent",
+            font: { size: 10 },
+            stepSize: 50,
+          },
+          grid: {
+            color: isDark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.1)",
+          },
+          angleLines: {
+            color: isDark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.1)",
+          },
+          pointLabels: {
+            color: isDark ? "#e2e8f0" : "#1e293b",
+            font: { size: 13, weight: "600" },
+          },
+        },
+      },
+    },
+  });
 }

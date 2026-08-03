@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 
-from app.config.settings import GROUP_DESCRIPTIONS, TEST_DESCRIPTIONS
+from app.config.settings import GROUP_DESCRIPTIONS, TEST_DESCRIPTIONS, KURZNAMEN
 from app.core.bewertung import bewerte_gruppe
 from app.infrastructure.database import get_db
 
@@ -34,6 +34,7 @@ async def gruppe_detail(gruppe: str):
                     "einheit": r["einheit_norm"],
                     "normbereich": r["normbereich"],
                     "beschreibung": TEST_DESCRIPTIONS.get(t, ""),
+                    "kurzname": KURZNAMEN.get(t, ""),
                     "werte": [],
                 }
             tests[t]["werte"].append({

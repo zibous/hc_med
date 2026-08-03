@@ -96,6 +96,8 @@ def generate_verknuepfung_empfehlung(name: str, tests: dict) -> str:
         empfehlungen = _empfehlung_lipid(get_latest)
     elif name == "Cholesterin-Aufschlüsselung":
         empfehlungen = _empfehlung_cholesterin(get_latest)
+    elif name == "Gefäßgesundheit":
+        empfehlungen = _empfehlung_gefaesse(get_latest)
 
     if not empfehlungen:
         empfehlungen = ["Keine spezifischen Auffälligkeiten in dieser Kombination."]
@@ -230,4 +232,47 @@ def _empfehlung_cholesterin(get_latest):
         e.append(f"HDL {hdl:.0f} gut (schützt Gefäße).")
     if ldl and ldl < 130:
         e.append(f"LDL {ldl:.0f} im Zielbereich.")
+    return e
+
+
+def _empfehlung_gefaesse(get_latest):
+    e = []
+    ldl, _ = get_latest("LDL")
+    hdl, _ = get_latest("HDL")
+    trig, _ = get_latest("Triglyceride")
+    crp, _ = get_latest("CRP")
+    hba1c, _ = get_latest("HbA1c")
+    hs, _ = get_latest("Harnsäure")
+
+    # Risiko-Score (vereinfacht)
+    risiko = 0
+    if trig and trig > 200: risiko += 2
+    if crp and crp > 0.5: risiko += 2
+    if hba1c and hba1c > 5.7: risiko += 1
+    if ldl and ldl > 130: risiko += 1
+    if hs and hs > 7.0: risiko += 1
+    if hdl and hdl < 40: risiko += 1
+
+    if risiko >= 5:
+        e.append(f"⚠️ Erhöhtes Gefäßrisiko (Score {risiko}/8). Mehrere Risikofaktoren zusammen wirken sich stärker aus als einzeln.")
+    elif risiko >= 3:
+        e.append(f"Mäßig erhöhtes Gefäßrisiko (Score {risiko}/8). Einzelne Werte beobachten.")
+    else:
+        e.append(f"Geringes Gefäßrisiko (Score {risiko}/8) – gut!")
+
+    # Spezifische Empfehlungen
+    if trig and trig > 200:
+        e.append(f"PRIORITÄT 1: Triglyceride ({trig:.0f}) senken – Zucker/Alkohol meiden, Omega-3, Bewegung. Effekt in 4-8 Wochen messbar.")
+    if crp and crp > 1.0:
+        e.append(f"PRIORITÄT 2: Entzündung (CRP {crp:.1f}) reduzieren – destabilisiert bestehende Plaques. Ursache suchen.")
+    if hba1c and hba1c > 5.7:
+        e.append(f"PRIORITÄT 3: Blutzucker (HbA1c {hba1c:.1f}%) schädigt Gefäßinnenwand. Zucker/Weißmehl reduzieren, nach Essen bewegen.")
+    if ldl and ldl > 130:
+        e.append(f"LDL {ldl:.0f} leicht über Zielwert 130. Bei zusätzlichen Risikofaktoren mit Arzt über Therapie sprechen.")
+    if hdl and hdl >= 55:
+        e.append(f"HDL {hdl:.0f} ist gut – schützt die Gefäße aktiv. Weiter mit Bewegung und ungesättigten Fetten.")
+    if hs and hs > 7.0:
+        e.append(f"Harnsäure {hs:.1f} leicht erhöht – fördert Gefäßentzündung. Viel trinken, weniger Fleisch.")
+
+    e.append("Allgemein: 30min Bewegung/Tag (Gehen reicht), mediterrane Ernährung, Nichtrauchen, Blutdruck <135/85.")
     return e

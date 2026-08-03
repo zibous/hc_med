@@ -8,7 +8,7 @@ const BEWERTUNG_STYLES = {
   kritisch: { icon: "🚨", color: "var(--red)" },
 };
 
-export function renderKPIs(kpis, gruppen, vergleich) {
+export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
   const el = document.getElementById("kpis");
   if (!kpis) { el.innerHTML = ""; return; }
 
@@ -86,6 +86,16 @@ export function renderKPIs(kpis, gruppen, vergleich) {
       </div>
       <div class="kpi-sub">${vergleich.stabil_count || 0} Tests unverändert</div>
     </div>` : ''}
+    ${gefaess ? `<div class="kpi kpi-wide kpi-clickable" id="kpi-gefaess" style="cursor:pointer; border-left:3px solid ${gefaess.status === 'kritisch' ? 'var(--red)' : gefaess.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
+      <div class="kpi-label">🫀 Gefäßgesundheit (Arterien-Risiko)</div>
+      <div class="kpi-value-text">
+        <span style="color:${gefaess.status === 'kritisch' ? 'var(--red)' : gefaess.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
+          Score ${gefaess.score}/${gefaess.max} – ${gefaess.status === 'kritisch' ? 'Erhöhtes Risiko' : gefaess.status === 'auffällig' ? 'Mäßiges Risiko' : 'Geringes Risiko'}
+        </span>
+        ${gefaess.details.length ? ' · ' + gefaess.details.join(', ') : ''}
+      </div>
+      <div class="kpi-sub">Klick für Detailanalyse mit Empfehlungen →</div>
+    </div>` : ''}
   `;
 
   // Klick auf Gruppen-Links
@@ -99,5 +109,10 @@ export function renderKPIs(kpis, gruppen, vergleich) {
   // Klick auf "Auffällige Werte"
   document.getElementById("kpi-auffaellig")?.addEventListener("click", () => {
     navigate("pathologisch", {});
+  });
+
+  // Klick auf Gefäßgesundheit
+  document.getElementById("kpi-gefaess")?.addEventListener("click", () => {
+    navigate("verknuepfung", { verknuepfung: "Gefäßgesundheit" });
   });
 }
