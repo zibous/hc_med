@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 
-from app.config.settings import TEST_DESCRIPTIONS, EREIGNISSE, VERKNUEPFUNGEN, KURZNAMEN
+from app.config.settings import TEST_DESCRIPTIONS, EREIGNISSE, VERKNUEPFUNGEN, KURZNAMEN, NUECHTERN_SENSITIV
 from app.core.empfehlungen import get_test_empfehlung
 from app.core.bewertung import bewerte_trend
 from app.infrastructure.database import get_db
@@ -16,8 +16,11 @@ async def trend(test: str):
     conn = get_db()
     try:
         rows = conn.execute(
-            """SELECT datum, wert_norm, einheit_norm, normbereich, flag, alter_bei_messung
-               FROM laborwerte WHERE test_standard=? ORDER BY datum""",
+            """SELECT l.datum, l.wert_norm, l.einheit_norm, l.normbereich, l.flag, l.alter_bei_messung,
+                      b.nuechtern
+               FROM laborwerte l
+               JOIN befunde b ON b.id = l.befund_id
+               WHERE l.test_standard=? ORDER BY l.datum""",
             (test,),
         ).fetchall()
 
@@ -54,6 +57,17 @@ async def trend(test: str):
         # Test-spezifische Empfehlung
         trend_empfehlung = get_test_empfehlung(test, last_val, last_flag, normbereich, conn)
 
+        # Nüchtern-Hinweis: Prüfen ob nicht-nüchtern-Befunde vorhanden sind
+        nuechtern_hinweis = ""
+        if test in NUECHTERN_SENSITIV:
+            nicht_nuechtern = conn.execute("""
+                SELECT COUNT(*) FROM laborwerte l
+                JOIN befunde b ON b.id = l.befund_id
+                WHERE l.test_standard = ? AND b.nuechtern = 0
+            """, (test,)).fetchone()[0]
+            if nicht_nuechtern:
+                nuechtern_hinweis = f"⚠️ Dieser Test ist nüchtern-sensitiv. {nicht_nuechtern} von {len(rows)} Messungen wurden NICHT nüchtern durchgeführt – diese Werte können deutlich verfälscht sein."
+
         return {
             "test": test,
             "kurzname": KURZNAMEN.get(test, ""),
@@ -63,7 +77,11 @@ async def trend(test: str):
             "bewertung": bewertung,
             "bewertung_empfehlung": trend_empfehlung,
             "bewertung_status": bewertung_status,
-            "werte": [dict(r) for r in rows],
+            "nuechtern_hinweis": nuechtern_hinweis,
+            "werte": [
+                {**dict(r), "nicht_nuechtern": (test in NUECHTERN_SENSITIV and r["nuechtern"] == 0)}
+                for r in rows
+            ],
             "ereignisse": relevante_ereignisse,
             "verknuepfungen": verwandte,
         }

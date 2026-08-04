@@ -63,7 +63,9 @@ TEST_ALIASES: dict[str, str] = {
     "neutroph. gran. rel.": "Neutrophile rel.",
     "neutrophile abs": "Neutrophile abs.",
     "neutrophile abs.": "Neutrophile abs.",
+    "neutrophile": "Neutrophile rel.",
     "granulocytes": "Granulozyten rel.",
+    "granulozyten": "Granulozyten rel.",
     "index ldl/hdl": "Quotient LDL/HDL",
     "gran.aut.": "Granulozyten rel.",
     "granul.abs": "Granulozyten abs.",
@@ -71,6 +73,7 @@ TEST_ALIASES: dict[str, str] = {
     "lymphocyten absolut": "Lymphozyten abs.",
     "lymphozyten abs.": "Lymphozyten abs.",
     "lymphozyten rel.": "Lymphozyten rel.",
+    "lymphozyten": "Lymphozyten rel.",
     "lymph.abs.": "Lymphozyten abs.",
     "lymph.aut.": "Lymphozyten rel.",
     "monocyten %": "Monozyten rel.",
@@ -83,6 +86,7 @@ TEST_ALIASES: dict[str, str] = {
     "eosinophile %": "Eosinophile rel.",
     "eosinophile gr. abs.": "Eosinophile abs.",
     "eosinophile gr. rel.": "Eosinophile rel.",
+    "eosinophile": "Eosinophile rel.",
     "eos.aut.": "Eosinophile rel.",
     "eos": "Eosinophile abs.",
     "basophile %": "Basophile rel.",
@@ -90,6 +94,15 @@ TEST_ALIASES: dict[str, str] = {
     "basophile gr.rel.": "Basophile rel.",
     "baso.aut.": "Basophile rel.",
     "baso": "Basophile abs.",
+    # Unreife Granulozyten / Normoblasten (KH-spezifisch)
+    "ig-absolut": "IG-Absolut",
+    "ig-wert": "IG-Wert",
+    "nrbc": "NRBC",
+    "nrbc-a": "NRBC-A",
+    "normoblast.(nrbc)rt.": "NRBC",
+    "normoblasten (nrbc) abs.": "NRBC-A",
+    "unreife neutrophile granulozyten abs.": "IG-Absolut",
+    "gran., unreife rel.": "IG-Wert",
     # Entzündung
     "crp": "CRP",
     "crp hs": "CRP",
@@ -1184,6 +1197,13 @@ def main():
         fmt = detect_format(filepath)
         print(f"  {filepath.name} -> Format: {fmt}")
 
+        # Nüchtern-Tag aus Datei erkennen (# nüchtern: nein/ja)
+        file_text = filepath.read_text(encoding="utf-8", errors="replace")
+        nuechtern = 1  # Default: ja/unbekannt
+        nuechtern_match = re.search(r"#\s*nüchtern\s*:\s*(nein|ja|no|yes)", file_text, re.IGNORECASE)
+        if nuechtern_match:
+            nuechtern = 0 if nuechtern_match.group(1).lower() in ("nein", "no") else 1
+
         if fmt == "simple_csv":
             results = parse_simple_csv(filepath)
         elif fmt == "csv":
@@ -1314,8 +1334,94 @@ def main():
             elif norm_lo is not None and wert < norm_lo:
                 row["Flag"] = "L"
 
-        file_results.append((filepath.name, fmt, results))
+        file_results.append((filepath.name, fmt, results, nuechtern))
         all_results.extend(results)
+
+    # ─── Berechnete Werte: Non-HDL-Cholesterin ──────────────────────────────────
+    # Non-HDL = Cholesterin - HDL (wenn beide am selben Datum vorhanden, aber Non-HDL fehlt)
+    from collections import defaultdict
+    by_datum = defaultdict(dict)
+    for row in all_results:
+        by_datum[row["Datum"]][row["Test_Standard"]] = row
+
+    non_hdl_added = 0
+    chol_hdl_added = 0
+    ldl_hdl_added = 0
+    for datum, tests in by_datum.items():
+        # Non-HDL-Cholesterin = Cholesterin - HDL
+        if "Non-HDL-Cholesterin" not in tests and "Cholesterin" in tests and "HDL" in tests:
+            try:
+                chol_val = float(tests["Cholesterin"]["Wert_Norm"].replace("<", "").replace(">", ""))
+                hdl_val = float(tests["HDL"]["Wert_Norm"].replace("<", "").replace(">", ""))
+            except (ValueError, TypeError):
+                pass
+            else:
+                non_hdl = round(chol_val - hdl_val, 1)
+                flag = "H" if non_hdl >= 160 else ""
+                age = tests["Cholesterin"].get("Alter", "")
+                all_results.append({
+                    "Datum": datum, "Alter": age, "Gruppe": "Lipide",
+                    "Test_Standard": "Non-HDL-Cholesterin",
+                    "Test": "Non-HDL-Cholesterin (berechnet)",
+                    "Wert_Norm": str(non_hdl), "Einheit_Norm": "mg/dL",
+                    "Wert": str(non_hdl), "Einheit": "mg/dL",
+                    "Normbereich": "<160", "Flag": flag,
+                })
+                non_hdl_added += 1
+
+        # Quotient Chol/HDL = Cholesterin / HDL
+        if "Quotient Chol/HDL" not in tests and "Cholesterin" in tests and "HDL" in tests:
+            try:
+                chol_val = float(tests["Cholesterin"]["Wert_Norm"].replace("<", "").replace(">", ""))
+                hdl_val = float(tests["HDL"]["Wert_Norm"].replace("<", "").replace(">", ""))
+            except (ValueError, TypeError):
+                pass
+            else:
+                if hdl_val > 0:
+                    quot = round(chol_val / hdl_val, 1)
+                    flag = "H" if quot > 5.0 else ""
+                    age = tests["Cholesterin"].get("Alter", "")
+                    all_results.append({
+                        "Datum": datum, "Alter": age, "Gruppe": "Lipide",
+                        "Test_Standard": "Quotient Chol/HDL",
+                        "Test": "Quotient Chol/HDL (berechnet)",
+                        "Wert_Norm": str(quot), "Einheit_Norm": "",
+                        "Wert": str(quot), "Einheit": "",
+                        "Normbereich": "0.0-5.0", "Flag": flag,
+                    })
+                    chol_hdl_added += 1
+
+        # Quotient LDL/HDL = LDL / HDL
+        if "Quotient LDL/HDL" not in tests and "LDL" in tests and "HDL" in tests:
+            try:
+                ldl_val = float(tests["LDL"]["Wert_Norm"].replace("<", "").replace(">", ""))
+                hdl_val = float(tests["HDL"]["Wert_Norm"].replace("<", "").replace(">", ""))
+            except (ValueError, TypeError):
+                pass
+            else:
+                if hdl_val > 0:
+                    quot = round(ldl_val / hdl_val, 1)
+                    flag = "H" if quot > 3.0 else ""
+                    age = tests["LDL"].get("Alter", "")
+                    all_results.append({
+                        "Datum": datum, "Alter": age, "Gruppe": "Lipide",
+                        "Test_Standard": "Quotient LDL/HDL",
+                        "Test": "Quotient LDL/HDL (berechnet)",
+                        "Wert_Norm": str(quot), "Einheit_Norm": "",
+                        "Wert": str(quot), "Einheit": "",
+                        "Normbereich": "0.0-3.0", "Flag": flag,
+                    })
+                    ldl_hdl_added += 1
+
+    berechnet_total = non_hdl_added + chol_hdl_added + ldl_hdl_added
+    if berechnet_total:
+        print(f"\n  📐 Berechnete Werte:")
+        if non_hdl_added:
+            print(f"    Non-HDL-Cholesterin: {non_hdl_added} (Cholesterin − HDL)")
+        if chol_hdl_added:
+            print(f"    Quotient Chol/HDL: {chol_hdl_added} (Cholesterin ÷ HDL)")
+        if ldl_hdl_added:
+            print(f"    Quotient LDL/HDL: {ldl_hdl_added} (LDL ÷ HDL)")
 
     # Nach Gruppe, Standard-Test und Datum sortieren
     all_results.sort(key=lambda x: (x["Gruppe"], x["Test_Standard"], x["Datum"]))
@@ -1342,7 +1448,7 @@ def main():
         )
 
         db_total = 0
-        for filename, fmt, results in file_results:
+        for filename, fmt, results, nuechtern_flag in file_results:
             # Labor aus Dateiformat/Name ableiten
             if fmt == "tab":
                 labor = "Dr. Zünd, Lustenau"
@@ -1352,7 +1458,15 @@ def main():
                 labor = ""
 
             count = db.import_results(
-                results, quelldatei=filename, patient_id=patient_id, format=fmt, labor=labor
+                results, quelldatei=filename, patient_id=patient_id, format=fmt, labor=labor, nuechtern=nuechtern_flag
+            )
+            db_total += count
+
+        # Berechnete Werte (Non-HDL etc.) separat importieren
+        berechnete = [r for r in all_results if "(berechnet)" in r.get("Test", "")]
+        if berechnete:
+            count = db.import_results(
+                berechnete, quelldatei="berechnet", patient_id=patient_id, format="berechnet", labor="berechnet"
             )
             db_total += count
 

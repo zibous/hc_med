@@ -276,6 +276,30 @@ body {
 .fav-star:hover { transform: scale(1.25); }
 .fav-star.active svg { filter: drop-shadow(0 0 3px rgba(245,158,11,.4)); }
 .trend-star-row { display: inline-flex; align-items: center; margin-right: .4rem; vertical-align: middle; }
+.nuechtern-hinweis {
+  margin-top: 1rem; padding: .6rem 1rem; border-radius: 6px;
+  background: rgba(245,158,11,.04); 
+  font-size: 1.15rem; color: var(--text-muted); line-height: 1.4;
+}
+
+/* Health Cards (Gruppen-Detail, Apple Health Style) */
+.health-card { display: flex; flex-direction: column; gap: .8rem; }
+.health-card-header { display: flex; justify-content: space-between; align-items: center; }
+.health-card-label { font-size: 1.2rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+.health-card-count { font-size: 1.1rem; color: var(--text-muted); }
+.health-bar { display: flex; gap: 3px; height: 12px; }
+.health-seg { flex: 1; border-radius: 6px; }
+.health-seg.ok { background: var(--green); }
+.health-seg.path { background: var(--red); opacity: .7; }
+.health-legend { display: flex; gap: 1.5rem; font-size: 1.2rem; }
+.health-legend-item { display: flex; align-items: center; gap: .4rem; }
+.health-dot { width: 10px; height: 10px; border-radius: 50%; }
+.health-dot.ok { background: var(--green); }
+.health-dot.path { background: var(--red); }
+.health-status { display: flex; align-items: center; gap: .8rem; }
+.health-status-icon { font-size: 2.4rem; }
+.health-status-label { font-size: 1.8rem; font-weight: 700; }
+.health-sub { font-size: 1.2rem; color: var(--text-muted); line-height: 1.5; }
 
 /* Gefäß-Score Card (Apple Health Style) */
 .gefaess-score-card {
@@ -394,9 +418,15 @@ body {
     background: #fff !important; border-color: #d1d5db !important;
     box-shadow: none !important; break-inside: avoid;
   }
-  .chart-card { border-left: 3px solid #14b8a6 !important; padding: 1rem !important; background: #1a1d27 !important; }
-  .radar-col { border-left: 3px solid #3b82f6 !important; background: #1a1d27 !important; }
+  .chart-card { border-left: 3px solid #14b8a6 !important; padding: 1rem !important; background: #fff !important; }
+  .radar-col { border-left: 3px solid #3b82f6 !important; background: #fff !important; }
   .chart-card canvas { height: 280px !important; background: #fff !important; }
+  .gefaess-score-card { background: #fff !important; border-color: #d1d5db !important; }
+  .score-seg.filled { background: #dc2626 !important; }
+  .score-seg.empty { background: #e5e7eb !important; }
+  .score-faktor.aktiv { background: #fef2f2 !important; }
+  .score-faktor-name, .score-faktor-wert { color: #1e293b !important; }
+  .score-faktor.aktiv .score-faktor-name, .score-faktor.aktiv .score-faktor-wert { color: #dc2626 !important; }
   .radar-empfehlung-row {
     grid-template-columns: 250px 1fr; gap: 1.5rem;
   }

@@ -29,14 +29,11 @@ def bewerte_gruppe(ok_count: int, path_count: int, total: int) -> tuple[str, str
 def bewerte_trend(rows: list, recent_count: int = 5) -> tuple[str, str]:
     """Bewertet einen einzelnen Test anhand der letzten Werte.
 
+    Primär am letzten Wert orientiert, mit Kontext der letzten Messungen.
     Returns: (bewertung_text, bewertung_status)
     """
     if not rows:
         return "", "gut"
-
-    recent = rows[-recent_count:] if len(rows) >= recent_count else rows
-    recent_path = sum(1 for r in recent if r["flag"] in ("H", "L"))
-    recent_ratio = recent_path / len(recent)
 
     last_val = rows[-1]["wert_norm"]
     last_flag = rows[-1]["flag"]
@@ -56,19 +53,30 @@ def bewerte_trend(rows: list, recent_count: int = 5) -> tuple[str, str]:
             norm = nb
             break
 
-    if recent_ratio == 0:
+    # Status primär am letzten Wert
+    if not last_flag:
+        # Letzter Wert OK – prüfe ob letzte 3 auch OK
+        recent3 = rows[-3:] if len(rows) >= 3 else rows
+        r3_path = sum(1 for r in recent3 if r["flag"] in ("H", "L"))
+        if r3_path == 0:
+            status = "gut"
+        else:
+            status = "gut"  # Letzter OK, tendenz besser
         text = _trend_texte.get("gut", "").format(wert=last_val, einheit=einheit, flag_text=flag_text, norm=norm)
-        status = "gut"
-    elif recent_ratio < 0.4:
-        text = _trend_texte.get("auffällig", "").format(wert=last_val, einheit=einheit, flag_text=flag_text, norm=norm)
-        status = "auffällig"
     else:
-        text = _trend_texte.get("kritisch", "").format(wert=last_val, einheit=einheit, flag_text=flag_text, norm=norm)
-        status = "kritisch"
+        # Letzter Wert auffällig – prüfe Schwere
+        recent3 = rows[-3:] if len(rows) >= 3 else rows
+        r3_path = sum(1 for r in recent3 if r["flag"] in ("H", "L"))
+        if r3_path >= 3:
+            status = "kritisch"
+            text = _trend_texte.get("kritisch", "").format(wert=last_val, einheit=einheit, flag_text=flag_text, norm=norm)
+        else:
+            status = "auffällig"
+            text = _trend_texte.get("auffällig", "").format(wert=last_val, einheit=einheit, flag_text=flag_text, norm=norm)
 
     # Historischer Kontext
     all_path = sum(1 for r in rows if r["flag"] in ("H", "L"))
-    if all_path > 0 and recent_ratio == 0:
+    if all_path > 0 and not last_flag:
         hist_tmpl = _trend_texte.get("historisch", "")
         text += " " + hist_tmpl.format(count=all_path, total=len(rows))
 

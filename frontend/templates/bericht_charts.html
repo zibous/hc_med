@@ -69,6 +69,31 @@
 const tests = {{ charts_json | safe }};
 const container = document.getElementById('report');
 
+// Sortierung clientseitig (gleiche Logik wie in cards.js)
+const urlParams = new URLSearchParams(window.location.search);
+const sortCol = urlParams.get('sort') || 'datum';
+const sortDir = parseInt(urlParams.get('dir') || '-1');
+
+tests.sort((a, b) => {
+  let va, vb;
+  if (sortCol === 'datum') { va = a.datum || ''; vb = b.datum || ''; }
+  else if (sortCol === 'gruppe') { va = a.gruppe || ''; vb = b.gruppe || ''; }
+  else if (sortCol === 'test_standard') { va = a.name || ''; vb = b.name || ''; }
+  else if (sortCol === 'flag') { va = a.flag || ''; vb = b.flag || ''; }
+  else if (sortCol === 'wert_norm') {
+    va = parseFloat(String(a.values[a.values.length-1]||'').replace(/[<>,]/g,'')) || 0;
+    vb = parseFloat(String(b.values[b.values.length-1]||'').replace(/[<>,]/g,'')) || 0;
+  }
+  else if (sortCol === 'anzahl') {
+    va = a.flags.filter(f => f === 'H' || f === 'L').length;
+    vb = b.flags.filter(f => f === 'H' || f === 'L').length;
+  }
+  else { va = a.datum || ''; vb = b.datum || ''; }
+  if (va < vb) return -1 * sortDir;
+  if (va > vb) return 1 * sortDir;
+  return 0;
+});
+
 tests.forEach((t, idx) => {
     const values = t.values.map(v => {
         let raw = String(v).replace(',','.').replace(/^[<>]/,'');

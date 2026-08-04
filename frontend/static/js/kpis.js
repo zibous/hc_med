@@ -16,26 +16,38 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
   if (kpis.bewertung) {
     const bst = BEWERTUNG_STYLES[kpis.bewertung_status] || BEWERTUNG_STYLES.gut;
     const normPct = kpis.gesamt > 0 ? Math.round(kpis.ok / kpis.gesamt * 100) : 100;
+    const pathPct = 100 - normPct;
+
+    // Segmented progress bar
+    const okSegs = Math.round(normPct / 10);
+    const pathSegs = 10 - okSegs;
+    let barHtml = "";
+    for (let i = 0; i < 10; i++) {
+      const filled = i < okSegs;
+      barHtml += `<div class="health-seg ${filled ? "ok" : "path"}"></div>`;
+    }
+
     el.innerHTML = `
-      <div class="kpi">
-        <div class="kpi-label">Im Normbereich</div>
-        <div class="kpi-value green">${normPct}%</div>
-        <div class="kpi-sub">${kpis.ok} von ${kpis.gesamt} Werten</div>
+      <div class="kpi kpi-half health-card">
+        <div class="health-card-header">
+          <span class="health-card-label">Verteilung</span>
+          <span class="health-card-count">${kpis.gesamt} Messungen</span>
+        </div>
+        <div class="health-bar">${barHtml}</div>
+        <div class="health-legend">
+          <span class="health-legend-item"><span class="health-dot ok"></span>${kpis.ok} im Norm (${normPct}%)</span>
+          <span class="health-legend-item"><span class="health-dot path"></span>${kpis.auffaellig} auffällig (${pathPct}%)</span>
+        </div>
       </div>
-      <div class="kpi">
-        <div class="kpi-label">Auffällig</div>
-        <div class="kpi-value red">${kpis.auffaellig}</div>
-        <div class="kpi-sub">${kpis.gesamt} Messungen gesamt</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">Einschätzung</div>
-        <div class="kpi-value-text" style="color:${bst.color}">${bst.icon} ${kpis.bewertung_status === 'gut' ? 'Sehr gut' : kpis.bewertung_status === 'ok' ? 'OK' : kpis.bewertung_status === 'auffällig' ? 'Beobachten' : 'Handeln'}</div>
-        <div class="kpi-sub">${kpis.bewertung}</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">Status</div>
-        <div class="kpi-value-text">${bst.icon}</div>
-        <div class="kpi-sub" style="color:${bst.color}">${kpis.bewertung}</div>
+      <div class="kpi kpi-half health-card">
+        <div class="health-card-header">
+          <span class="health-card-label">Einschätzung</span>
+        </div>
+        <div class="health-status" style="color:${bst.color}">
+          <span class="health-status-icon">${bst.icon}</span>
+          <span class="health-status-label">${kpis.bewertung_status === 'gut' ? 'Sehr gut' : kpis.bewertung_status === 'ok' ? 'Weitgehend OK' : kpis.bewertung_status === 'auffällig' ? 'Beobachten' : 'Handeln'}</span>
+        </div>
+        <div class="health-sub">${kpis.bewertung}</div>
       </div>
     `;
     return;
@@ -96,6 +108,11 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
       </div>
       <div class="kpi-sub">Klick für Detailanalyse mit Empfehlungen →</div>
     </div>` : ''}
+    <div class="kpi kpi-half kpi-clickable" id="kpi-gesamtbericht" style="cursor:pointer; border-left:3px solid var(--accent)">
+      <div class="kpi-label">📋 Gesamtbericht</div>
+      <div class="kpi-value-text">Alle Befunde auf einer Seite – für den Arzttermin</div>
+      <div class="kpi-sub">Klick → druckfertiger Bericht in neuem Tab →</div>
+    </div>
   `;
 
   // Klick auf Gruppen-Links
@@ -119,5 +136,10 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
   // Klick auf Vergleich
   document.getElementById("kpi-vergleich")?.addEventListener("click", () => {
     navigate("vergleich", {});
+  });
+
+  // Klick auf Gesamtbericht
+  document.getElementById("kpi-gesamtbericht")?.addEventListener("click", () => {
+    window.open("api/gesamtbericht", "_blank");
   });
 }

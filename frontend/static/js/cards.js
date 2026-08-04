@@ -182,7 +182,7 @@ export function renderCards(items, mode = "gruppe") {
       el.querySelectorAll("th[data-col]").forEach(th => {
         th.addEventListener("click", () => {
           const newCol = th.dataset.col;
-          if (newCol === sortCol) { sortDir *= -1; } else { sortCol = newCol; sortDir = -1; }
+          if (newCol === sortCol) { sortDir *= -1; } else { sortCol = newCol; sortDir = 1; }
           state.pathSortCol = sortCol;
           state.pathSortDir = sortDir;
           localStorage.setItem("lab_state", JSON.stringify(state));
@@ -192,6 +192,10 @@ export function renderCards(items, mode = "gruppe") {
           if (btn) btn.href = `api/bericht/charts?period=${state.pathPeriod || 'all'}&sort=${sortCol}&dir=${sortDir}`;
         });
       });
+
+      // Bericht-Link immer nach renderTable aktualisieren
+      const btn = document.querySelector(".report-btn");
+      if (btn) btn.href = `api/bericht/charts?period=${state.pathPeriod || 'all'}&sort=${col}&dir=${dir}`;
 
       // Row-Click
       el.querySelectorAll(".path-row").forEach(row => {

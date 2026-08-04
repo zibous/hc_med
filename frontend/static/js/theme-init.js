@@ -49,3 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const cy = document.getElementById('currentYear');
   if (cy) cy.textContent = new Date().getFullYear();
 });
+
+// 4. PRINT-HANDLING: Hinweis dass Bericht-Button für optimalen Druck genutzt werden sollte
+// Charts werden im aktuellen Theme gerendert (Canvas ist Bitmap, nicht per CSS änderbar)

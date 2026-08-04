@@ -110,6 +110,9 @@ export async function loadView() {
     // Radar/Empfehlung-Row immer bereinigen (wird nur in Verknüpfung neu erstellt)
     cleanupRadar();
 
+    // Nüchtern-Hinweis entfernen (wird nur im Trend-View neu erstellt)
+    document.querySelectorAll(".nuechtern-hinweis").forEach(el => el.remove());
+
     if (state.view === "overview") {
       const res = await fetch("api/overview");
       const data = await res.json();
@@ -206,6 +209,14 @@ export async function loadView() {
       renderKPIs(null);
       renderCards(null);
       renderChart(data);
+      // Nüchtern-Hinweis unter dem Chart (dezent, mit Markierungs-Beispiel)
+      if (data.nuechtern_hinweis) {
+        const chartCard = document.getElementById("chartCard");
+        const hinweis = document.createElement("div");
+        hinweis.className = "nuechtern-hinweis";
+        hinweis.innerHTML = `<svg width="12" height="12" style="vertical-align:middle;margin-right:6px;"><circle cx="6" cy="6" r="4" fill="var(--red)" stroke="#f59e0b" stroke-width="2"/></svg>${data.nuechtern_hinweis}`;
+        chartCard.appendChild(hinweis);
+      }
       // Stern-Toggle + Beschreibung + Referenzwerte + Bewertung + Verknüpfungs-Links
       let desc = `<span class="trend-star-row">${starIconHtml(data.test)}</span>`;
       desc += data.beschreibung || "";
@@ -238,7 +249,7 @@ export async function loadView() {
       // Beschreibung oben + Drucken-Button rechts
       let desc = `<div style="display:flex;align-items:center;gap:1rem;">`;
       desc += `<span style="flex:1">${data.beschreibung || ""}</span>`;
-      desc += `<button class="print-btn" onclick="window.print()">🖨️ Drucken</button>`;
+      desc += `<button class="print-btn" id="printVerknuepfung">🖨️ Drucken</button>`;
       desc += `</div>`;
       document.getElementById("view-description").innerHTML = desc;
       // Radar + Empfehlung nebeneinander
@@ -251,6 +262,10 @@ export async function loadView() {
         document.getElementById("print-patient").textContent = patEl ? patEl.textContent : "";
         document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
       }
+      // Drucken-Button: Öffnet druckoptimierte Version in neuem Tab
+      document.getElementById("printVerknuepfung")?.addEventListener("click", () => {
+        window.open(`api/verknuepfung/${encodeURIComponent(state.verknuepfung)}/print`, "_blank");
+      });
     }
     renderBreadcrumb();
   } catch (err) {

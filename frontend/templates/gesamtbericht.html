@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Gesamtbericht – {{ generated_at }}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 1rem; color: #1a1a1a; margin: 1.5cm; line-height: 1.5; }
+    html { font-size: 18px; }
+    h1 { font-size: 1.5rem; margin-bottom: .2rem; }
+    h2 { font-size: 1.15rem; margin: 1.5rem 0 .6rem; padding-bottom: .3rem; border-bottom: 2px solid #e2e8f0; }
+    .meta { color: #666; font-size: .85rem; margin-bottom: 1.5rem; }
+    .print-btn { position: fixed; top: 1rem; right: 1rem; padding: .7rem 1.4rem; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 10pt; cursor: pointer; z-index: 100; }
+    .period-link { padding: .4rem .9rem; border-radius: 99px; border: 1px solid #e2e8f0; text-decoration: none; font-size: 9pt; font-weight: 500; color: #444; }
+    .period-link:hover { border-color: #2563eb; color: #2563eb; }
+    .period-link.active { background: #2563eb; color: white; border-color: #2563eb; }
+
+    /* Gruppen-Ampel */
+    .gruppen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .6rem; margin-bottom: 1.5rem; }
+    .gruppe-card { padding: .6rem .8rem; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: .5rem; }
+    .gruppe-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .gruppe-dot.gut { background: #22c55e; }
+    .gruppe-dot.ok { background: #86efac; }
+    .gruppe-dot.auffällig { background: #f59e0b; }
+    .gruppe-dot.kritisch { background: #ef4444; }
+    .gruppe-name { font-size: .85rem; font-weight: 600; flex: 1; }
+    .gruppe-count { font-size: .75rem; color: #666; }
+
+    /* Gefäß Score */
+    .score-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; max-width: 400px; }
+    .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+    .score-label { font-size: .75rem; font-weight: 600; color: #666; text-transform: uppercase; }
+    .score-value { font-size: 1.8rem; font-weight: 800; }
+    .score-value.kritisch { color: #dc2626; }
+    .score-value.auffällig { color: #d97706; }
+    .score-value.gut { color: #16a34a; }
+    .score-bar { display: flex; gap: 3px; height: 8px; margin-bottom: .4rem; }
+    .score-seg { flex: 1; border-radius: 4px; }
+    .score-seg.filled { background: #dc2626; }
+    .score-seg.empty { background: #e5e7eb; }
+    .score-status { font-size: .8rem; font-weight: 600; margin-bottom: .8rem; }
+    .faktor { display: flex; align-items: center; gap: .5rem; font-size: .8rem; padding: .25rem .4rem; border-radius: 4px; margin-bottom: .15rem; }
+    .faktor.aktiv { background: #fef2f2; color: #dc2626; font-weight: 600; }
+    .faktor-name { flex: 1; }
+    .faktor-dots { display: flex; gap: 2px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #e5e7eb; }
+    .dot.active { background: #dc2626; }
+
+    /* Auffällige Tests Tabelle */
+    .tests-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-bottom: 1.5rem; }
+    .tests-table th { text-align: left; padding: .4rem .5rem; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #666; font-size: .75rem; text-transform: uppercase; }
+    .tests-table td { padding: .4rem .5rem; border-bottom: 1px solid #f1f5f9; }
+    .tests-table tr.crit td { background: #fef2f2; }
+    .flag-h { color: #dc2626; font-weight: 700; }
+    .flag-l { color: #2563eb; font-weight: 700; }
+    .trend-worse { color: #dc2626; }
+    .trend-better { color: #16a34a; }
+    .empfehlung-cell { font-size: .75rem; color: #444; max-width: 250px; }
+
+    /* Charts */
+    .chart-section { page-break-inside: avoid; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; }
+    .chart-section h3 { font-size: 1rem; margin: 0 0 .3rem; }
+    .chart-desc { font-size: .75rem; color: #666; margin-bottom: .5rem; }
+    .chart-wrap { height: 200px; }
+    .chart-emp { font-size: .8rem; color: #166534; background: #f0fdf4; padding: .5rem .7rem; border-radius: 4px; margin-top: .5rem; }
+
+    /* Vorjahresvergleich */
+    .vergleich-section { margin-bottom: 1.5rem; }
+    .vergleich-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .vergleich-col h4 { font-size: .9rem; margin: 0 0 .4rem; }
+    .vergleich-item { font-size: .8rem; padding: .2rem 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; }
+    .vergleich-item .test-name { font-weight: 600; }
+    .vergleich-item .pct { font-weight: 700; }
+    .pct-worse { color: #dc2626; }
+    .pct-better { color: #16a34a; }
+
+    @media print {
+      .print-btn, .period-link { display: none; }
+      @page { margin: 1cm; }
+      body { margin: 0; }
+      .chart-section { page-break-inside: avoid; }
+      .score-card { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨️ Als PDF drucken</button>
+
+  <h1>🩸 Gesamtbericht Laborwerte</h1>
+  <div class="meta">{{ patient.vorname }} {{ patient.nachname }} · geb. {{ patient.geburtsdatum }} · Erstellt am {{ generated_at }} · Zeitraum: {{ period_label }}</div>
+
+  <!-- Zeitraum-Filter -->
+  <div style="margin-bottom:1.2rem; display:flex; gap:.4rem;">
+    <a href="?period=all" class="period-link {{ 'active' if period == 'all' else '' }}">Alle</a>
+    <a href="?period=1y" class="period-link {{ 'active' if period == '1y' else '' }}">1 Jahr</a>
+    <a href="?period=6m" class="period-link {{ 'active' if period == '6m' else '' }}">6 Monate</a>
+    <a href="?period=1m" class="period-link {{ 'active' if period == '1m' else '' }}">1 Monat</a>
+  </div>
+
+  <!-- Sektion 1: Gruppen-Ampel -->
+  <h2>Übersicht nach Gruppen</h2>
+  <div class="gruppen-grid">
+    {% for g in gruppen %}
+    <div class="gruppe-card">
+      <span class="gruppe-dot {{ g.status }}"></span>
+      <span class="gruppe-name">{{ g.icon }} {{ g.name }}</span>
+      {% if g.pathologisch > 0 %}<span class="gruppe-count">{{ g.pathologisch }}×</span>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Sektion 2: Gefäß Score + Radar -->
+  <h2>🫀 Gefäßgesundheit</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+    <div class="score-card">
+      <div class="score-header">
+        <span class="score-label">Arterien-Risiko</span>
+        <span class="score-value {{ gefaess_score.status }}">{{ gefaess_score.score }}/{{ gefaess_score.max }}</span>
+      </div>
+      <div class="score-bar">
+        {% for i in range(gefaess_score.max) %}
+        <div class="score-seg {{ 'filled' if i < gefaess_score.score else 'empty' }}"></div>
+        {% endfor %}
+      </div>
+      <div class="score-status" style="color: {{ '#dc2626' if gefaess_score.status == 'kritisch' else '#d97706' if gefaess_score.status == 'auffällig' else '#16a34a' }}">
+        {{ 'Erhöhtes Risiko' if gefaess_score.status == 'kritisch' else 'Mäßiges Risiko' if gefaess_score.status == 'auffällig' else 'Geringes Risiko' }}
+      </div>
+      {% for f in gefaess_score.faktoren %}
+      <div class="faktor {{ 'aktiv' if f.aktiv else '' }}">
+        <span class="faktor-name">{{ f.name }}</span>
+        <span>{{ f.wert }}</span>
+        <span class="faktor-dots">
+          {% for i in range(f.max) %}<span class="dot {{ 'active' if i < f.punkte else '' }}"></span>{% endfor %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="display:flex; align-items:center; justify-content:center;">
+      <canvas id="radarChart" style="max-width:280px; max-height:280px;"></canvas>
+    </div>
+  </div>
+
+  <!-- Sektion 3: Auffällige Tests -->
+  <h2>⚠️ Auffällige Laborwerte</h2>
+  {% if abnormal_tests %}
+  <table class="tests-table">
+    <thead>
+      <tr><th>Test</th><th>Gruppe</th><th>Wert</th><th>Norm</th><th>Flag</th><th>Trend</th><th>Empfehlung</th></tr>
+    </thead>
+    <tbody>
+      {% for t in abnormal_tests %}
+      <tr class="{{ t.bewertung_cls }}">
+        <td><strong>{{ t.name }}</strong></td>
+        <td>{{ t.gruppe }}</td>
+        <td>{{ t.wert }} {{ t.einheit }}</td>
+        <td>{{ t.norm }}</td>
+        <td class="{{ 'flag-h' if t.flag == 'H' else 'flag-l' }}">{{ '↑ hoch' if t.flag == 'H' else '↓ tief' }}</td>
+        <td class="{{ 'trend-worse' if t.trend_label == 'verschlechtert' else 'trend-better' if t.trend_label == 'verbessert' else '' }}">{{ t.trend }} {{ t.trend_label }}</td>
+        <td class="empfehlung-cell">{{ t.empfehlung[:120] }}{{ '…' if t.empfehlung|length > 120 else '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:#16a34a">✅ Keine auffälligen Laborwerte – alle Tests im Normbereich.</p>
+  {% endif %}
+
+  <!-- Sektion 4: Verknüpfungs-Charts -->
+  {% if verknuepfung_charts %}
+  <h2>📊 Zusammenhänge</h2>
+  {% for chart in verknuepfung_charts %}
+  <div class="chart-section">
+    <h3>{{ chart.name }}</h3>
+    <div class="chart-desc">{{ chart.beschreibung }}</div>
+    <div class="chart-wrap"><canvas id="chart{{ loop.index }}"></canvas></div>
+    {% if chart.empfehlung %}
+    <div class="chart-emp">💡 {{ chart.empfehlung[:200] }}{{ '…' if chart.empfehlung|length > 200 else '' }}</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <!-- Sektion 5: Vorjahresvergleich -->
+  <h2>📈 Vergleich zum Vorjahr</h2>
+  <div class="vergleich-section">
+    <div class="vergleich-grid">
+      <div class="vergleich-col">
+        <h4 style="color:#dc2626">↓ Verschlechtert ({{ vergleich.verschlechtert|length }})</h4>
+        {% for v in vergleich.verschlechtert %}
+        <div class="vergleich-item">
+          <span class="test-name">{{ v.test }}</span>
+          <span class="pct pct-worse">{{ v.aktuell }} ({{ '+' if v.pct > 0 else '' }}{{ v.pct }}%)</span>
+        </div>
+        {% endfor %}
+        {% if not vergleich.verschlechtert %}
+        <p style="color:#16a34a; font-size:9pt;">Keine Verschlechterungen 👍</p>
+        {% endif %}
+      </div>
+      <div class="vergleich-col">
+        <h4 style="color:#16a34a">↑ Verbessert ({{ vergleich.verbessert|length }})</h4>
+        {% for v in vergleich.verbessert %}
+        <div class="vergleich-item">
+          <span class="test-name">{{ v.test }}</span>
+          <span class="pct pct-better">{{ v.aktuell }} ({{ v.pct }}%)</span>
+        </div>
+        {% endfor %}
+        {% if not vergleich.verbessert %}
+        <p style="color:#666; font-size:9pt;">Keine signifikanten Verbesserungen</p>
+        {% endif %}
+      </div>
+    </div>
+    <div style="font-size:8pt; color:#666; margin-top:.5rem;">{{ vergleich.stabil_count }} Tests unverändert (Änderung &lt;5%)</div>
+  </div>
+
+  <!-- Chart.js Rendering -->
+  <script>
+  const COLORS = ["#059669", "#2563eb", "#ea580c", "#db2777", "#ca8a04", "#0891b2"];
+
+  // Radar-Chart für Gefäßgesundheit
+  (function() {
+    const faktoren = {{ gefaess_score.faktoren | tojson }};
+    const labels = faktoren.map(f => f.name);
+    const data = faktoren.map(f => {
+      const val = parseFloat(f.wert.replace("%","").replace(",",".")) || 0;
+      // Normalisierung: Wert als % der Schwelle (100% = Grenze)
+      const thresholds = {"Triglyceride":200, "CRP":0.5, "HbA1c":5.7, "LDL":130, "Harnsäure":7.0, "HDL":40};
+      const thr = thresholds[f.name] || 100;
+      if (f.name === "HDL") return Math.min(200, (val / 60) * 100);
+      return Math.min(200, (val / thr) * 100);
+    });
+    const pointColors = data.map(v => v > 120 ? "#dc2626" : v > 100 ? "#d97706" : "#059669");
+
+    new Chart(document.getElementById("radarChart"), {
+      type: "radar",
+      data: {
+        labels,
+        datasets: [
+          { label: "Aktuell (% der Norm)", data, borderColor: "#3b82f6", backgroundColor: "rgba(59,130,246,.1)", borderWidth: 2, pointBackgroundColor: pointColors, pointRadius: 5 },
+          { label: "Normgrenze (100%)", data: Array(labels.length).fill(100), borderColor: "rgba(234,88,12,.4)", backgroundColor: "transparent", borderWidth: 1.5, borderDash: [5,3], pointRadius: 0 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true, animation: false,
+        plugins: { legend: { display: false }, title: { display: true, text: "Risiko-Profil", font: { size: 11, weight: "600" } } },
+        scales: { r: { beginAtZero: true, max: 200, ticks: { font: { size: 8 }, stepSize: 50, backdropColor: "transparent" }, pointLabels: { font: { size: 10, weight: "600" } }, grid: { color: "rgba(0,0,0,.1)" }, angleLines: { color: "rgba(0,0,0,.1)" } } }
+      }
+    });
+  })();
+
+  // Verknüpfungs-Charts
+  {% for chart in verknuepfung_charts %}
+  (function() {
+    const tests = {{ chart.tests_json | safe }};
+    const testNames = Object.keys(tests);
+    const allDates = new Set();
+    Object.values(tests).forEach(t => t.werte.forEach(w => allDates.add(w.datum)));
+    const labels = [...allDates].sort();
+
+    const medians = {};
+    testNames.forEach(name => {
+      const vals = tests[name].werte.map(w => parseFloat(String(w.wert).replace(",",".").replace(/^[<>]/,"")) || 0).filter(v => v > 0);
+      vals.sort((a,b) => a-b);
+      medians[name] = vals[Math.floor(vals.length/2)] || 0;
+    });
+    const medVals = Object.values(medians).filter(v => v > 0);
+    const ratio = medVals.length >= 2 ? Math.max(...medVals) / Math.min(...medVals) : 1;
+    const groupL = [], groupR = [];
+    if (ratio > 1.8 && testNames.length >= 2) {
+      const thr = (Math.max(...medVals) + Math.min(...medVals)) / 2;
+      testNames.forEach(n => { (medians[n] >= thr ? groupL : groupR).push(n); });
+    } else { testNames.forEach(n => groupL.push(n)); }
+    const dual = groupL.length > 0 && groupR.length > 0;
+
+    const datasets = testNames.map((name, i) => {
+      const t = tests[name];
+      const isR = dual && groupR.includes(name);
+      const vm = {}; t.werte.forEach(w => { vm[w.datum] = parseFloat(String(w.wert).replace(",",".").replace(/^[<>]/,"")) || null; });
+      return { label: name+" ("+t.einheit+")", data: labels.map(d => vm[d] ?? null), borderColor: COLORS[i%COLORS.length], backgroundColor:"transparent", tension:.25, pointRadius: labels.length > 30 ? 0 : 2, borderWidth: 1.5, spanGaps:true, borderDash: isR?[6,3]:[], yAxisID: isR?"y1":"y" };
+    });
+
+    const scales = { x:{ticks:{maxTicksLimit:8,font:{size:8}},grid:{display:false}}, y:{position:"left",ticks:{font:{size:8}},grid:{color:"rgba(0,0,0,.05)"}} };
+    if (dual) scales.y1 = {position:"right",ticks:{font:{size:8}},grid:{display:false}};
+
+    new Chart(document.getElementById("chart{{ loop.index }}"), {
+      type:"line", data:{labels, datasets},
+      options:{ responsive:true, maintainAspectRatio:false, animation:false,
+        plugins:{legend:{display:true,position:"top",labels:{font:{size:9}}}, title:{display:true,text:"{{ chart.name }}"+(dual?" (gestrichelt=rechte Achse)":""),font:{size:10,weight:"600"}}},
+        scales }
+    });
+  })();
+  {% endfor %}
+  </script>
+</body>
+</html>

@@ -108,7 +108,7 @@ def import_scale_data():
         ("bmi", "BMI", "", "18.5-25.0"),
         ("fat", "Fettgehalt", "%", "10-20"),
         ("muscle", "Muskelmasse", "%", "40-55"),
-        ("water", "Körperwasser", "%", "55-65"),
+        ("water", "Körperwasser", "%", "50-65"),
         ("visceral", "Viszeralfett", "Lvl", "1-12"),
         ("lbm", "Fettfreie Masse", "kg", "50-70"),
         ("protein", "Proteinanteil", "%", "16-22"),

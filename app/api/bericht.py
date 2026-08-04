@@ -83,12 +83,33 @@ async def bericht_charts(request: Request, period: str = "1m", sort: str = "datu
     """Arztbericht mit Verlaufs-Charts pro auffälligem Test."""
     conn = get_db()
     try:
-        query = "SELECT DISTINCT test_standard, gruppe FROM laborwerte WHERE flag IN ('H','L')"
-        query = _period_filter(query, period)
-        test_names = [(r[0], r[1]) for r in conn.execute(query).fetchall()]
+        # Gleiche Query wie /api/pathologisch für konsistente Reihenfolge
+        period_filter = ""
+        if period == "1m":
+            period_filter = " AND datum >= date('now', '-1 month')"
+        elif period == "6m":
+            period_filter = " AND datum >= date('now', '-6 months')"
+        elif period == "1y":
+            period_filter = " AND datum >= date('now', '-1 year')"
+
+        path_query = f"""
+            SELECT l.test_standard, l.gruppe, l.flag, l.datum
+            FROM laborwerte l
+            WHERE l.flag IN ('H', 'L')
+            {period_filter}
+            AND l.datum = (
+                SELECT MAX(l3.datum) FROM laborwerte l3
+                WHERE l3.test_standard = l.test_standard AND l3.flag IN ('H','L')
+                {period_filter}
+            )
+            GROUP BY l.test_standard
+            ORDER BY l.datum DESC, l.gruppe
+        """
+        path_rows = conn.execute(path_query).fetchall()
+        test_order = [(r["test_standard"], r["gruppe"], r["flag"], r["datum"]) for r in path_rows]
 
         tests_data = []
-        for test, gruppe in sorted(test_names):
+        for test, gruppe, last_flag, last_datum in test_order:
             rows = conn.execute(
                 "SELECT datum, wert_norm, einheit_norm, normbereich, flag FROM laborwerte WHERE test_standard=? ORDER BY datum",
                 (test,),
@@ -114,6 +135,8 @@ async def bericht_charts(request: Request, period: str = "1m", sort: str = "datu
                 "beschreibung": TEST_DESCRIPTIONS.get(test, ""),
                 "einheit": rows[0]["einheit_norm"] or "", "norm": norm,
                 "bewertung": bew, "bewertung_cls": bew_cls,
+                "flag": last_flag or "",
+                "datum": last_datum or "",
                 "empfehlung": get_test_empfehlung(test, last["wert_norm"], last["flag"], norm, conn),
                 "labels": [r["datum"] for r in rows],
                 "values": [r["wert_norm"] for r in rows],
@@ -122,15 +145,8 @@ async def bericht_charts(request: Request, period: str = "1m", sort: str = "datu
     finally:
         conn.close()
 
-    # Sortierung
-    sort_keys = {
-        "datum": lambda t: t["labels"][-1] if t["labels"] else "",
-        "gruppe": lambda t: t.get("gruppe", ""),
-        "test_standard": lambda t: t["name"],
-        "wert_norm": lambda t: float(str(t["values"][-1]).replace(",", ".").replace("<", "").replace(">", "") or "0") if t["values"] else 0,
-        "flag": lambda t: t["bewertung_cls"],
-    }
-    tests_data.sort(key=sort_keys.get(sort, sort_keys["datum"]), reverse=(dir == -1))
+    # Keine serverseitige Sortierung – wird im Bericht-JS clientseitig gemacht
+    # (gleiche Logik wie in cards.js, vermeidet Inkonsistenzen)
 
     return templates.TemplateResponse("bericht_charts.html", {
         "request": request,

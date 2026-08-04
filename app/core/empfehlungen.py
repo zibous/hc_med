@@ -131,10 +131,12 @@ def _empfehlung_bauchfett(get_latest):
     crp, _ = get_latest("CRP")
     if vf and vf > 12:
         e.append(f"Viszeralfett Level {vf:.0f} erhöht. Ausdauersport und Intervallfasten helfen.")
+        if crp and crp > 0.5:
+            e.append(f"CRP {crp:.2f} mg/dL erhöht – Bauchfett als Ursache wahrscheinlich. Weniger Viszeralfett senkt CRP.")
     elif vf:
         e.append(f"Viszeralfett Level {vf:.1f} im guten Bereich.")
-    if crp and crp > 0.5:
-        e.append(f"CRP {crp:.2f} mg/dL deutet auf Entzündung. Zusammenhang mit Bauchfett prüfen.")
+        if crp and crp > 0.5:
+            e.append(f"CRP {crp:.2f} mg/dL erhöht, aber Bauchfett ist NICHT die Ursache. Andere Quellen suchen (Zähne, Gelenke, Infekt).")
     return e
 
 

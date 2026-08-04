@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ name }} – {{ now }}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 11pt; color: #1a1a1a; margin: 1.5cm; line-height: 1.5; }
+    h1 { font-size: 16pt; margin-bottom: .2rem; }
+    .meta { color: #666; font-size: 9pt; margin-bottom: 1.2rem; }
+    .desc { font-size: 10pt; color: #444; margin-bottom: 1.2rem; }
+    .chart-wrap { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .chart-wrap canvas { width: 100% !important; height: 250px !important; }
+    .score-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .6rem; }
+    .score-label { font-size: 9pt; font-weight: 600; color: #666; text-transform: uppercase; }
+    .score-value { font-size: 18pt; font-weight: 800; color: #dc2626; }
+    .score-bar { display: flex; gap: 3px; height: 8px; margin-bottom: .5rem; }
+    .score-seg { flex: 1; border-radius: 4px; }
+    .score-seg.filled { background: #dc2626; }
+    .score-seg.empty { background: #e5e7eb; }
+    .score-status { font-size: 10pt; font-weight: 600; color: #dc2626; margin-bottom: .8rem; }
+    .faktor { display: flex; align-items: center; gap: .6rem; font-size: 9pt; padding: .3rem .5rem; border-radius: 4px; margin-bottom: .2rem; }
+    .faktor.aktiv { background: #fef2f2; color: #dc2626; font-weight: 600; }
+    .faktor-name { flex: 1; }
+    .faktor-dots { display: flex; gap: 2px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #e5e7eb; }
+    .dot.active { background: #dc2626; }
+    .empfehlung { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1rem; font-size: 10pt; }
+    .empfehlung ol { margin: .5rem 0 0 1.2rem; padding: 0; }
+    .empfehlung li { margin-bottom: .4rem; }
+    .row { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .print-btn { position: fixed; top: 1rem; right: 1rem; padding: .6rem 1.4rem; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 10pt; cursor: pointer; }
+    @media print { .print-btn { display: none; } @page { margin: 1cm; } }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨️ Als PDF drucken</button>
+  <h1>{{ name }} – Risikoprofil</h1>
+  <div class="meta">{{ patient.vorname }} {{ patient.nachname }} · Erstellt am {{ now }}</div>
+  <div class="desc">{{ beschreibung }}</div>
+
+  <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+
+  <div class="row">
+    {% if gefaess_score %}
+    <div class="score-card">
+      <div class="score-header">
+        <span class="score-label">Gefäßrisiko</span>
+        <span class="score-value">{{ gefaess_score.score }}/{{ gefaess_score.max }}</span>
+      </div>
+      <div class="score-bar">
+        {% for i in range(gefaess_score.max) %}
+        <div class="score-seg {{ 'filled' if i < gefaess_score.score else 'empty' }}"></div>
+        {% endfor %}
+      </div>
+      <div class="score-status">{{ 'Erhöhtes Risiko' if gefaess_score.score >= 5 else ('Mäßiges Risiko' if gefaess_score.score >= 3 else 'Geringes Risiko') }}</div>
+      {% for f in gefaess_score.faktoren %}
+      <div class="faktor {{ 'aktiv' if f.aktiv else '' }}">
+        <span class="faktor-name">{{ f.name }}</span>
+        <span>{{ f.wert }}</span>
+        <span class="faktor-dots">
+          {% for i in range(f.max) %}<span class="dot {{ 'active' if i < f.punkte else '' }}"></span>{% endfor %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="empfehlung">
+      <strong>💡 Empfehlung:</strong>
+      <ol>
+        {% for item in empfehlung.split(' · ') %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const tests = {{ tests_json | safe }};
+    const testNames = Object.keys(tests);
+    const allDates = new Set();
+    Object.values(tests).forEach(t => t.werte.forEach(w => allDates.add(w.datum)));
+    const labels = [...allDates].sort();
+
+    const COLORS = ["#059669", "#2563eb", "#ea580c", "#db2777", "#ca8a04", "#0891b2"];
+
+    // Dual-Axis Logik (gleich wie im Dashboard)
+    const medians = {};
+    testNames.forEach(name => {
+      const t = tests[name];
+      const vals = t.werte.map(w => parseFloat(String(w.wert).replace(",",".").replace(/^[<>]/,"")) || 0).filter(v => v > 0);
+      vals.sort((a, b) => a - b);
+      medians[name] = vals[Math.floor(vals.length / 2)] || 0;
+    });
+    const medianValues = Object.values(medians).filter(v => v > 0);
+    const maxMedian = Math.max(...medianValues);
+    const minMedian = Math.min(...medianValues);
+    const ratio = minMedian > 0 ? maxMedian / minMedian : 1;
+
+    const groupLeft = [], groupRight = [];
+    if (ratio > 1.8 && testNames.length >= 2) {
+      const threshold = (maxMedian + minMedian) / 2;
+      testNames.forEach(name => { (medians[name] >= threshold ? groupLeft : groupRight).push(name); });
+    } else {
+      testNames.forEach(name => groupLeft.push(name));
+    }
+    const useDualAxis = groupLeft.length > 0 && groupRight.length > 0;
+
+    const datasets = testNames.map((name, i) => {
+      const t = tests[name];
+      const isRight = useDualAxis && groupRight.includes(name);
+      const valueMap = {};
+      t.werte.forEach(w => { valueMap[w.datum] = parseFloat(String(w.wert).replace(",",".").replace(/^[<>]/,"")) || null; });
+      return {
+        label: name + " (" + (t.einheit||"") + ")",
+        data: labels.map(d => valueMap[d] ?? null),
+        borderColor: COLORS[i % COLORS.length],
+        backgroundColor: "transparent",
+        tension: 0.25, pointRadius: 3, borderWidth: 2, spanGaps: true,
+        borderDash: isRight ? [6, 3] : [],
+        yAxisID: isRight ? "y1" : "y",
+      };
+    });
+
+    const scales = {
+      x: { ticks: { maxTicksLimit: 8, font: { size: 9 } }, grid: { display: false } },
+      y: { position: "left", ticks: { font: { size: 9 } }, grid: { color: "rgba(0,0,0,.06)" },
+           title: { display: useDualAxis, text: groupLeft.join(", "), font: { size: 8 } } },
+    };
+    if (useDualAxis) {
+      scales.y1 = { position: "right", ticks: { font: { size: 9 } }, grid: { display: false },
+                    title: { display: true, text: groupRight.join(", "), font: { size: 8 } } };
+    }
+
+    new Chart(document.getElementById("mainChart"), {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { display: true, position: "top", labels: { font: { size: 10 } } },
+                   title: { display: true, text: "{{ name }}" + (useDualAxis ? "  (gestrichelt = rechte Achse)" : ""), font: { size: 12, weight: "600" } } },
+        scales
+      }
+    });
+  </script>
+</body>
+</html>

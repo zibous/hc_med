@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS befunde (
     quelldatei TEXT NOT NULL,     -- Dateiname
     labor TEXT,                   -- Labor/Arztpraxis
     format TEXT,                  -- Erkanntes Dateiformat
+    nuechtern INTEGER DEFAULT 1, -- 1=ja/unbekannt, 0=nein
     importiert_am TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(patient_id, quelldatei)
 );
@@ -156,7 +157,7 @@ class LaborDB:
         return cursor.lastrowid
 
     def get_or_create_befund(
-        self, patient_id: int, datum: str, quelldatei: str, labor: str = "", format: str = ""
+        self, patient_id: int, datum: str, quelldatei: str, labor: str = "", format: str = "", nuechtern: int = 1
     ) -> int:
         """Gibt die Befund-ID zurück, erstellt den Befund falls nötig."""
         cursor = self.conn.execute(
@@ -165,11 +166,14 @@ class LaborDB:
         )
         row = cursor.fetchone()
         if row:
+            # nuechtern-Flag aktualisieren
+            self.conn.execute("UPDATE befunde SET nuechtern=? WHERE id=?", (nuechtern, row[0]))
+            self.conn.commit()
             return row[0]
 
         cursor = self.conn.execute(
-            "INSERT INTO befunde (patient_id, datum, quelldatei, labor, format) VALUES (?, ?, ?, ?, ?)",
-            (patient_id, datum, quelldatei, labor, format),
+            "INSERT INTO befunde (patient_id, datum, quelldatei, labor, format, nuechtern) VALUES (?, ?, ?, ?, ?, ?)",
+            (patient_id, datum, quelldatei, labor, format, nuechtern),
         )
         self.conn.commit()
         return cursor.lastrowid
@@ -181,6 +185,7 @@ class LaborDB:
         patient_id: int,
         format: str = "",
         labor: str = "",
+        nuechtern: int = 1,
     ) -> int:
         """Importiert eine Liste von Laborwerten in die Datenbank.
 
@@ -191,7 +196,7 @@ class LaborDB:
 
         # Befund-Datum: erstes Datum aus den Ergebnissen
         datum = results[0].get("Datum", "")
-        befund_id = self.get_or_create_befund(patient_id, datum, quelldatei, labor, format)
+        befund_id = self.get_or_create_befund(patient_id, datum, quelldatei, labor, format, nuechtern)
 
         # Alte Werte für diesen Befund löschen (Reimport)
         self.conn.execute("DELETE FROM laborwerte WHERE befund_id=?", (befund_id,))

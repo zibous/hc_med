@@ -1,12 +1,21 @@
 """API: /verknuepfungen und /verknuepfung/{name} – Verknüpfungs-Ansichten."""
 
-from fastapi import APIRouter, HTTPException
+import json
+from datetime import datetime
+from pathlib import Path
 
-from app.config.settings import EREIGNISSE, VERKNUEPFUNGEN
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+from app.config.settings import EREIGNISSE, VERKNUEPFUNGEN, PATIENT_CONFIG
 from app.core.empfehlungen import generate_verknuepfung_empfehlung
 from app.infrastructure.database import get_db
 
 router = APIRouter(prefix="/api", tags=["labor"])
+
+TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 
 @router.get("/verknuepfungen")
@@ -60,6 +69,53 @@ async def verknuepfung_detail(name: str):
             "tests": result_tests,
             "ereignisse": EREIGNISSE,
         }
+    finally:
+        conn.close()
+
+
+@router.get("/verknuepfung/{name}/print", response_class=HTMLResponse)
+async def verknuepfung_print(request: Request, name: str):
+    """Druckoptimierte Version einer Verknüpfung (Light-Mode, eigene Seite)."""
+    vk = next((v for v in VERKNUEPFUNGEN if v["name"] == name), None)
+    if not vk:
+        raise HTTPException(status_code=404, detail=f"Verknüpfung '{name}' nicht gefunden")
+
+    conn = get_db()
+    try:
+        result_tests = {}
+        for test in vk["tests"]:
+            rows = conn.execute(
+                """SELECT datum, wert_norm, einheit_norm, normbereich, flag
+                   FROM laborwerte WHERE test_standard=? ORDER BY datum""",
+                (test,),
+            ).fetchall()
+            if rows:
+                norm = ""
+                for r in rows:
+                    if r["normbereich"] and r["normbereich"].strip():
+                        norm = r["normbereich"]
+                        break
+                result_tests[test] = {
+                    "einheit": rows[0]["einheit_norm"],
+                    "normbereich": norm,
+                    "werte": [{"datum": r["datum"], "wert": r["wert_norm"], "flag": r["flag"]} for r in rows],
+                }
+
+        empfehlung = generate_verknuepfung_empfehlung(vk["name"], result_tests)
+        gefaess_score = None
+        if vk["name"] == "Gefäßgesundheit":
+            gefaess_score = _berechne_gefaess_details(result_tests)
+
+        return templates.TemplateResponse("verknuepfung_print.html", {
+            "request": request,
+            "name": vk["name"],
+            "beschreibung": vk.get("beschreibung", ""),
+            "empfehlung": empfehlung,
+            "gefaess_score": gefaess_score,
+            "tests_json": json.dumps(result_tests, ensure_ascii=False),
+            "patient": PATIENT_CONFIG,
+            "now": datetime.now().strftime("%d.%m.%Y"),
+        })
     finally:
         conn.close()
 

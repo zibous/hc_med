@@ -44,10 +44,19 @@ export function renderChart(data) {
   }
 
   // Punkt-Farben basierend auf Flag
-  const pointColors = flags.map(f => {
+  const pointColors = flags.map((f, i) => {
     if (f === "H") return isDark ? "#f87171" : "#dc2626";
     if (f === "L") return isDark ? "#60a5fa" : "#2563eb";
     return isDark ? "#34d399" : "#059669";
+  });
+
+  // Punkt-Rahmen für nicht-nüchtern Werte (orange Umrandung)
+  const nichtNuechtern = data.werte.map(w => w.nicht_nuechtern || false);
+  const pointBorderColors = nichtNuechtern.map((nn, i) => nn ? "#f59e0b" : pointColors[i]);
+  const pointBorderWidths = nichtNuechtern.map(nn => nn ? 2 : 0);
+  const pointRadii = values.map((v, i) => {
+    const base = values.length > 50 ? 0 : values.length > 20 ? 2 : 4;
+    return nichtNuechtern[i] ? base + 1 : base;
   });
 
   // Datasets
@@ -59,7 +68,9 @@ export function renderChart(data) {
     fill: true,
     tension: 0.25,
     pointBackgroundColor: pointColors,
-    pointRadius: values.length > 50 ? 0 : values.length > 20 ? 2 : 4,
+    pointBorderColor: pointBorderColors,
+    pointBorderWidth: pointBorderWidths,
+    pointRadius: pointRadii,
     pointHoverRadius: values.length > 50 ? 3 : 5,
     borderWidth: values.length > 50 ? 1.2 : 1.8,
   }];
@@ -270,21 +281,40 @@ export function renderMultiChart(data) {
   Object.values(data.tests).forEach(t => t.werte.forEach(w => allDates.add(w.datum)));
   const labels = [...allDates].sort();
 
-  // Tests in zwei Gruppen teilen: "groß" (>50 typischer Wert) und "klein" (<50)
+  // Tests in zwei Gruppen teilen für Dual-Axis
   const testNames = Object.keys(data.tests);
   const groupLeft = []; // große Werte → linke Y-Achse
   const groupRight = []; // kleine Werte → rechte Y-Achse
 
+  // Mediane berechnen
+  const medians = {};
   testNames.forEach(name => {
     const t = data.tests[name];
-    const vals = t.werte.map(w => parseFloat(String(w.wert).replace(",", ".").replace(/^[<>]/, "")) || 0);
-    const median = vals.sort((a, b) => a - b)[Math.floor(vals.length / 2)] || 0;
-    if (median > 20) {
-      groupLeft.push(name);
-    } else {
-      groupRight.push(name);
-    }
+    const vals = t.werte.map(w => parseFloat(String(w.wert).replace(",", ".").replace(/^[<>]/, "")) || 0).filter(v => v > 0);
+    vals.sort((a, b) => a - b);
+    medians[name] = vals[Math.floor(vals.length / 2)] || 0;
   });
+
+  // Dynamische Aufteilung: wenn Verhältnis max/min Median > 2.5 → Dual-Axis
+  const medianValues = Object.values(medians).filter(v => v > 0);
+  const maxMedian = Math.max(...medianValues);
+  const minMedian = Math.min(...medianValues);
+  const ratio = minMedian > 0 ? maxMedian / minMedian : 1;
+
+  if (ratio > 1.8 && testNames.length >= 2) {
+    // Schwelle: Mitte zwischen min und max Median
+    const threshold = (maxMedian + minMedian) / 2;
+    testNames.forEach(name => {
+      if (medians[name] >= threshold) {
+        groupLeft.push(name);
+      } else {
+        groupRight.push(name);
+      }
+    });
+  } else {
+    // Alle auf eine Achse
+    testNames.forEach(name => groupLeft.push(name));
+  }
 
   // Falls alle in einer Gruppe landen, keine zweite Achse
   const useDualAxis = groupLeft.length > 0 && groupRight.length > 0;
