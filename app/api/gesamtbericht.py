@@ -16,14 +16,18 @@ templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 
 @router.get("/gesamtbericht", response_class=HTMLResponse)
-async def gesamtbericht(request: Request, period: str = "1y"):
-    """Rendert den umfassenden Laborbericht als druckoptimiertes HTML."""
+async def gesamtbericht(request: Request, befunde: int = 2):
+    """Rendert den umfassenden Laborbericht als druckoptimiertes HTML.
+    
+    Args:
+        befunde: Anzahl der letzten Befunde die berücksichtigt werden (1, 2, 3, oder 0=alle).
+    """
     conn = get_db()
     try:
-        data = build_report_data(conn, period=period)
+        data = build_report_data(conn, befunde_count=befunde)
         return templates.TemplateResponse("gesamtbericht.html", {
             "request": request,
-            "period": period,
+            "befunde_count": befunde,
             **data,
         })
     finally:

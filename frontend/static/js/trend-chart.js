@@ -203,7 +203,7 @@ function renderChartStats(container, values, data) {
     // Nur farbig warnen wenn aktueller Wert auffällig ist (Flag H oder L)
     const lastFlag = data.werte[data.werte.length-1]?.flag;
     const isAuffaellig = lastFlag === "H" || lastFlag === "L";
-    if (Math.abs(pct) < 5) { trendText = "→ Stabil"; trendColor = "var(--green)"; }
+    if (Math.abs(pct) < 5) { trendText = "→ Unverändert"; trendColor = "var(--green)"; }
     else if (pct > 0) { trendText = `↑ +${pct}%`; trendColor = isAuffaellig ? "var(--orange)" : "var(--text-muted)"; }
     else { trendText = `↓ ${pct}%`; trendColor = isAuffaellig ? "var(--accent)" : "var(--text-muted)"; }
   } else {
@@ -217,7 +217,7 @@ function renderChartStats(container, values, data) {
       const pct = firstThree !== 0 ? ((lastThree - firstThree) / firstThree * 100).toFixed(0) : 0;
       const lastFlag = data.werte[data.werte.length-1]?.flag;
       const isAuffaellig = lastFlag === "H" || lastFlag === "L";
-      if (Math.abs(pct) < 10) { trendText = "→ Stabil"; trendColor = "var(--green)"; }
+      if (Math.abs(pct) < 10) { trendText = "→ Unverändert"; trendColor = "var(--green)"; }
       else if (pct > 0) { trendText = `↑ +${pct}%`; trendColor = isAuffaellig ? "var(--orange)" : "var(--text-muted)"; }
       else { trendText = `↓ ${pct}%`; trendColor = isAuffaellig ? "var(--accent)" : "var(--text-muted)"; }
     }

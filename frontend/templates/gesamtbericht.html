@@ -16,18 +16,20 @@
     .period-link.active { background: #2563eb; color: white; border-color: #2563eb; }
 
     /* Gruppen-Ampel */
-    .gruppen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .6rem; margin-bottom: 1.5rem; }
-    .gruppe-card { padding: .6rem .8rem; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: .5rem; }
-    .gruppe-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .gruppe-dot.gut { background: #22c55e; }
-    .gruppe-dot.ok { background: #86efac; }
-    .gruppe-dot.auffällig { background: #f59e0b; }
-    .gruppe-dot.kritisch { background: #ef4444; }
-    .gruppe-name { font-size: .85rem; font-weight: 600; flex: 1; }
-    .gruppe-count { font-size: .75rem; color: #666; }
+    .gruppen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .5rem; margin-bottom: 1.5rem; }
+    .gruppe-card { padding: .5rem .8rem; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: .5rem; }
+    .gruppe-dot { width: 14px; height: 14px; flex-shrink: 0; }
+    .gruppe-dot.gut svg { color: #22c55e; }
+    .gruppe-dot.ok svg { color: #86efac; }
+    .gruppe-dot.auffällig svg { color: #f59e0b; }
+    .gruppe-dot.kritisch svg { color: #ef4444; }
+    .gruppe-info { flex: 1; display: flex; flex-direction: column; }
+    .gruppe-name { font-size: .85rem; font-weight: 600; }
+    .gruppe-details { font-size: .7rem; display: flex; gap: .4rem; margin-top: .1rem; }
+    .gruppe-trend { flex-shrink: 0; font-size: .85rem; }
 
     /* Gefäß Score */
-    .score-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; max-width: 400px; }
+    .score-card { padding: 1rem; margin-bottom: 1.5rem; max-width: 400px; }
     .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
     .score-label { font-size: .75rem; font-weight: 600; color: #666; text-transform: uppercase; }
     .score-value { font-size: 1.8rem; font-weight: 800; }
@@ -50,7 +52,7 @@
     .tests-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-bottom: 1.5rem; }
     .tests-table th { text-align: left; padding: .4rem .5rem; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #666; font-size: .75rem; text-transform: uppercase; }
     .tests-table td { padding: .4rem .5rem; border-bottom: 1px solid #f1f5f9; }
-    .tests-table tr.crit td { background: #fef2f2; }
+    .tests-table tr.crit td { }
     .flag-h { color: #dc2626; font-weight: 700; }
     .flag-l { color: #2563eb; font-weight: 700; }
     .trend-worse { color: #dc2626; }
@@ -80,21 +82,26 @@
       body { margin: 0; }
       .chart-section { page-break-inside: avoid; }
       .score-card { page-break-inside: avoid; }
+      .vergleich-section { page-break-inside: avoid; }
+      .tests-table { page-break-inside: auto; }
+      .tests-table tr { page-break-inside: avoid; }
+      h2 { page-break-after: avoid; }
     }
   </style>
 </head>
 <body>
   <button class="print-btn" onclick="window.print()">🖨️ Als PDF drucken</button>
 
-  <h1>🩸 Gesamtbericht Laborwerte</h1>
+  <h1>Gesamtbericht Laborwerte</h1>
   <div class="meta">{{ patient.vorname }} {{ patient.nachname }} · geb. {{ patient.geburtsdatum }} · Erstellt am {{ generated_at }} · Zeitraum: {{ period_label }}</div>
 
   <!-- Zeitraum-Filter -->
   <div style="margin-bottom:1.2rem; display:flex; gap:.4rem;">
-    <a href="?period=all" class="period-link {{ 'active' if period == 'all' else '' }}">Alle</a>
-    <a href="?period=1y" class="period-link {{ 'active' if period == '1y' else '' }}">1 Jahr</a>
-    <a href="?period=6m" class="period-link {{ 'active' if period == '6m' else '' }}">6 Monate</a>
-    <a href="?period=1m" class="period-link {{ 'active' if period == '1m' else '' }}">1 Monat</a>
+    <a href="?befunde=1" class="period-link {{ 'active' if befunde_count == 1 else '' }}">Letzter Befund</a>
+    <a href="?befunde=2" class="period-link {{ 'active' if befunde_count == 2 else '' }}">Letzte 2</a>
+    <a href="?befunde=3" class="period-link {{ 'active' if befunde_count == 3 else '' }}">Letzte 3</a>
+    <a href="?befunde=5" class="period-link {{ 'active' if befunde_count == 5 else '' }}">Letzte 5</a>
+    <a href="?befunde=0" class="period-link {{ 'active' if befunde_count == 0 else '' }}">Alle</a>
   </div>
 
   <!-- Sektion 1: Gruppen-Ampel -->
@@ -102,15 +109,31 @@
   <div class="gruppen-grid">
     {% for g in gruppen %}
     <div class="gruppe-card">
-      <span class="gruppe-dot {{ g.status }}"></span>
-      <span class="gruppe-name">{{ g.icon }} {{ g.name }}</span>
-      {% if g.pathologisch > 0 %}<span class="gruppe-count">{{ g.pathologisch }}×</span>{% endif %}
+      <span class="gruppe-dot {{ g.status }}">
+        {% if g.status == 'gut' or g.status == 'ok' %}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        {% elif g.status == 'auffällig' %}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        {% else %}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        {% endif %}
+      </span>
+      <span class="gruppe-info">
+        <span class="gruppe-name">{{ g.name }}</span>
+        {% if g.hoch > 0 or g.tief > 0 %}
+        <span class="gruppe-details">
+          {% if g.hoch > 0 %}<span style="color:#dc2626;">{{ g.hoch }}× ↑</span>{% endif %}
+          {% if g.tief > 0 %}<span style="color:#2563eb;">{{ g.tief }}× ↓</span>{% endif %}
+        </span>
+        {% endif %}
+      </span>
+      <span class="gruppe-trend" style="color:{{ '#dc2626' if g.trend == '↑' else '#16a34a' if g.trend == '↓' else '#999' }}">{{ g.trend }}</span>
     </div>
     {% endfor %}
   </div>
 
   <!-- Sektion 2: Gefäß Score + Radar -->
-  <h2>🫀 Gefäßgesundheit</h2>
+  <h2>Gefäßgesundheit</h2>
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
     <div class="score-card">
       <div class="score-header">
@@ -135,39 +158,68 @@
       </div>
       {% endfor %}
     </div>
-    <div style="display:flex; align-items:center; justify-content:center;">
+    <div style="display:flex; align-items:center; justify-content:center; padding:1rem;">
       <canvas id="radarChart" style="max-width:280px; max-height:280px;"></canvas>
     </div>
   </div>
+  {% if gefaess_score.zusammenfassung %}
+  <div style="font-size:.85rem; color:#444; margin-bottom:1.5rem; padding:.7rem 1rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; line-height:1.6;">
+    <strong>Zusammenfassung:</strong> {{ gefaess_score.zusammenfassung }}
+  </div>
+  {% endif %}
+
+  {% if bemerkung %}
+  <div style="font-size:.85rem; color:#1a1a1a; margin-bottom:1.5rem; padding:.7rem 1rem; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; line-height:1.6;">
+    <strong>Bemerkung:</strong> {{ bemerkung }}
+  </div>
+  {% endif %}
 
   <!-- Sektion 3: Auffällige Tests -->
-  <h2>⚠️ Auffällige Laborwerte</h2>
+  <div style="page-break-inside: avoid; display: block;">
+  <h2>Auffällige Laborwerte ({{ abnormal_tests|length }})</h2>
   {% if abnormal_tests %}
+  <div style="font-size:.75rem; color:#666; margin-bottom:.5rem;">Flag: ↑ hoch = über Norm · ↓ tief = unter Norm — Trend: ↑ verschlechtert · ↓ verbessert · → unverändert</div>
   <table class="tests-table">
     <thead>
-      <tr><th>Test</th><th>Gruppe</th><th>Wert</th><th>Norm</th><th>Flag</th><th>Trend</th><th>Empfehlung</th></tr>
+      <tr><th>Test</th><th>Gruppe</th><th>Wert</th><th>Norm</th><th>Flag</th><th>Trend</th></tr>
     </thead>
     <tbody>
       {% for t in abnormal_tests %}
       <tr class="{{ t.bewertung_cls }}">
-        <td><strong>{{ t.name }}</strong></td>
+        <td><strong>{{ t.name }}</strong>{% if t.kurzname %}<br><span style="color:#666; font-size:.75rem;">{{ t.kurzname }}</span>{% endif %}</td>
         <td>{{ t.gruppe }}</td>
         <td>{{ t.wert }} {{ t.einheit }}</td>
         <td>{{ t.norm }}</td>
         <td class="{{ 'flag-h' if t.flag == 'H' else 'flag-l' }}">{{ '↑ hoch' if t.flag == 'H' else '↓ tief' }}</td>
-        <td class="{{ 'trend-worse' if t.trend_label == 'verschlechtert' else 'trend-better' if t.trend_label == 'verbessert' else '' }}">{{ t.trend }} {{ t.trend_label }}</td>
-        <td class="empfehlung-cell">{{ t.empfehlung[:120] }}{{ '…' if t.empfehlung|length > 120 else '' }}</td>
+        <td class="{{ 'trend-worse' if t.trend_label == 'verschlechtert' else 'trend-better' if t.trend_label == 'verbessert' else '' }}">{% if t.trend_label == 'unverändert' %}→ unverändert{% else %}{{ t.trend }} {{ t.trend_label }}{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
-  <p style="color:#16a34a">✅ Keine auffälligen Laborwerte – alle Tests im Normbereich.</p>
+  <p style="color:#16a34a">Keine auffälligen Laborwerte – alle Tests im Normbereich.</p>
+  {% endif %}
+  </div>
+
+  <!-- Sektion 3b: Normale Tests -->
+  <!-- Sektion 3b: Normale Tests -->
+  {% if normal_tests %}
+  <div style="page-break-inside: avoid; display: block;">
+  <h2>Laborwerte im Normbereich ({{ normal_tests|length }})</h2>
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:.3rem; font-size:.8rem;">
+    {% for t in normal_tests %}
+    <div style="padding:.2rem .4rem; display:flex; gap:.4rem;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+      <span><strong>{{ t.name }}</strong>{% if t.kurzname %} <span style="color:#666">({{ t.kurzname }})</span>{% endif %}: {{ t.wert }} {{ t.einheit }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  </div>
   {% endif %}
 
   <!-- Sektion 4: Verknüpfungs-Charts -->
   {% if verknuepfung_charts %}
-  <h2>📊 Zusammenhänge</h2>
+  <h2>Zusammenhänge</h2>
   {% for chart in verknuepfung_charts %}
   <div class="chart-section">
     <h3>{{ chart.name }}</h3>
@@ -181,35 +233,29 @@
   {% endif %}
 
   <!-- Sektion 5: Vorjahresvergleich -->
-  <h2>📈 Vergleich zum Vorjahr</h2>
+  <h2>Vergleich zum Vorjahr</h2>
+  {% if vergleich_zusammenfassung and vergleich_zusammenfassung.text %}
+  <div style="font-size:.85rem; color:#444; margin-bottom:1rem; padding:.7rem 1rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; line-height:1.6;">
+    <strong>Zusammenfassung:</strong> {{ vergleich_zusammenfassung.text }}
+  </div>
+  {% if vergleich_zusammenfassung.details %}
+  <div style="font-size:.8rem; margin-bottom:1rem;">
+    <strong>Wichtigste Veränderungen:</strong>
+    <table style="width:100%; border-collapse:collapse; margin-top:.4rem;">
+      {% for d in vergleich_zusammenfassung.details %}
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:.25rem .4rem; font-weight:600;">{{ d.test }}</td>
+        <td style="padding:.25rem .4rem;">{{ d.wert }}</td>
+        <td style="padding:.25rem .4rem; color:#dc2626; font-weight:600;">{{ d.pct }}</td>
+        <td style="padding:.25rem .4rem; color:#666;">{{ d.beschreibung }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+  {% endif %}
   <div class="vergleich-section">
-    <div class="vergleich-grid">
-      <div class="vergleich-col">
-        <h4 style="color:#dc2626">↓ Verschlechtert ({{ vergleich.verschlechtert|length }})</h4>
-        {% for v in vergleich.verschlechtert %}
-        <div class="vergleich-item">
-          <span class="test-name">{{ v.test }}</span>
-          <span class="pct pct-worse">{{ v.aktuell }} ({{ '+' if v.pct > 0 else '' }}{{ v.pct }}%)</span>
-        </div>
-        {% endfor %}
-        {% if not vergleich.verschlechtert %}
-        <p style="color:#16a34a; font-size:9pt;">Keine Verschlechterungen 👍</p>
-        {% endif %}
-      </div>
-      <div class="vergleich-col">
-        <h4 style="color:#16a34a">↑ Verbessert ({{ vergleich.verbessert|length }})</h4>
-        {% for v in vergleich.verbessert %}
-        <div class="vergleich-item">
-          <span class="test-name">{{ v.test }}</span>
-          <span class="pct pct-better">{{ v.aktuell }} ({{ v.pct }}%)</span>
-        </div>
-        {% endfor %}
-        {% if not vergleich.verbessert %}
-        <p style="color:#666; font-size:9pt;">Keine signifikanten Verbesserungen</p>
-        {% endif %}
-      </div>
-    </div>
-    <div style="font-size:8pt; color:#666; margin-top:.5rem;">{{ vergleich.stabil_count }} Tests unverändert (Änderung &lt;5%)</div>
+    <div style="font-size:.75rem; color:#666;">{{ vergleich.stabil_count }} Tests unverändert (Änderung &lt;5%)</div>
   </div>
 
   <!-- Chart.js Rendering -->

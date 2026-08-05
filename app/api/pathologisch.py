@@ -9,32 +9,34 @@ router = APIRouter(prefix="/api", tags=["labor"])
 
 
 @router.get("/pathologisch")
-async def pathologisch(period: str = "all"):
+async def pathologisch(befunde: int = 0):
     """Auffällige Werte – letzter auffälliger Wert pro Test im Zeitraum."""
     conn = get_db()
     try:
-        # Zeitfilter-Bedingung
-        period_filter = ""
-        if period == "1m":
-            period_filter = " AND datum >= date('now', '-1 month')"
-        elif period == "6m":
-            period_filter = " AND datum >= date('now', '-6 months')"
-        elif period == "1y":
-            period_filter = " AND datum >= date('now', '-1 year')"
+        # Befunde-basierter Filter
+        datum_filter = ""
+        if befunde > 0:
+            befund_rows = conn.execute(
+                "SELECT DISTINCT datum FROM befunde ORDER BY datum DESC LIMIT ?",
+                (befunde,)
+            ).fetchall()
+            if befund_rows:
+                aeltestes_datum = befund_rows[-1]["datum"]
+                datum_filter = f" AND datum >= '{aeltestes_datum}'"
 
         # Letzter auffälliger Wert pro Test (unabhängig von Flag-Richtung)
         query = f"""
             SELECT l.datum, l.gruppe, l.test_standard, l.wert_norm, l.einheit_norm, l.normbereich, l.flag,
                    (SELECT COUNT(*) FROM laborwerte l2 
                     WHERE l2.test_standard = l.test_standard AND l2.flag IN ('H','L')
-                    {period_filter}) as anzahl
+                    {datum_filter}) as anzahl
             FROM laborwerte l
             WHERE l.flag IN ('H', 'L')
-            {period_filter}
+            {datum_filter}
             AND l.datum = (
                 SELECT MAX(l3.datum) FROM laborwerte l3 
                 WHERE l3.test_standard = l.test_standard AND l3.flag IN ('H','L')
-                {period_filter}
+                {datum_filter}
             )
             GROUP BY l.test_standard
             ORDER BY l.datum DESC, l.gruppe

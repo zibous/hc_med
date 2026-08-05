@@ -71,7 +71,7 @@ export function renderVergleich(data) {
       <span style="color:var(--green)">✅↑ normalisiert</span>
       <span style="color:var(--red)">↓ verschlechtert</span>
       <span style="color:var(--red)">⚠️↓ neu auffällig</span>
-      <span style="color:var(--text-muted)">→ stabil</span>
+      <span style="color:var(--text-muted)">→ unverändert</span>
     </div>
     <table class="vgl-table">
       <thead><tr>

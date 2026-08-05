@@ -16,5 +16,6 @@ PATIENT_CONFIG = _config.get("patient", {})
 EMPFEHLUNGEN_TESTS = _config.get("empfehlungen_tests", {})
 KURZNAMEN = _config.get("kurznamen", {})
 NUECHTERN_SENSITIV = _config.get("nuechtern_sensitiv", [])
+GESAMTBERICHT_BEMERKUNG = _config.get("gesamtbericht_bemerkung", "")
 
 GROUP_DESCRIPTIONS = {k: v.get("beschreibung", "").strip() for k, v in GROUP_CONFIG.items()}

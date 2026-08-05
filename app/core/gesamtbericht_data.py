@@ -126,37 +126,125 @@ def berechne_gefaess_score(conn: sqlite3.Connection) -> dict:
         "max": max_score,
         "status": status,
         "faktoren": faktoren,
+        "zusammenfassung": _build_gefaess_zusammenfassung(faktoren),
     }
+
+
+def _build_gefaess_zusammenfassung(faktoren: list[dict]) -> str:
+    """Generiert einen medizinischen Zusammenfassungssatz basierend auf den aktiven Risikofaktoren."""
+    aktive = [f for f in faktoren if f["aktiv"]]
+    if not aktive:
+        return "Kein erhöhtes Gefäßrisiko – alle Risikofaktoren im Normbereich."
+
+    teile = []
+
+    # Fettstoffwechsel (Triglyceride + LDL)
+    trig_aktiv = any(f["name"] == "Triglyceride" for f in aktive)
+    ldl_aktiv = any(f["name"] == "LDL" for f in aktive)
+    hdl_ok = not any(f["name"] == "HDL" and f["aktiv"] for f in faktoren)
+
+    if trig_aktiv and ldl_aktiv:
+        teil = "eine kombinierte Fettstoffwechselstörung (erhöhte Triglyceride und erhöhtes LDL-Cholesterin"
+        if hdl_ok:
+            teil += " bei gutem HDL"
+        teil += ")"
+        teile.append(teil)
+    elif trig_aktiv:
+        teil = "eine Hypertriglyceridämie (stark erhöhte Triglyceride"
+        if hdl_ok:
+            teil += " bei gutem HDL"
+        teil += ")"
+        teile.append(teil)
+    elif ldl_aktiv:
+        teile.append("ein erhöhtes LDL-Cholesterin")
+
+    # HDL niedrig (nur wenn nicht schon im Fett-Teil erwähnt)
+    if any(f["name"] == "HDL" and f["aktiv"] for f in faktoren):
+        teile.append("ein erniedrigtes HDL-Cholesterin (fehlender Gefäßschutz)")
+
+    # HbA1c
+    if any(f["name"] == "HbA1c" for f in aktive):
+        teile.append("einen Prädiabetes (erhöhter Langzeitblutzucker)")
+
+    # Harnsäure
+    if any(f["name"] == "Harnsäure" for f in aktive):
+        teile.append("eine leichte Hyperurikämie (erhöhte Harnsäure)")
+
+    # CRP
+    if any(f["name"] == "CRP" for f in aktive):
+        teile.append("Hinweise auf ein akutes oder chronisch-subklinisches Entzündungsgeschehen (erhöhtes CRP)")
+
+    if not teile:
+        return ""
+
+    # Satz zusammenbauen
+    if len(teile) == 1:
+        aufzaehlung = teile[0]
+    else:
+        aufzaehlung = ", ".join(teile[:-1]) + " sowie " + teile[-1]
+
+    return f"Es liegt ein metabolisches Risikoprofil mit {aufzaehlung} vor."
 
 
 # ---------------------------------------------------------------------------
 # Gruppen-Summary mit Traffic-Light
 # ---------------------------------------------------------------------------
 
-def build_gruppen_summary(conn: sqlite3.Connection) -> list[dict]:
-    """Erstellt eine Traffic-Light-Zusammenfassung aller Gruppen.
-
-    Fragt die Datenbank nach Gruppenstatistiken und wendet
-    `classify_traffic_light` an.
-
-    Returns:
-        Liste von dicts mit: name, icon, status, anzahl, pathologisch, path_ratio
-    """
-    rows = conn.execute("""
+def build_gruppen_summary(conn: sqlite3.Connection, datum_filter: str = "") -> list[dict]:
+    """Erstellt eine Traffic-Light-Zusammenfassung aller Gruppen mit Flag-Details und Trend."""
+    rows = conn.execute(f"""
         SELECT gruppe,
                COUNT(*) as anzahl,
-               SUM(CASE WHEN flag IN ('H','L') THEN 1 ELSE 0 END) as path_count
+               SUM(CASE WHEN flag = 'H' THEN 1 ELSE 0 END) as hoch_count,
+               SUM(CASE WHEN flag = 'L' THEN 1 ELSE 0 END) as tief_count
         FROM laborwerte
+        WHERE 1=1 {datum_filter}
         GROUP BY gruppe
         ORDER BY gruppe
     """).fetchall()
+
+    # Vorjahresvergleich pro Gruppe (vereinfacht: Anzahl pathologischer im letzten Jahr vs. davor)
+    from datetime import date, timedelta
+    vor_12m = (date.today() - timedelta(days=365)).isoformat()
 
     gruppen = []
     for row in rows:
         name = row["gruppe"]
         anzahl = row["anzahl"]
-        path_count = row["path_count"]
+        hoch = row["hoch_count"]
+        tief = row["tief_count"]
+        path_count = hoch + tief
         path_ratio = path_count / anzahl if anzahl > 0 else 0.0
+
+        # Trend: Vergleiche aktuelle pathologische Anzahl (letztes Jahr) mit davor
+        recent_path = conn.execute(
+            "SELECT COUNT(*) FROM laborwerte WHERE gruppe=? AND flag IN ('H','L') AND datum >= ?",
+            (name, vor_12m)
+        ).fetchone()[0]
+        older_path = conn.execute(
+            "SELECT COUNT(*) FROM laborwerte WHERE gruppe=? AND flag IN ('H','L') AND datum < ?",
+            (name, vor_12m)
+        ).fetchone()[0]
+        recent_total = conn.execute(
+            "SELECT COUNT(*) FROM laborwerte WHERE gruppe=? AND datum >= ?",
+            (name, vor_12m)
+        ).fetchone()[0]
+        older_total = conn.execute(
+            "SELECT COUNT(*) FROM laborwerte WHERE gruppe=? AND datum < ?",
+            (name, vor_12m)
+        ).fetchone()[0]
+
+        # Trend berechnen (Ratio-Vergleich)
+        recent_ratio = recent_path / recent_total if recent_total > 0 else 0
+        older_ratio = older_path / older_total if older_total > 0 else 0
+        if older_total == 0 or recent_total == 0:
+            trend = "→"
+        elif recent_ratio > older_ratio + 0.05:
+            trend = "↑"  # verschlechtert
+        elif recent_ratio < older_ratio - 0.05:
+            trend = "↓"  # verbessert
+        else:
+            trend = "→"  # stabil
 
         gc = GROUP_CONFIG.get(name, {})
         gruppen.append({
@@ -165,6 +253,9 @@ def build_gruppen_summary(conn: sqlite3.Connection) -> list[dict]:
             "status": classify_traffic_light(path_count, anzahl),
             "anzahl": anzahl,
             "pathologisch": path_count,
+            "hoch": hoch,
+            "tief": tief,
+            "trend": trend,
             "path_ratio": round(path_ratio, 4),
         })
 
@@ -188,17 +279,17 @@ def compute_trend(current: float, previous: float, flag: str) -> tuple[str, str]
 
     Returns:
         Tuple (trend_symbol, trend_label):
-        - ("→", "stabil") wenn Änderung < 5%
+        - ("→", "unverändert") wenn Änderung < 5%
         - ("↑", "verschlechtert") wenn Wert sich in pathologische Richtung bewegt
         - ("↓", "verbessert") wenn Wert sich Richtung Normalbereich bewegt
     """
     if previous == 0:
-        return ("→", "stabil")
+        return ("→", "unverändert")
 
     change_pct = abs(current - previous) / abs(previous)
 
     if change_pct < 0.05:
-        return ("→", "stabil")
+        return ("→", "unverändert")
 
     if flag == "H":
         if current > previous:
@@ -216,37 +307,27 @@ def compute_trend(current: float, previous: float, flag: str) -> tuple[str, str]
 # Abnormal Tests Collection
 # ---------------------------------------------------------------------------
 
-def build_abnormal_tests(conn: sqlite3.Connection, period: str = "all") -> list[dict]:
+def build_abnormal_tests(conn: sqlite3.Connection, datum_filter: str = "") -> list[dict]:
     """Sammelt alle Tests mit pathologischem Flag auf der letzten Messung.
 
     Args:
         conn: SQLite-Datenbankverbindung.
-        period: Zeitfilter – "all", "1y", "6m", "1m".
+        datum_filter: SQL-Fragment für Datumsfilter (z.B. " AND datum >= '2025-07-07'").
 
     Returns:
-        Liste von Dicts mit: name, gruppe, wert, einheit, norm, flag,
-        trend, trend_label, empfehlung, bewertung_cls
+        Liste von Dicts.
     """
-    # Zeitfilter
-    period_filter = ""
-    if period == "1m":
-        period_filter = " AND l.datum >= date('now', '-1 month')"
-    elif period == "6m":
-        period_filter = " AND l.datum >= date('now', '-6 months')"
-    elif period == "1y":
-        period_filter = " AND l.datum >= date('now', '-1 year')"
-
     # Letzter Wert pro Test, nur mit H/L-Flag
     rows = conn.execute(f"""
         SELECT l.datum, l.gruppe, l.test_standard, l.wert_norm, l.einheit_norm,
                l.normbereich, l.flag
         FROM laborwerte l
         WHERE l.flag IN ('H', 'L')
-        {period_filter}
+        {datum_filter}
         AND l.datum = (
             SELECT MAX(l2.datum) FROM laborwerte l2
             WHERE l2.test_standard = l.test_standard AND l2.flag IN ('H','L')
-            {period_filter}
+            {datum_filter}
         )
         GROUP BY l.test_standard
         ORDER BY l.datum DESC
@@ -276,7 +357,7 @@ def build_abnormal_tests(conn: sqlite3.Connection, period: str = "all") -> list[
         ).fetchone()
 
         trend = "→"
-        trend_label = "stabil"
+        trend_label = "unverändert"
         if current_val is not None and prev_row:
             try:
                 prev_val = float(
@@ -304,7 +385,8 @@ def build_abnormal_tests(conn: sqlite3.Connection, period: str = "all") -> list[
         bewertung_cls = "crit" if path_ratio >= 0.6 else "warn"
 
         results.append({
-            "name": KURZNAMEN.get(test_name, test_name),
+            "name": test_name,
+            "kurzname": KURZNAMEN.get(test_name, ""),
             "gruppe": row["gruppe"],
             "wert": current_wert,
             "einheit": row["einheit_norm"] or "",
@@ -410,16 +492,53 @@ def build_verknuepfung_charts(conn: sqlite3.Connection) -> list[dict]:
     return charts
 
 
+def _get_abnormal_test_names(conn: sqlite3.Connection, datum_filter: str = "") -> set[str]:
+    """Gibt die Testnamen zurück die im Zeitraum einen auffälligen Wert haben."""
+    rows = conn.execute(f"""
+        SELECT DISTINCT test_standard FROM laborwerte
+        WHERE flag IN ('H','L') {datum_filter}
+    """).fetchall()
+    return {r["test_standard"] for r in rows}
+
+
+def _build_normal_tests(conn: sqlite3.Connection, datum_filter: str = "", exclude_tests: set = None) -> list[dict]:
+    """Sammelt alle Tests deren letzter Wert im gewählten Zeitraum im Normbereich liegt."""
+    rows = conn.execute(f"""
+        SELECT l.test_standard, l.gruppe, l.wert_norm, l.einheit_norm
+        FROM laborwerte l
+        WHERE l.datum = (SELECT MAX(l2.datum) FROM laborwerte l2 WHERE l2.test_standard = l.test_standard)
+        AND (l.flag IS NULL OR l.flag = '')
+        {datum_filter}
+        GROUP BY l.test_standard
+        ORDER BY l.gruppe, l.test_standard
+    """).fetchall()
+
+    results = []
+    if exclude_tests is None:
+        exclude_tests = set()
+    for row in rows:
+        if row["test_standard"] in exclude_tests:
+            continue
+        results.append({
+            "name": row["test_standard"],
+            "kurzname": KURZNAMEN.get(row["test_standard"], ""),
+            "gruppe": row["gruppe"],
+            "wert": row["wert_norm"],
+            "einheit": row["einheit_norm"] or "",
+        })
+    return results
+
+
 # ---------------------------------------------------------------------------
 # Haupt-Orchestrator
 # ---------------------------------------------------------------------------
 
-def build_report_data(conn: sqlite3.Connection, period: str = "1y") -> dict:
+def build_report_data(conn: sqlite3.Connection, befunde_count: int = 2) -> dict:
     """Orchestriert alle Datensammlung für den Gesamtbericht.
 
     Args:
         conn: DB-Verbindung.
-        period: Zeitfilter – "all", "1y", "6m", "1m".
+        befunde_count: Anzahl der letzten Befunde (0=alle).
 
     Returns:
         Dict mit allen Report-Sektionen.
@@ -428,15 +547,175 @@ def build_report_data(conn: sqlite3.Connection, period: str = "1y") -> dict:
     from app.config.settings import PATIENT_CONFIG
     from app.core.vergleich import berechne_vorjahresvergleich
 
-    PERIOD_LABELS = {"all": "Gesamter Zeitraum", "1y": "Letztes Jahr", "6m": "Letzte 6 Monate", "1m": "Letzter Monat"}
+    # Bemerkung direkt aus Config lesen (nicht gecacht)
+    import yaml
+    from pathlib import Path
+    _live_config = yaml.safe_load((Path(__file__).resolve().parent.parent.parent / "data" / "labor_config.yaml").read_text(encoding="utf-8"))
+    bemerkung = _live_config.get("gesamtbericht_bemerkung", "")
+
+    # Befunde-basierter Filter: Datum des ältesten relevanten Befunds ermitteln
+    datum_filter = ""
+    period_display = "Gesamter Zeitraum"
+    if befunde_count > 0:
+        befund_rows = conn.execute(
+            "SELECT DISTINCT datum FROM befunde ORDER BY datum DESC LIMIT ?",
+            (befunde_count,)
+        ).fetchall()
+        if befund_rows:
+            aeltestes_datum = befund_rows[-1]["datum"]
+            neuestes_datum = befund_rows[0]["datum"]
+            period_display = f"Letzte{'r' if befunde_count == 1 else ''} {befunde_count} Befund{'e' if befunde_count > 1 else ''} ({aeltestes_datum} – {neuestes_datum})"
+            datum_filter = f" AND datum >= '{aeltestes_datum}'"
 
     return {
         "patient": PATIENT_CONFIG,
         "generated_at": datetime.now().strftime("%d.%m.%Y %H:%M"),
-        "period_label": PERIOD_LABELS.get(period, period),
-        "gruppen": build_gruppen_summary(conn),
+        "period_label": period_display,
+        "bemerkung": bemerkung,
+        "gruppen": build_gruppen_summary(conn, datum_filter=datum_filter),
         "gefaess_score": berechne_gefaess_score(conn),
-        "abnormal_tests": build_abnormal_tests(conn, period=period),
+        "abnormal_tests": build_abnormal_tests(conn, datum_filter=datum_filter),
+        "normal_tests": _build_normal_tests(conn, datum_filter=datum_filter, exclude_tests=_get_abnormal_test_names(conn, datum_filter)),
         "verknuepfung_charts": build_verknuepfung_charts(conn),
         "vergleich": berechne_vorjahresvergleich(conn),
+        "vergleich_zusammenfassung": _build_vergleich_zusammenfassung(berechne_vorjahresvergleich(conn)),
     }
+
+
+# ---------------------------------------------------------------------------
+# Vorjahresvergleich Zusammenfassung
+# ---------------------------------------------------------------------------
+
+def _build_vergleich_zusammenfassung(vergleich: dict) -> dict:
+    """Generiert eine dynamische Zusammenfassung des Vorjahresvergleichs.
+
+    Returns:
+        dict mit: text (Fließtext), details (Liste mit Einzelbeschreibungen)
+    """
+    verschlechtert = vergleich.get("verschlechtert", [])
+    verbessert = vergleich.get("verbessert", [])
+
+    if not verschlechtert and not verbessert:
+        return {"text": "Im Vergleich zum Vorjahr keine signifikanten Veränderungen.", "details": []}
+
+    # Kategorisierung der Verschlechterungen
+    fett_tests = {"Triglyceride", "Cholesterin", "Non-HDL-Cholesterin", "LDL", "HDL", "Quotient Chol/HDL", "Quotient LDL/HDL"}
+    zucker_tests = {"HbA1c", "HbA1c (IFCC)", "Glucose"}
+    niere_tests = {"GFR", "Kreatinin", "Harnstoff"}
+    entzuendung_tests = {"CRP", "Leukozyten", "Interleukin-6"}
+    gerinnung_tests = {"Quick", "INR", "aPTT"}
+
+    v_names = {v["test"] for v in verschlechtert}
+
+    teile = []
+
+    # Fettstoffwechsel
+    fett_treffer = v_names & fett_tests
+    if fett_treffer:
+        if len(fett_treffer) >= 3:
+            teile.append("einer massiven Progression der Fettstoffwechselstörung")
+        elif len(fett_treffer) >= 2:
+            teile.append("einer deutlichen Verschlechterung der Blutfettwerte")
+        else:
+            teile.append(f"einer Verschlechterung bei {', '.join(fett_treffer)}")
+
+    # Zucker
+    zucker_treffer = v_names & zucker_tests
+    if zucker_treffer:
+        teile.append("einer metabolischen Verschlechterung in Richtung Diabetes (Anstieg des Langzeitblutzuckers)")
+
+    # Niere
+    niere_treffer = v_names & niere_tests
+    if niere_treffer:
+        teile.append("einer beginnenden Einschränkung der Nierenfunktion")
+
+    # Entzündung
+    entz_treffer = v_names & entzuendung_tests
+    if entz_treffer:
+        if len(entz_treffer) >= 2:
+            teile.append("Zeichen einer akuten Immunreaktion mit Entzündungsgeschehen")
+        else:
+            teile.append(f"Hinweisen auf Entzündung ({', '.join(entz_treffer)} erhöht)")
+
+    # Gerinnung
+    ger_treffer = v_names & gerinnung_tests
+    if ger_treffer:
+        teile.append("Veränderungen der Blutgerinnung")
+
+    # Sonstige
+    sonstige = v_names - fett_tests - zucker_tests - niere_tests - entzuendung_tests - gerinnung_tests
+    if sonstige and not teile:
+        teile.append(f"Verschlechterung bei {', '.join(sorted(sonstige))}")
+
+    # Verbesserungen erwähnen
+    verb_teil = ""
+    if verbessert:
+        verb_namen = [v["test"] for v in verbessert[:3]]
+        verb_teil = f", während sich {', '.join(verb_namen)} verbessert zeig{'en' if len(verb_namen) > 1 else 't'}"
+
+    # Zusammenfassung bauen
+    if teile:
+        if len(teile) == 1:
+            aufzaehlung = teile[0]
+        else:
+            aufzaehlung = ", ".join(teile[:-1]) + " sowie " + teile[-1]
+        text = f"Im Vergleich zum Vorjahr zeigt sich eine Befundverschlechterung mit {aufzaehlung}{verb_teil}."
+    elif verbessert:
+        text = f"Im Vergleich zum Vorjahr zeigen sich Verbesserungen bei {', '.join(v['test'] for v in verbessert[:4])}."
+    else:
+        text = ""
+
+    # Details: Wichtigste Veränderungen
+    details = []
+    # Verschlechtert (nach abs(pct) sortiert, Top 8)
+    for v in sorted(verschlechtert, key=lambda x: abs(x.get("pct", 0)), reverse=True)[:8]:
+        pct = v.get("pct", 0)
+        pct_str = f"+{pct}%" if pct > 0 else f"{pct}%"
+
+        # Dynamische Beschreibung pro Test
+        beschreibung = _detail_beschreibung(v["test"], pct)
+        details.append({
+            "test": v["test"],
+            "wert": v.get("aktuell", ""),
+            "pct": pct_str,
+            "richtung": "verschlechtert",
+            "beschreibung": beschreibung,
+        })
+
+    return {"text": text, "details": details}
+
+
+def _detail_beschreibung(test: str, pct: int) -> str:
+    """Generiert eine kurze medizinische Beschreibung der Veränderung."""
+    abs_pct = abs(pct)
+
+    # Intensitäts-Prefix
+    if abs_pct > 200:
+        intensitaet = "Massiver"
+    elif abs_pct > 100:
+        intensitaet = "Drastischer"
+    elif abs_pct > 50:
+        intensitaet = "Starker"
+    elif abs_pct > 20:
+        intensitaet = "Deutlicher"
+    else:
+        intensitaet = "Leichter"
+
+    beschreibungen = {
+        "CRP": f"{intensitaet} Anstieg – akutes Entzündungsgeschehen",
+        "Triglyceride": f"{intensitaet} Anstieg der Blutfette",
+        "Cholesterin": f"Gesamtcholesterin {intensitaet.lower()} erhöht",
+        "Non-HDL-Cholesterin": f"{intensitaet} Anstieg der gefäßschädigenden Cholesterinanteile",
+        "LDL": f"LDL-Cholesterin {intensitaet.lower()} verschlechtert",
+        "Quotient Chol/HDL": f"Cholesterin-Verhältnis {intensitaet.lower()} verschlechtert",
+        "Quick": f"{intensitaet} beschleunigte Blutgerinnung",
+        "Leukozyten": f"Veränderung der weißen Blutkörperchen",
+        "GFR": f"Rückgang der Nierenfiltrationsleistung – Nierenwerte kontrollieren",
+        "HbA1c": f"Anstieg des Langzeitblutzuckers – Trend zum Diabetes",
+        "HbA1c (IFCC)": f"Anstieg des Langzeitblutzuckers (IFCC)",
+        "Harnsäure": f"Anstieg der Harnsäure – Gichtrisiko",
+        "Hämatokrit": f"Veränderung der Blutdicke",
+        "Hämoglobin": f"Veränderung des roten Blutfarbstoffs",
+    }
+
+    return beschreibungen.get(test, f"{intensitaet} Veränderung")

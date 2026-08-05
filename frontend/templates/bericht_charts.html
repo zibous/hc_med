@@ -102,6 +102,8 @@ tests.forEach((t, idx) => {
 
     const section = document.createElement('div');
     section.className = 'test-section';
+    const hasChart = values.filter(v => v !== null).length >= 3;
+    if (!hasChart) return;
     section.innerHTML = `
         <div class="test-header">
             <span class="test-name">${t.name} (${t.einheit})</span>
@@ -115,7 +117,8 @@ tests.forEach((t, idx) => {
     `;
     container.appendChild(section);
 
-    // Statistik
+    // Statistik + Chart nur bei >= 2 Messungen
+    if (!hasChart) return;
     const numVals = values.filter(v => v !== null);
     if (numVals.length > 0) {
         const mn = Math.min(...numVals);

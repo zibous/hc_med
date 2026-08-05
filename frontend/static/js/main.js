@@ -128,9 +128,9 @@ export async function loadView() {
         sub.textContent = `Verlaufsanalyse · ${data.kpis.zeitraum_von?.slice(0,4)} – ${data.kpis.zeitraum_bis?.slice(0,4)}`;
       }
     } else if (state.view === "pathologisch") {
-      const period = state.pathPeriod || "all";
+      const period = state.pathPeriod || "2";
       let url = "api/pathologisch";
-      if (period !== "all") url += `?period=${period}`;
+      if (period !== "all") url += `?befunde=${parseInt(period) || 0}`;
       const res = await fetch(url);
       const data = await res.json();
       renderKPIs(null);
@@ -138,10 +138,11 @@ export async function loadView() {
       renderChart(null);
       // Zeitfilter-Buttons
       const periods = [
+        { key: "1", label: "Letzter Befund" },
+        { key: "2", label: "Letzte 2" },
+        { key: "3", label: "Letzte 3" },
+        { key: "5", label: "Letzte 5" },
         { key: "all", label: "Alle" },
-        { key: "1y", label: "Letztes Jahr" },
-        { key: "6m", label: "6 Monate" },
-        { key: "1m", label: "Letzter Monat" },
       ];
       document.getElementById("view-description").innerHTML = `
         <div class="period-filter">
@@ -158,7 +159,7 @@ export async function loadView() {
       });
       // Bericht-Button
       const reportBtn = document.createElement("a");
-      reportBtn.href = `api/bericht/charts?period=${period}&sort=${state.pathSortCol}&dir=${state.pathSortDir}`;
+      reportBtn.href = `api/bericht/charts?befunde=${parseInt(period) || 0}&sort=${state.pathSortCol}&dir=${state.pathSortDir}`;
       reportBtn.target = "_blank";
       reportBtn.className = "report-btn";
       reportBtn.textContent = "🖨️ Bericht drucken";

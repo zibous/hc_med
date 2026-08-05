@@ -79,28 +79,38 @@ def _period_filter(query: str, period: str) -> str:
 
 
 @router.get("/bericht/charts", response_class=HTMLResponse)
-async def bericht_charts(request: Request, period: str = "1m", sort: str = "datum", dir: int = -1):
+async def bericht_charts(request: Request, befunde: int = 0, period: str = "", sort: str = "datum", dir: int = -1):
     """Arztbericht mit Verlaufs-Charts pro auffälligem Test."""
+    # Fallback: alte period-Parameter auf befunde mappen
+    if not befunde and period and period not in ("all", ""):
+        try:
+            befunde = int(period)
+        except ValueError:
+            befunde = 0
     conn = get_db()
     try:
-        # Gleiche Query wie /api/pathologisch für konsistente Reihenfolge
-        period_filter = ""
-        if period == "1m":
-            period_filter = " AND datum >= date('now', '-1 month')"
-        elif period == "6m":
-            period_filter = " AND datum >= date('now', '-6 months')"
-        elif period == "1y":
-            period_filter = " AND datum >= date('now', '-1 year')"
+        # Befunde-basierter Filter
+        datum_filter = ""
+        period_label = "Gesamter Zeitraum"
+        if befunde > 0:
+            befund_rows = conn.execute(
+                "SELECT DISTINCT datum FROM befunde ORDER BY datum DESC LIMIT ?",
+                (befunde,)
+            ).fetchall()
+            if befund_rows:
+                aeltestes_datum = befund_rows[-1]["datum"]
+                datum_filter = f" AND datum >= '{aeltestes_datum}'"
+                period_label = f"Letzte {befunde} Befunde (ab {aeltestes_datum})"
 
         path_query = f"""
             SELECT l.test_standard, l.gruppe, l.flag, l.datum
             FROM laborwerte l
             WHERE l.flag IN ('H', 'L')
-            {period_filter}
+            {datum_filter}
             AND l.datum = (
                 SELECT MAX(l3.datum) FROM laborwerte l3
                 WHERE l3.test_standard = l.test_standard AND l3.flag IN ('H','L')
-                {period_filter}
+                {datum_filter}
             )
             GROUP BY l.test_standard
             ORDER BY l.datum DESC, l.gruppe
@@ -151,7 +161,7 @@ async def bericht_charts(request: Request, period: str = "1m", sort: str = "datu
     return templates.TemplateResponse("bericht_charts.html", {
         "request": request,
         "now": datetime.now().strftime("%d.%m.%Y %H:%M"),
-        "period_label": PERIOD_LABELS.get(period, period),
+        "period_label": period_label,
         "patient": PATIENT_CONFIG,
         "tests_data": tests_data,
         "charts_json": json.dumps(tests_data, ensure_ascii=False),

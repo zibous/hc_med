@@ -511,6 +511,14 @@ nuechtern_sensitiv:
   - Quotient LDL/HDL
 
 
+# Zusatzbemerkung für den Gesamtbericht
+# Wird nach der Gefäßgesundheit-Sektion angezeigt (auch beim Drucken)
+# Leer lassen oder entfernen wenn nicht benötigt
+gesamtbericht_bemerkung: ""
+gesamtbericht_bemerkung1: "KI Auswertung: Patient mit bekannter PAVK/Halsschlagader-Plaques zeigt akuten Entzündungsschub (CRP 3.14, Leukozyten 14.2), Thrombozytenabfall (114) bei Hyperkoagulabilität (Quick >120) und beginnendes Nierenversagen (GFR 66) bei metabolischem Kipppunkt (Triglyceride 473, HbA1c 6.2%)."
+
+
+
 # Fallback-Normbereiche wenn im Befund kein Referenzwert steht
 # Format: "min-max" oder "<max" oder ">min"
 fallback_normbereiche:

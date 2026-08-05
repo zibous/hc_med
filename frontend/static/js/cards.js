@@ -189,13 +189,13 @@ export function renderCards(items, mode = "gruppe") {
           renderTable(data, sortCol, sortDir);
           // Bericht-Link aktualisieren
           const btn = document.querySelector(".report-btn");
-          if (btn) btn.href = `api/bericht/charts?period=${state.pathPeriod || 'all'}&sort=${sortCol}&dir=${sortDir}`;
+          if (btn) btn.href = `api/bericht/charts?befunde=${parseInt(sortCol === sortCol ? state.pathPeriod : state.pathPeriod) || 0}&sort=${sortCol}&dir=${sortDir}`;
         });
       });
 
       // Bericht-Link immer nach renderTable aktualisieren
       const btn = document.querySelector(".report-btn");
-      if (btn) btn.href = `api/bericht/charts?period=${state.pathPeriod || 'all'}&sort=${col}&dir=${dir}`;
+      if (btn) btn.href = `api/bericht/charts?befunde=${parseInt(state.pathPeriod) || 0}&sort=${col}&dir=${dir}`;
 
       // Row-Click
       el.querySelectorAll(".path-row").forEach(row => {

@@ -103,7 +103,7 @@ async def get_favoriten_detail():
                         elif pct < -5:
                             trend = f"↓ {pct}%"
                         else:
-                            trend = "→ stabil"
+                            trend = "→ unverändert"
             except (ValueError, TypeError):
                 pass
 
