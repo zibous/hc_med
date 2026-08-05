@@ -1289,11 +1289,10 @@ def main():
                     pass
         results = clean_results
 
-        # Fehlende Flags berechnen anhand des Normbereichs
+        # Flags berechnen/korrigieren anhand des Normbereichs
+        # Auch vorhandene Flags werden neu geprüft (könnten durch Einheiten-Konvertierung falsch sein)
         fallback_norms = _config.get("fallback_normbereiche", {})
         for row in results:
-            if row.get("Flag"):
-                continue  # Flag bereits gesetzt
             norm = row.get("Normbereich", "").strip()
             # Fallback-Norm verwenden wenn keine vorhanden
             if not norm or not any(c.isdigit() for c in norm):
@@ -1315,6 +1314,24 @@ def main():
             m = _re.match(r"^([\d.]+)\s*-\s*([\d.]+)$", norm)
             if m:
                 norm_lo, norm_hi = float(m.group(1)), float(m.group(2))
+
+            # Korrektur: Hämatokrit Norm in L/L (0.41-0.53) → auf % konvertieren
+            if row.get("Test_Standard") == "Hämatokrit" and norm_hi is not None and norm_hi < 1:
+                norm_lo = norm_lo * 100 if norm_lo else None
+                norm_hi = norm_hi * 100
+                row["Normbereich"] = f"{norm_lo:.0f}-{norm_hi:.0f}" if norm_lo else f"<{norm_hi:.0f}"
+
+            # Korrektur: Hämoglobin/MCHC Norm in g/L (>100) → auf g/dL konvertieren (÷10)
+            if row.get("Test_Standard") in ("Hämoglobin", "MCHC") and norm_hi is not None and norm_hi > 50:
+                norm_lo = norm_lo / 10 if norm_lo else None
+                norm_hi = norm_hi / 10
+                row["Normbereich"] = f"{norm_lo:.1f}-{norm_hi:.1f}" if norm_lo else f"<{norm_hi:.1f}"
+
+            # Korrektur: Cholinesterase Norm in KU/l (<15) → auf U/L konvertieren (×1000)
+            if row.get("Test_Standard") == "Cholinesterase" and norm_hi is not None and norm_hi < 20:
+                norm_lo = norm_lo * 1000 if norm_lo else None
+                norm_hi = norm_hi * 1000
+                row["Normbereich"] = f"{norm_lo:.0f}-{norm_hi:.0f}" if norm_lo else f"<{norm_hi:.0f}"
             # Nur Obergrenze: "< 0.50" oder "<-200"
             m2 = _re.match(r"^[<]\s*-?\s*([\d.]+)$", norm)
             if m2:
@@ -1328,11 +1345,14 @@ def main():
             if m4 and not m:
                 norm_hi = float(m4.group(1))
 
-            # Flag setzen
+            # Flag setzen (oder korrigieren wenn Norm konvertiert wurde)
             if norm_hi is not None and wert > norm_hi:
                 row["Flag"] = "H"
             elif norm_lo is not None and wert < norm_lo:
                 row["Flag"] = "L"
+            else:
+                # Wert ist im Normbereich → Flag entfernen (auch wenn Original-Befund eines hatte)
+                row["Flag"] = ""
 
         file_results.append((filepath.name, fmt, results, nuechtern))
         all_results.extend(results)
