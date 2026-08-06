@@ -14,6 +14,9 @@ export function renderBreadcrumb() {
   if (state.view === "favoriten") {
     crumbs.push({ label: "⭐ Favoriten", view: "favoriten" });
   }
+  if (state.view === "alle-tests") {
+    crumbs.push({ label: "📋 Alle Tests", view: "alle-tests" });
+  }
   if (state.view === "trend" && state.fromPath === "pathologisch") {
     crumbs.push({ label: "⚠️ Auffällige Werte", view: "pathologisch" });
   }
@@ -22,6 +25,9 @@ export function renderBreadcrumb() {
   }
   if (state.view === "trend" && state.fromPath === "favoriten") {
     crumbs.push({ label: "⭐ Favoriten", view: "favoriten" });
+  }
+  if (state.view === "trend" && state.fromPath === "alle-tests") {
+    crumbs.push({ label: "📋 Alle Tests", view: "alle-tests" });
   }
   if (state.gruppe && state.view !== "pathologisch") {
     crumbs.push({ label: state.gruppe, view: "gruppe", params: { gruppe: state.gruppe } });

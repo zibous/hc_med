@@ -578,6 +578,11 @@ def parse_pivot_format(filepath: Path) -> list[dict]:
         unit = parts[1].strip() if len(parts) > 1 else ""
         norm_raw = parts[2].strip() if len(parts) > 2 else ""
 
+        # Korrektur: Wenn Einheit leer und Norm wie eine Einheit aussieht (enthält /)
+        if not unit and norm_raw and "/" in norm_raw and not any(c.isdigit() for c in norm_raw):
+            unit = norm_raw
+            norm_raw = ""
+
         # Referenz bereinigen: Einheit am Ende entfernen, Komma->Punkt
         norm = norm_raw
         # Einheit aus Norm entfernen (z.B. "0,70 - 1,20 mg/dl" -> "0.70-1.20")
@@ -1292,8 +1297,26 @@ def main():
         # Flags berechnen/korrigieren anhand des Normbereichs
         # Auch vorhandene Flags werden neu geprüft (könnten durch Einheiten-Konvertierung falsch sein)
         fallback_norms = _config.get("fallback_normbereiche", {})
+        # Ungültige Normbereich-Strings die keine echten Normbereiche sind
+        INVALID_NORMS = {"abs", "aut%", "rel%", "rel", "aut", "%"}
         for row in results:
             norm = row.get("Normbereich", "").strip()
+
+            # Ungültige Norm-Strings bereinigen
+            if norm.lower() in INVALID_NORMS:
+                norm = ""
+                row["Normbereich"] = ""
+
+            # "< - 200" → "< 200" (Leerzeichen-Minus bereinigen)
+            if norm:
+                norm = re.sub(r"^(<\s*)-\s*", r"\1", norm)
+                row["Normbereich"] = norm
+
+            # Einzelne Zahl ohne Operator → "< X" (Obergrenze)
+            if norm and re.match(r"^\d+\.?\d*$", norm):
+                norm = f"< {norm}"
+                row["Normbereich"] = norm
+
             # Fallback-Norm verwenden wenn keine vorhanden
             if not norm or not any(c.isdigit() for c in norm):
                 norm = fallback_norms.get(row.get("Test_Standard", ""), "")

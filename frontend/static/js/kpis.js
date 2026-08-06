@@ -113,6 +113,11 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
       <div class="kpi-value-text">Alle Befunde auf einer Seite – für den Arzttermin</div>
       <div class="kpi-sub">Klick → druckfertiger Bericht in neuem Tab →</div>
     </div>
+    <div class="kpi kpi-half kpi-clickable" id="kpi-alle-tests" style="cursor:pointer; border-left:3px solid var(--teal)">
+      <div class="kpi-label">📋 Alle Tests</div>
+      <div class="kpi-value-text">Alle Laborwerte in einer sortierbaren Tabelle mit Norm-Balken</div>
+      <div class="kpi-sub">Klick → Übersicht aller Werte →</div>
+    </div>
   `;
 
   // Klick auf Gruppen-Links
@@ -141,5 +146,10 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
   // Klick auf Gesamtbericht
   document.getElementById("kpi-gesamtbericht")?.addEventListener("click", () => {
     window.open("api/gesamtbericht", "_blank");
+  });
+
+  // Klick auf Alle Tests
+  document.getElementById("kpi-alle-tests")?.addEventListener("click", () => {
+    navigate("alle-tests", {});
   });
 }

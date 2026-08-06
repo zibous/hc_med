@@ -6,6 +6,7 @@ import { renderChart, renderMultiChart, renderRadarChart } from "./trend-chart.j
 import { renderBreadcrumb } from "./breadcrumb.js";
 import { loadFavoritenListe, renderFavoritenKarte, starIconHtml, bindStarHandlers, renderFavoritenDetail } from "./favoriten.js";
 import { renderVergleich } from "./vergleich.js";
+import { renderAlleTests } from "./alle-tests.js";
 
 function cleanupRadar() {
   const r1 = document.getElementById("radarEmpfehlungRow");
@@ -128,38 +129,44 @@ export async function loadView() {
         sub.textContent = `Verlaufsanalyse · ${data.kpis.zeitraum_von?.slice(0,4)} – ${data.kpis.zeitraum_bis?.slice(0,4)}`;
       }
     } else if (state.view === "pathologisch") {
-      const period = state.pathPeriod || "2";
+      const von = state.pathVon || "";
+      const bis = state.pathBis || "";
       let url = "api/pathologisch";
-      if (period !== "all") url += `?befunde=${parseInt(period) || 0}`;
+      const params = [];
+      if (von) params.push(`von=${von}`);
+      if (bis) params.push(`bis=${bis}`);
+      if (params.length) url += "?" + params.join("&");
       const res = await fetch(url);
       const data = await res.json();
+      const jahre = data.verfuegbare_jahre || [];
       renderKPIs(null);
-      renderCards(data, "pathologisch");
+      renderCards(data.items, "pathologisch");
       renderChart(null);
-      // Zeitfilter-Buttons
-      const periods = [
-        { key: "1", label: "Letzter Befund" },
-        { key: "2", label: "Letzte 2" },
-        { key: "3", label: "Letzte 3" },
-        { key: "5", label: "Letzte 5" },
-        { key: "all", label: "Alle" },
-      ];
+      // Jahres-Dropdowns
+      const optionsVon = `<option value="">Anfang</option>` + jahre.slice().reverse().map(j => `<option value="${j}" ${j === von ? 'selected' : ''}>${j}</option>`).join("");
+      const optionsBis = `<option value="">Heute</option>` + jahre.map(j => `<option value="${j}" ${j === bis ? 'selected' : ''}>${j}</option>`).join("");
       document.getElementById("view-description").innerHTML = `
-        <div class="period-filter">
-          ${periods.map(p => `<button class="period-btn ${p.key === period ? 'active' : ''}" data-period="${p.key}">${p.label}</button>`).join("")}
+        <div class="period-filter" style="align-items:center;">
+          <span style="font-size:1.3rem;color:var(--text-muted)">Zeitraum:</span>
+          <select id="pathVon" class="period-select">${optionsVon}</select>
+          <span style="font-size:1.3rem;color:var(--text-muted)">bis</span>
+          <select id="pathBis" class="period-select">${optionsBis}</select>
         </div>
         <span style="color:var(--text-muted)">Messwerte außerhalb des Normbereichs – klick auf eine Zeile für den Verlauf.</span>
       `;
-      document.querySelectorAll(".period-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          state.pathPeriod = btn.dataset.period;
-          localStorage.setItem("lab_state", JSON.stringify(state));
-          loadView();
-        });
+      document.getElementById("pathVon")?.addEventListener("change", (e) => {
+        state.pathVon = e.target.value;
+        localStorage.setItem("lab_state", JSON.stringify(state));
+        loadView();
+      });
+      document.getElementById("pathBis")?.addEventListener("change", (e) => {
+        state.pathBis = e.target.value;
+        localStorage.setItem("lab_state", JSON.stringify(state));
+        loadView();
       });
       // Bericht-Button
       const reportBtn = document.createElement("a");
-      reportBtn.href = `api/bericht/charts?befunde=${parseInt(period) || 0}&sort=${state.pathSortCol}&dir=${state.pathSortDir}`;
+      reportBtn.href = `api/bericht/charts?von=${von}&bis=${bis}&sort=${state.pathSortCol}&dir=${state.pathSortDir}`;
       reportBtn.target = "_blank";
       reportBtn.className = "report-btn";
       reportBtn.textContent = "🖨️ Bericht drucken";
@@ -195,6 +202,44 @@ export async function loadView() {
         ph2.querySelector("h1").textContent = "Favoriten – Laborwerte";
         const patEl2 = document.getElementById("patient-name");
         document.getElementById("print-patient").textContent = patEl2 ? patEl2.textContent : "";
+        document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
+      }
+    } else if (state.view === "alle-tests") {
+      renderKPIs(null);
+      renderChart(null);
+      await renderAlleTests();
+      const jahre = window._alleTestsJahre || [];
+      const von = state.alleTestsVon || "";
+      const bis = state.alleTestsBis || "";
+      
+      const optionsVon = `<option value="">Anfang</option>` + jahre.slice().reverse().map(j => `<option value="${j}" ${j === von ? 'selected' : ''}>${j}</option>`).join("");
+      const optionsBis = `<option value="">Heute</option>` + jahre.map(j => `<option value="${j}" ${j === bis ? 'selected' : ''}>${j}</option>`).join("");
+
+      document.getElementById("view-description").innerHTML = `
+        <div class="period-filter" style="align-items:center;">
+          <span style="font-size:1.3rem;color:var(--text-muted)">Zeitraum:</span>
+          <select id="alleTestsVon" class="period-select">${optionsVon}</select>
+          <span style="font-size:1.3rem;color:var(--text-muted)">bis</span>
+          <select id="alleTestsBis" class="period-select">${optionsBis}</select>
+        </div>
+        <span style="color:var(--text-muted)">Alle Laborwerte – letzter Messwert pro Test im gewählten Zeitraum. Klick auf eine Zeile für den Verlauf.</span>
+      `;
+      document.getElementById("alleTestsVon")?.addEventListener("change", (e) => {
+        state.alleTestsVon = e.target.value;
+        localStorage.setItem("lab_state", JSON.stringify(state));
+        loadView();
+      });
+      document.getElementById("alleTestsBis")?.addEventListener("change", (e) => {
+        state.alleTestsBis = e.target.value;
+        localStorage.setItem("lab_state", JSON.stringify(state));
+        loadView();
+      });
+      // Print-Header
+      const ph3 = document.querySelector(".print-header");
+      if (ph3) {
+        ph3.querySelector("h1").textContent = "Alle Tests – Laborwerte";
+        const patEl3 = document.getElementById("patient-name");
+        document.getElementById("print-patient").textContent = patEl3 ? patEl3.textContent : "";
         document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
       }
     } else if (state.view === "gruppe") {

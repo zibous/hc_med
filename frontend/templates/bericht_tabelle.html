@@ -21,6 +21,14 @@
     .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 9px; color: #999; }
     @media print { body { margin: 1.5cm; } .no-print { display: none; } }
     .print-btn { position: fixed; top: 16px; right: 16px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 19px; cursor: pointer; }
+    /* Norm-Bar (Print) */
+    .norm-bar-print { display: inline-block; width: 80px; height: 8px; border-radius: 4px; position: relative; background: #e5e7eb; vertical-align: middle; }
+    .norm-bar-print .nb-ok { position: absolute; top: 0; height: 100%; background: #6ee7b7; border-radius: 2px; }
+    .norm-bar-print .nb-low { position: absolute; top: 0; left: 0; height: 100%; background: #fca5a5; border-radius: 4px 0 0 4px; }
+    .norm-bar-print .nb-high { position: absolute; top: 0; height: 100%; background: #fca5a5; border-radius: 0 4px 4px 0; }
+    .norm-bar-print .nb-dot { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); border: 1.5px solid #fff; box-shadow: 0 0 0 1px #374151; }
+    .nb-dot-ok { background: #059669; }
+    .nb-dot-bad { background: #dc2626; }
 </style>
 </head>
 <body>
@@ -49,7 +57,7 @@
             <td>{{ r.datum }}</td>
             <td>{{ r.test_standard }}</td>
             <td><strong>{{ r.wert_norm }}</strong> {{ r.einheit_norm or "" }}</td>
-            <td>{{ r.normbereich or "" }}</td>
+            <td>{{ norm_bar_html(r.wert_norm, r.normbereich or "", r.flag or "")|safe }}</td>
             <td class="{{ 'high' if r.flag == 'H' else 'low' }}">{{ "↑ erhöht" if r.flag == "H" else "↓ erniedrigt" }}</td>
             <td>{{ beschreibungen.get(r.test_standard, "")[:80] }}</td>
         </tr>
@@ -71,7 +79,7 @@
         <tr class="{{ 'high' if r.flag == 'H' else 'low' if r.flag == 'L' else '' }}">
             <td>{{ r.test_standard }}</td>
             <td><strong>{{ r.wert_norm }}</strong> {{ r.einheit_norm or "" }}</td>
-            <td>{{ r.normbereich or "" }}</td>
+            <td>{{ norm_bar_html(r.wert_norm, r.normbereich or "", r.flag or "")|safe }}</td>
             <td>{{ r.datum }}</td>
             <td>{{ r.flag or "✓" }}</td>
         </tr>

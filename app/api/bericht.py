@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.config.settings import PATIENT_CONFIG, TEST_DESCRIPTIONS, KURZNAMEN
 from app.core.empfehlungen import get_test_empfehlung
+from app.core.norm_bar import norm_bar_html
 from app.core.vergleich import berechne_vorjahresvergleich
 from app.infrastructure.database import get_db
 
@@ -17,6 +18,7 @@ router = APIRouter(prefix="/api", tags=["labor"])
 
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+templates.env.globals["norm_bar_html"] = norm_bar_html
 
 PERIOD_LABELS = {"1m": "Letzter Monat", "6m": "Letzte 6 Monate", "1y": "Letztes Jahr", "all": "Gesamter Zeitraum"}
 
@@ -79,7 +81,7 @@ def _period_filter(query: str, period: str) -> str:
 
 
 @router.get("/bericht/charts", response_class=HTMLResponse)
-async def bericht_charts(request: Request, befunde: int = 0, period: str = "", sort: str = "datum", dir: int = -1):
+async def bericht_charts(request: Request, befunde: int = 0, period: str = "", sort: str = "datum", dir: int = -1, von: str = "", bis: str = ""):
     """Arztbericht mit Verlaufs-Charts pro auffälligem Test."""
     # Fallback: alte period-Parameter auf befunde mappen
     if not befunde and period and period not in ("all", ""):
@@ -89,10 +91,19 @@ async def bericht_charts(request: Request, befunde: int = 0, period: str = "", s
             befunde = 0
     conn = get_db()
     try:
-        # Befunde-basierter Filter
+        # Jahres-Filter oder Befunde-Filter
         datum_filter = ""
         period_label = "Gesamter Zeitraum"
-        if befunde > 0:
+
+        if von or bis:
+            parts = []
+            if von:
+                parts.append(f"datum >= '{von}-01-01'")
+            if bis:
+                parts.append(f"datum <= '{bis}-12-31'")
+            datum_filter = " AND " + " AND ".join(parts)
+            period_label = f"{von or 'Anfang'} – {bis or 'Heute'}"
+        elif befunde > 0:
             befund_rows = conn.execute(
                 "SELECT DISTINCT datum FROM befunde ORDER BY datum DESC LIMIT ?",
                 (befunde,)

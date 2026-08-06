@@ -1,6 +1,6 @@
 """API: /pathologisch – Auffällige Werte pro Test im Zeitraum."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from app.config.settings import KURZNAMEN
 from app.infrastructure.database import get_db
@@ -9,20 +9,21 @@ router = APIRouter(prefix="/api", tags=["labor"])
 
 
 @router.get("/pathologisch")
-async def pathologisch(befunde: int = 0):
+async def pathologisch(
+    von: str = Query("", description="Start-Jahr (YYYY)"),
+    bis: str = Query("", description="End-Jahr (YYYY)"),
+):
     """Auffällige Werte – letzter auffälliger Wert pro Test im Zeitraum."""
     conn = get_db()
     try:
-        # Befunde-basierter Filter
+        # Jahres-Filter aufbauen
         datum_filter = ""
-        if befunde > 0:
-            befund_rows = conn.execute(
-                "SELECT DISTINCT datum FROM befunde ORDER BY datum DESC LIMIT ?",
-                (befunde,)
-            ).fetchall()
-            if befund_rows:
-                aeltestes_datum = befund_rows[-1]["datum"]
-                datum_filter = f" AND datum >= '{aeltestes_datum}'"
+        if von and bis:
+            datum_filter = f" AND datum >= '{von}-01-01' AND datum <= '{bis}-12-31'"
+        elif von:
+            datum_filter = f" AND datum >= '{von}-01-01'"
+        elif bis:
+            datum_filter = f" AND datum <= '{bis}-12-31'"
 
         # Letzter auffälliger Wert pro Test (unabhängig von Flag-Richtung)
         query = f"""
@@ -58,6 +59,11 @@ async def pathologisch(befunde: int = 0):
                 "anzahl": r["anzahl"],
             })
 
-        return results
+        # Verfügbare Jahre
+        jahre_rows = conn.execute(
+            "SELECT DISTINCT substr(datum, 1, 4) AS jahr FROM laborwerte ORDER BY jahr DESC"
+        ).fetchall()
+
+        return {"items": results, "verfuegbare_jahre": [r["jahr"] for r in jahre_rows]}
     finally:
         conn.close()

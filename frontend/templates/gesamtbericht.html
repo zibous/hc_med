@@ -96,13 +96,34 @@
   <div class="meta">{{ patient.vorname }} {{ patient.nachname }} · geb. {{ patient.geburtsdatum }} · Erstellt am {{ generated_at }} · Zeitraum: {{ period_label }}</div>
 
   <!-- Zeitraum-Filter -->
-  <div style="margin-bottom:1.2rem; display:flex; gap:.4rem;">
-    <a href="?befunde=1" class="period-link {{ 'active' if befunde_count == 1 else '' }}">Letzter Befund</a>
-    <a href="?befunde=2" class="period-link {{ 'active' if befunde_count == 2 else '' }}">Letzte 2</a>
-    <a href="?befunde=3" class="period-link {{ 'active' if befunde_count == 3 else '' }}">Letzte 3</a>
-    <a href="?befunde=5" class="period-link {{ 'active' if befunde_count == 5 else '' }}">Letzte 5</a>
-    <a href="?befunde=0" class="period-link {{ 'active' if befunde_count == 0 else '' }}">Alle</a>
+  <div style="margin-bottom:1.2rem; display:flex; gap:.6rem; align-items:center;" class="no-print">
+    <span style="font-size:.85rem; color:#666;">Zeitraum:</span>
+    <select id="berichtVon" class="period-select" style="padding:.3rem .6rem; border-radius:6px; border:1px solid #ccc; font-size:.85rem;">
+      <option value="">Anfang</option>
+      {% for j in verfuegbare_jahre|reverse %}
+      <option value="{{ j }}" {{ 'selected' if j == von else '' }}>{{ j }}</option>
+      {% endfor %}
+    </select>
+    <span style="font-size:.85rem; color:#666;">bis</span>
+    <select id="berichtBis" class="period-select" style="padding:.3rem .6rem; border-radius:6px; border:1px solid #ccc; font-size:.85rem;">
+      <option value="">Heute</option>
+      {% for j in verfuegbare_jahre %}
+      <option value="{{ j }}" {{ 'selected' if j == bis else '' }}>{{ j }}</option>
+      {% endfor %}
+    </select>
   </div>
+  <script>
+    document.getElementById('berichtVon')?.addEventListener('change', updateFilter);
+    document.getElementById('berichtBis')?.addEventListener('change', updateFilter);
+    function updateFilter() {
+      const v = document.getElementById('berichtVon').value;
+      const b = document.getElementById('berichtBis').value;
+      const params = [];
+      if (v) params.push('von=' + v);
+      if (b) params.push('bis=' + b);
+      window.location.href = '?' + params.join('&');
+    }
+  </script>
 
   <!-- Sektion 1: Gruppen-Ampel -->
   <h2>Übersicht nach Gruppen</h2>

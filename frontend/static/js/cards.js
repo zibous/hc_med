@@ -1,6 +1,7 @@
 // cards.js – Gruppen- und Test-Karten rendern
 import { state, navigate } from "./state.js";
 import { starIconHtml, bindStarHandlers } from "./favoriten.js";
+import { renderNormBar } from "./norm-bar.js";
 
 const GROUP_ICONS = {
   Blutbild: "🩸", Differentialblutbild: "🔬", Entzündung: "🔥",
@@ -169,7 +170,7 @@ export function renderCards(items, mode = "gruppe") {
                 <td><span style="color:${GROUP_COLORS[r.gruppe] || '#64748b'}">${r.gruppe}</span></td>
                 <td><strong>${r.test_standard}</strong>${r.kurzname ? `<br><span class="card-kurzname">${r.kurzname}</span>` : ''}</td>
                 <td>${r.wert_norm} ${r.einheit_norm || ""}</td>
-                <td style="color:var(--text-muted)">${r.normbereich || ""}</td>
+                <td>${renderNormBar(r.wert_norm, r.normbereich, r.flag) || `<span style="color:var(--text-muted)">${r.normbereich || ""}</span>`}</td>
                 <td><span class="flag-pill ${r.flag === 'H' ? 'high' : 'low'}">${r.flag === 'H' ? '↑ hoch' : '↓ tief'}</span></td>
                 <td style="font-weight:600;color:var(--text-muted)">${r.anzahl > 1 ? r.anzahl + '×' : '1'}</td>
               </tr>
@@ -301,6 +302,7 @@ export function renderCards(items, mode = "gruppe") {
             <span class="card-count">${last.wert}</span>
             <span class="card-unit">${data.einheit || ""}</span>
           </div>
+          ${renderNormBar(last.wert, data.normbereich, last.flag) ? `<div class="card-norm-bar">${renderNormBar(last.wert, data.normbereich, last.flag)}</div>` : ""}
           ${canDrill ? `<div class="card-sparkline-wrap"><canvas class="mini-spark" data-values='${JSON.stringify(sparkVals)}'></canvas></div>` : detailHtml}
           <div class="card-stats-row">
             <span class="card-stat">${total} Messung${total > 1 ? 'en' : ''}</span>

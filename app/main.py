@@ -67,6 +67,7 @@ from app.api.pathologisch import router as pathologisch_router  # noqa: E402
 from app.api.favoriten import router as favoriten_router  # noqa: E402
 from app.api.vergleich import router as vergleich_router  # noqa: E402
 from app.api.gesamtbericht import router as gesamtbericht_router  # noqa: E402
+from app.api.alle_tests import router as alle_tests_router  # noqa: E402
 
 app.include_router(overview_router)
 app.include_router(gruppe_router)
@@ -79,6 +80,7 @@ app.include_router(pathologisch_router)
 app.include_router(favoriten_router)
 app.include_router(vergleich_router)
 app.include_router(gesamtbericht_router)
+app.include_router(alle_tests_router)
 
 
 @app.get("/api/status")

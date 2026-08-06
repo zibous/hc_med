@@ -211,6 +211,12 @@ body {
 .period-filter .period-btn { padding: .5rem 1.2rem; border-radius: 99px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.2rem; font-weight: 500; cursor: pointer; transition: .2s; }
 .period-filter .period-btn:hover { border-color: var(--accent); }
 .period-filter .period-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.period-select {
+  padding: .5rem 1rem; border-radius: 99px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 1.2rem; font-weight: 500;
+  cursor: pointer; appearance: auto; min-width: 7rem;
+}
+.period-select:focus { border-color: var(--accent); outline: none; }
 .report-btn {
   padding: .5rem 1.2rem; border-radius: 99px; border: 1px solid var(--green);
   background: rgba(16,185,129,.1); color: var(--green); font-size: 1.2rem;
@@ -397,6 +403,40 @@ body {
 .fav-wert.low { color: var(--accent); }
 .fav-einheit { font-size: 1.15rem; color: var(--text-muted); }
 
+/* Norm-Bar (Apple Health Style) */
+.norm-bar {
+  width: 100%; min-width: 8rem; max-width: 14rem;
+  padding: .3rem 0;
+}
+.norm-bar-track {
+  position: relative; height: 8px; border-radius: 4px;
+  background: rgba(128,128,128,.1); overflow: visible;
+}
+.norm-bar-low {
+  position: absolute; top: 0; left: 0; height: 100%;
+  border-radius: 4px 0 0 4px;
+  background: linear-gradient(90deg, rgba(239,68,68,.5), rgba(239,68,68,.25));
+}
+.norm-bar-ok {
+  position: absolute; top: 0; height: 100%;
+  background: linear-gradient(90deg, rgba(16,185,129,.55), rgba(16,185,129,.45));
+  border-radius: 2px;
+}
+.norm-bar-high {
+  position: absolute; top: 0; height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(90deg, rgba(239,68,68,.25), rgba(239,68,68,.5));
+}
+.norm-bar-dot {
+  position: absolute; top: 50%; width: 12px; height: 12px;
+  border-radius: 50%; transform: translate(-50%, -50%);
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  z-index: 1;
+}
+.path-table .norm-bar { max-width: 12rem; }
+.card .norm-bar { max-width: 100%; margin: .4rem 0; }
+
 /* Print Styles */
 @media print {
   @page { margin: 1.5cm; }
@@ -443,4 +483,11 @@ body {
   .vgl-cell.verschlechtert, .vgl-cell.neu_auffällig { background: #fef2f2 !important; }
   .vgl-cell.verbessert, .vgl-cell.normalisiert { background: #f0fdf4 !important; }
   .vgl-row:hover { background: none !important; }
+
+  /* Norm-Bar Print */
+  .norm-bar-track { background: #e5e7eb !important; }
+  .norm-bar-low { background: linear-gradient(90deg, #fca5a5, #fecaca) !important; }
+  .norm-bar-ok { background: linear-gradient(90deg, #6ee7b7, #a7f3d0) !important; }
+  .norm-bar-high { background: linear-gradient(90deg, #fecaca, #fca5a5) !important; }
+  .norm-bar-dot { border-color: #fff !important; box-shadow: 0 0 0 1px #374151 !important; }
 }

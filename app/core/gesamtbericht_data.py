@@ -533,12 +533,14 @@ def _build_normal_tests(conn: sqlite3.Connection, datum_filter: str = "", exclud
 # Haupt-Orchestrator
 # ---------------------------------------------------------------------------
 
-def build_report_data(conn: sqlite3.Connection, befunde_count: int = 2) -> dict:
+def build_report_data(conn: sqlite3.Connection, befunde_count: int = 0, von: str = "", bis: str = "") -> dict:
     """Orchestriert alle Datensammlung für den Gesamtbericht.
 
     Args:
         conn: DB-Verbindung.
-        befunde_count: Anzahl der letzten Befunde (0=alle).
+        befunde_count: Anzahl der letzten Befunde (0=alle, legacy).
+        von: Start-Jahr (YYYY), leer = ab Anfang.
+        bis: End-Jahr (YYYY), leer = bis heute.
 
     Returns:
         Dict mit allen Report-Sektionen.
@@ -553,10 +555,19 @@ def build_report_data(conn: sqlite3.Connection, befunde_count: int = 2) -> dict:
     _live_config = yaml.safe_load((Path(__file__).resolve().parent.parent.parent / "data" / "labor_config.yaml").read_text(encoding="utf-8"))
     bemerkung = _live_config.get("gesamtbericht_bemerkung", "")
 
-    # Befunde-basierter Filter: Datum des ältesten relevanten Befunds ermitteln
+    # Zeitraum-Filter: Von/Bis hat Vorrang vor befunde_count
     datum_filter = ""
     period_display = "Gesamter Zeitraum"
-    if befunde_count > 0:
+
+    if von or bis:
+        parts = []
+        if von:
+            parts.append(f"datum >= '{von}-01-01'")
+        if bis:
+            parts.append(f"datum <= '{bis}-12-31'")
+        datum_filter = " AND " + " AND ".join(parts)
+        period_display = f"{von or 'Anfang'} – {bis or 'Heute'}"
+    elif befunde_count > 0:
         befund_rows = conn.execute(
             "SELECT DISTINCT datum FROM befunde ORDER BY datum DESC LIMIT ?",
             (befunde_count,)

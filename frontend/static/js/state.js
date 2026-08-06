@@ -22,6 +22,8 @@ export function navigate(view, params = {}) {
     state.fromPath = "vergleich";
   } else if (view === "trend" && state.view === "favoriten") {
     state.fromPath = "favoriten";
+  } else if (view === "trend" && state.view === "alle-tests") {
+    state.fromPath = "alle-tests";
   } else if (view !== "trend" && view !== "verknuepfung") {
     state.fromPath = null;
   }

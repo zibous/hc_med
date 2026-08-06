@@ -1,5 +1,6 @@
 // favoriten.js – Favoriten-Verwaltung (Stern-Toggle + Favoriten-Karte)
 import { navigate } from "./state.js";
+import { renderNormBar } from "./norm-bar.js";
 
 // Cache der Favoriten-Liste (Testnamen)
 let favoritenCache = null;
@@ -195,7 +196,7 @@ export async function renderFavoritenDetail() {
           <td><span style="color:var(--text-muted)">${f.gruppe}</span></td>
           <td><strong>${f.test}</strong>${f.kurzname ? `<br><span class="card-kurzname">${f.kurzname}</span>` : ""}</td>
           <td class="${flagClass}" style="font-size:1.4rem"><strong>${f.wert}</strong> ${f.einheit}</td>
-          <td style="color:var(--text-muted)">${f.normbereich || "–"}</td>
+          <td>${renderNormBar(f.wert, f.normbereich, f.flag) || `<span style="color:var(--text-muted)">${f.normbereich || "–"}</span>`}</td>
           <td>${flagPill}</td>
           <td style="color:${trendColor}">${f.trend || "–"}</td>
           <td style="color:var(--text-muted)">${f.vorwert ? f.vorwert + " " + f.einheit : "–"}</td>

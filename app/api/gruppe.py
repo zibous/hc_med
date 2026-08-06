@@ -32,11 +32,16 @@ async def gruppe_detail(gruppe: str):
             if t not in tests:
                 tests[t] = {
                     "einheit": r["einheit_norm"],
-                    "normbereich": r["normbereich"],
+                    "normbereich": "",
                     "beschreibung": TEST_DESCRIPTIONS.get(t, ""),
                     "kurzname": KURZNAMEN.get(t, ""),
                     "werte": [],
                 }
+            # Ersten nicht-leeren, gültigen Normbereich übernehmen
+            if not tests[t]["normbereich"]:
+                nb = (r["normbereich"] or "").strip()
+                if nb and any(c.isdigit() for c in nb):
+                    tests[t]["normbereich"] = nb
             tests[t]["werte"].append({
                 "datum": r["datum"],
                 "wert": r["wert_norm"],
