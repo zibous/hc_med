@@ -1,0 +1,45 @@
+Dr. med. SIMON ZÜND Facharzt für Innere Medizin 
+A - 6890 Lustenau • Maria-Theresien-Str. 15 • T: 05577/62444-0 • F: 11 • e-mail: simon.zuend@gnv.at​
+​
+​
+Lustenau, 07.07.25
+​
+Untersuchungsbericht von SIEBLER Hans-Peter, geb.am 16.12.1955, 
+wohnhaft in 6973 Höchst; Grenzstraße 8b.
+​
+Kürzel	Bezeichnung	Path	Wert	Einh.	Referenz
+CHEMIE	KLINISCHE CHEMIE				 
+KR-COMP	Kreatinin		0.97	mg/dL	0.70 - 1.20 mg/dL 
+GFR-CKD	GFR-CKD Krea	*	80	mL/min	> - 90 mL/min 
+GLUC	Glucose nüchtern		88	mg/dL	60 - 100 mg/dL 
+HS	Harnsäure		6.8	mg/dL	3.4 - 7.0 mg/dL 
+TRI	Triglyceride		139	mg/dL	< - 200 mg/dL 
+CHO	Cholesterin		200	mg/dL	< - 200 mg/dL 
+HDL	HDL-Cholesterin		60	mg/dL	> - 55 mg/dL 
+LDL	LDL-Cholesterin		101	mg/dL	< - 150 mg/dL 
+NONHDLCO	Non-HDL-Chol.		140	mg/dL	 
+QHDL	Quot. Chol./HDL		3.3		0.0 - 3.5 
+Q-LDL	LDL/HDL Quotient		1.7		0.0 - 2.5 
+GGT-37	GGT		22	U/L	< - 60 U/L 
+PSA	PSA		3.03	ng/mL	< - 4.00 ng/mL 
+CRP	CRP		0.39	mg/dL	< - 0.50 mg/dL 
+CCPR	Anti-CCP		<8	U/mL	< - 17 U/mL 
+Harn	HARNUNTERSUCHUNG				 
+U-STAT	HARNANALYSE				 
+U-SPEZ	Spez. Gewicht		1016		1015 - 1025 
+U-PH	pH-Wert		5.50		5.00 - 8.00 
+U-SED	HARNSEDIMENT				 
+UF-LEUK	Leukocyten		negativ		 
+UF-NIT	Nitrit		negativ		 
+UF-GEQL	Eiweiß qualitat.		negativ		 
+UF-GLU	Glucose		negativ		 
+UF-KETO	Ketone		negativ		 
+UF-BIL	Bilirubin		negativ		 
+UF-UBG	Urobilinogen		normal		 
+UF-BLUT	Blut im Harn		negativ		 
+UF-LEUKO	Leukozyten		22	/ľL	< - 28 /ľL 
+UF-RBC	Erythrozyten		5	/ľL	< - 17 /ľL 
+UF-PEPIT	Plattenepithel.		2.0	/ľL	< - 28.0 /ľL 
+UF-HYZYL	Hyaline Zylinder	*	1	/ľL	< - 1 /ľL 
+UF-MUCS	Schleim	*	197	/ľL	< - 46 /ľL 
+​

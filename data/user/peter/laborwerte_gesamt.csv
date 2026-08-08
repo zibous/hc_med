@@ -1,0 +1,595 @@
+Datum;Alter;Gruppe;Test_Standard;Test;Wert_Norm;Einheit_Norm;Wert;Einheit;Normbereich;Flag
+2025-07-07;69;Autoimmun;Anti-CCP;Anti-CCP;<8;U/mL;<8;U/mL;<17;
+2018-02-02;62;Autoimmun;Anti-Cardiolipin;Anti-Cardiolipin Ak (ACA);<4.0;U/mL;<4.0;U/mL;< 10.0;
+2018-02-12;62;Autoimmun;Anti-Cardiolipin;Anti-Cardiolipin Ak (ACA);<4.0;U/mL;<4.0;U/mL;< 10.0;
+2018-02-12;62;Autoimmun;La-Confirm;La-Confirm;31.5;Sek.;31.5;Sek.;;
+2018-02-12;62;Autoimmun;La-Screen;La-Screen;35.7;Sek.;35.7;Sek.;;
+2018-01-26;62;Autoimmun;Rheumafaktor;Rheumafaktor;12;U/mL;12;U/mL;< 14;
+2013-10-18;57;Blutbild;Erythrozyten;Erythrozyten;5.96;106/µl;5.96;106/µl;4.00-6.50;
+2013-12-12;57;Blutbild;Erythrozyten;Erythrozyten;5.70;106/µl;5.70;106/µl;4.00-6.50;
+2014-10-24;58;Blutbild;Erythrozyten;Erythrozyten;5.07;106/µl;5.07;106/µl;4.00-6.50;
+2017-08-06;61;Blutbild;Erythrozyten;Erythrozyten;4.83;106/µl;4.83;106/µl;4.00-6.50;
+2018-01-29;62;Blutbild;Erythrozyten;Erythrozyten;4.46;106/µl;4.46;106/µl;4.00-6.50;
+2018-01-29;62;Blutbild;Erythrozyten;Erythrocyten;4.46;10^12/L;4.46;T/L;4.60-5.70;L
+2018-02-12;62;Blutbild;Erythrozyten;Erythrocyten;5.01;10^12/L;5.01;T/L;4.60-5.70;
+2018-02-20;62;Blutbild;Erythrozyten;Erythrocyten;3.85;10^12/L;3.85;T/L;4.60-5.70;L
+2018-06-13;62;Blutbild;Erythrozyten;Erythrozyten;5.30;106/µl;5.30;106/µl;4.00-6.50;
+2018-10-04;62;Blutbild;Erythrozyten;Erythrozyten;5.45;106/µl;5.45;106/µl;4.00-6.50;
+2019-07-10;63;Blutbild;Erythrozyten;Erythrozyten;5.40;106/µl;5.40;106/µl;4.00-6.50;
+2019-07-10;63;Blutbild;Erythrozyten;Erythrozyten;5.30;10^12/L;5.30;T/L;4.00-6.50;
+2024-02-08;68;Blutbild;Erythrozyten;Erythrocyten;5.68;10^12/L;5.68;T/L;4.60-5.70;
+2024-12-01;68;Blutbild;Erythrozyten;Erythrozyten;5.60;10^12/L;5.60;10^12/l;4.50-5.90;
+2024-12-06;68;Blutbild;Erythrozyten;Ery;4.74;10^12/L;4.74;10^12/l;4.50-5.90;
+2024-12-11;68;Blutbild;Erythrozyten;Erythrozyten;5.04;10^12/L;5.04;10^12/l;4.50-5.90;
+2025-01-06;69;Blutbild;Erythrozyten;Ery;4.74;10^12/L;4.74;10^12/l;4.50-5.90;
+2025-07-07;69;Blutbild;Erythrozyten;Erythrozyten;5;/ľL;5;/ľL;<17;
+2013-12-12;57;Blutbild;HbA1c;HbA1c;6.10;;6.10;;;
+2015-07-05;59;Blutbild;HbA1c;HbA1c;5.30;;5.30;;;
+2018-10-04;62;Blutbild;HbA1c;HbA1c;6.00;;6.00;;;
+2026-07-13;70;Blutbild;HbA1c;HbAlc (NGSP);6.2;%Hb;6.2;%Hb;3.8-5.7;H
+2013-12-12;57;Blutbild;HbA1c (IFCC);HbA1c;43.00;mmol/mol;43.00;mmol/mol;;
+2015-07-05;59;Blutbild;HbA1c (IFCC);HbA1c;35.00;mmol/mol;35.00;mmol/mol;;
+2018-10-04;62;Blutbild;HbA1c (IFCC);HbA1c;38.00;mmol/mol;38.00;mmol/mol;;
+2019-04-07;63;Blutbild;HbA1c (IFCC);HbA1c;42.00;mmol/mol;42.00;mmol/mol;;
+2026-07-13;70;Blutbild;HbA1c (IFCC);HbAlc (IFCC);45;mmol/mol;45;mmol/mol;18-39;H
+2013-10-18;57;Blutbild;Hämatokrit;Hämatokrit;50.40;%;50.40;%;40.00-54.00;
+2013-12-12;57;Blutbild;Hämatokrit;Hämatokrit;48.20;%;48.20;%;40.00-54.00;
+2014-10-24;58;Blutbild;Hämatokrit;Hämatokrit;44.10;%;44.10;%;40.00-54.00;
+2018-01-26;62;Blutbild;Hämatokrit;Hämatokrit;44.0;%;0.44;/L;41-53;
+2018-01-29;62;Blutbild;Hämatokrit;Hämatokrit;39.0;%;0.39;L/L;41-53;L
+2018-02-12;62;Blutbild;Hämatokrit;Hämatokrit;44.0;%;0.44;/L;41-53;
+2018-02-20;62;Blutbild;Hämatokrit;Hämatokrit;34.0;%;0.34;L/L;41-53;L
+2018-04-17;62;Blutbild;Hämatokrit;Hämatokrit;46.20;%;46.20;%;40.00-54.00;
+2018-06-13;62;Blutbild;Hämatokrit;Hämatokrit;50.00;%;50.00;%;40.00-54.00;
+2018-10-04;62;Blutbild;Hämatokrit;Hämatokrit;49.70;%;49.70;%;40.00-54.00;
+2019-04-07;63;Blutbild;Hämatokrit;Hämatokrit;46.70;%;46.70;%;40.00-54.00;
+2019-07-10;63;Blutbild;Hämatokrit;Hämatokrit;48.00;%;48.00;%;40.00-54.00;
+2024-02-08;68;Blutbild;Hämatokrit;Hämatokrit;49.0;%;0.49;/L;41-53;
+2024-12-01;68;Blutbild;Hämatokrit;Hämatokrit;48.9;%;48.9;%;40.0-53.0;
+2024-12-06;68;Blutbild;Hämatokrit;HK;41.9;%;41.9;%;40.0-53.0;
+2024-12-11;68;Blutbild;Hämatokrit;Hämatokrit;45.0;%;45.0;%;40.0-53.0;
+2025-01-06;69;Blutbild;Hämatokrit;HK;41.9;%;41.9;%;40.0-53.0;
+2026-07-13;70;Blutbild;Hämatokrit;Hämatokrit;46.0;%;0.46;/L;41-53;
+2013-10-18;57;Blutbild;Hämoglobin;Hämoglobin;17.10;g/dL;17.10;g/dl;12.00-18.00;
+2013-12-12;57;Blutbild;Hämoglobin;Hämoglobin;15.90;g/dL;15.90;g/dl;12.00-18.00;
+2014-10-24;58;Blutbild;Hämoglobin;Hämoglobin;14.80;g/dL;14.80;g/dl;12.00-18.00;
+2018-01-26;62;Blutbild;Hämoglobin;Hämoglobin;15.0;g/dL;150;g/L_;14.4-17.5;
+2018-01-29;62;Blutbild;Hämoglobin;Hämoglobin;12.6;g/dL;126;g/L_;14.4-17.5;L
+2018-02-12;62;Blutbild;Hämoglobin;Hämoglobin;14.7;g/dL;147;g/L_;14.4-17.5;
+2018-02-14;62;Blutbild;Hämoglobin;Hämoglobin;9.10;g/dL;91;g/L_;14.4-17.5;L
+2018-02-16;62;Blutbild;Hämoglobin;Hämoglobin;7.40;g/dL;74;g/L_;14.4-17.5;L
+2018-02-17;62;Blutbild;Hämoglobin;Hämoglobin;10.3;g/dL;103;g/L_;14.4-17.5;L
+2018-02-20;62;Blutbild;Hämoglobin;Hämoglobin;11.2;g/dL;112;g/L;14.4-17.5;L
+2018-04-17;62;Blutbild;Hämoglobin;Hämoglobin;15.40;g/dL;15.40;g/dl;12.00-18.00;
+2018-06-13;62;Blutbild;Hämoglobin;Hämoglobin;15.20;g/dL;15.20;g/dl;12.00-18.00;
+2018-10-04;62;Blutbild;Hämoglobin;Hämoglobin;16.50;g/dL;16.50;g/dl;12.00-18.00;
+2019-04-07;63;Blutbild;Hämoglobin;Hämoglobin;15.60;g/dL;15.60;g/dl;12.00-18.00;
+2019-07-10;63;Blutbild;Hämoglobin;Hämoglobin;16.20;g/dL;16.20;g/dl;12.00-18.00;
+2024-02-08;68;Blutbild;Hämoglobin;Hämoglobin;16.1;g/dL;16.1;g/dL;13.0-17.5;
+2024-12-01;68;Blutbild;Hämoglobin;Hämoglobin;16.2;g/dL;16.2;g/dl;13.5-17.5;
+2024-12-06;68;Blutbild;Hämoglobin;HB;13.7;g/dL;13.7;g/dl;13.5-17.5;
+2024-12-11;68;Blutbild;Hämoglobin;Hämoglobin;14.4;g/dL;14.4;g/dl;13.5-17.5;
+2025-01-06;69;Blutbild;Hämoglobin;HB;13.7;g/dL;13.7;g/dl;13.5-17.5;
+2026-07-13;70;Blutbild;Hämoglobin;Hämoglobin;15.7;g/dL;15.7;g/dL;13.0-17.5;
+2026-07-14;70;Blutbild;Hämoglobin;Hämoglobin;14.3;g/dL;14.3;g/dL;13.0-17.5;
+2026-07-17;70;Blutbild;Hämoglobin;Hämoglobin;12.1;g/dL;12.1;g/dL;13.0-17.5;L
+2026-07-18;70;Blutbild;Hämoglobin;Hämoglobin;12.2;g/dL;12.2;g/dL;13.0-17.5;L
+2026-07-21;70;Blutbild;Hämoglobin;Hämoglobin;14.1;g/dL;14.1;g/dL;13.0-17.5;
+2013-10-18;57;Blutbild;Leukozyten;Leukozyten;16.30;103/µl;16.30;103/µl;4.00-11.00;H
+2013-12-12;57;Blutbild;Leukozyten;Leukozyten;10.17;103/µl;10.17;103/µl;4.00-11.00;
+2014-10-24;58;Blutbild;Leukozyten;Leukozyten;7.40;103/µl;7.40;103/µl;4.00-11.00;
+2015-07-05;59;Blutbild;Leukozyten;Leukozyten;7.80;103/µl;7.80;103/µl;4.00-11.00;
+2017-11-22;61;Blutbild;Leukozyten;Leukozyten;10.60;103/µl;10.60;103/µl;4.00-11.00;
+2018-01-26;62;Blutbild;Leukozyten;Leukocyten;11.2;10^9/L;11.2;G/L;3.7-10.0;H
+2018-01-29;62;Blutbild;Leukozyten;Leukozyten;8.30;103/µl;8.30;103/µl;4.00-11.00;
+2018-01-29;62;Blutbild;Leukozyten;Leukocyten;8.50;10^9/L;8.5;G/L;3.7-10.0;
+2018-02-02;62;Blutbild;Leukozyten;Leukocyten;7.80;10^9/L;7.8;G/L;3.7-10.0;
+2018-02-02;62;Blutbild;Leukozyten;Leukocyten;8.60;10^9/L;8.6;G/L;3.7-10.0;
+2018-02-12;62;Blutbild;Leukozyten;Leukocyten;11.1;10^9/L;11.1;G/L;3.7-10.0;H
+2018-02-13;62;Blutbild;Leukozyten;Leukocyten;13.1;10^9/L;13.1;G/L;3.7-10.0;H
+2018-02-14;62;Blutbild;Leukozyten;Leukocyten;14.2;10^9/L;14.2;G/L;3.7-10.0;H
+2018-02-14;62;Blutbild;Leukozyten;Leukocyten;16.8;10^9/L;16.8;G/L;3.7-10.0;H
+2018-02-16;62;Blutbild;Leukozyten;Leukocyten;7.90;10^9/L;7.9;G/L;3.7-10.0;
+2018-02-20;62;Blutbild;Leukozyten;Leukocyten;10.5;10^9/L;10.5;G/L;3.7-10.0;H
+2018-04-17;62;Blutbild;Leukozyten;Leukozyten;10.70;103/µl;10.70;103/µl;4.00-11.00;
+2018-06-13;62;Blutbild;Leukozyten;Leukozyten;11.60;103/µl;11.60;103/µl;4.00-11.00;H
+2019-07-10;63;Blutbild;Leukozyten;Leukozyten;13.40;103/µl;13.40;103/µl;4.00-11.00;H
+2024-02-08;68;Blutbild;Leukozyten;Leukocyten;17.8;10^9/L;17.8;G/L;3.7-10.0;H
+2024-12-01;68;Blutbild;Leukozyten;Leukozyten;13.7;10^9/L;13.7;10^9/l;4.20-9.10;H
+2024-12-06;68;Blutbild;Leukozyten;Leuko;13.3;10^9/L;13.3;10^9/l;4.20-9.10;H
+2024-12-11;68;Blutbild;Leukozyten;Leukozyten;13.2;10^9/L;13.2;10^9/l;4.20-9.10;H
+2025-01-06;69;Blutbild;Leukozyten;Leuko;13.3;10^9/L;13.3;10^9/l;4.20-9.10;H
+2025-07-07;69;Blutbild;Leukozyten;Leukozyten;22;/ľL;22;/ľL;<28;
+2026-07-13;70;Blutbild;Leukozyten;Leukocyten;10.1;10^9/L;10.1;G/L;3.7-10.0;H
+2026-07-17;70;Blutbild;Leukozyten;Leukocyten;16.8;10^9/L;16.8;G/L;3.7-10.0;H
+2026-07-18;70;Blutbild;Leukozyten;Leukocyten;14.2;10^9/L;14.2;G/L;3.7-10.0;H
+2026-07-21;70;Blutbild;Leukozyten;Leukocyten;14.2;10^9/L;14.2;G/L;3.7-10.0;H
+2013-10-18;57;Blutbild;Lymphozyten abs.;Leukozyten abs.;2.40;G/l;2.40;G/l;0.70-4.80;
+2014-10-24;58;Blutbild;Lymphozyten abs.;Leukozyten abs.;2.80;G/l;2.80;G/l;0.70-4.80;
+2019-04-07;63;Blutbild;Lymphozyten abs.;Leukozyten abs.;2.80;G/l;2.80;G/l;0.70-4.80;
+2013-10-18;57;Blutbild;MCH;HBE (MCA);28.70;pg;28.70;pg;;
+2013-12-12;57;Blutbild;MCH;HBE (MCA);29.00;pg;29.00;pg;;
+2018-01-29;62;Blutbild;MCH;MCH;28.3;pg;28.3;pg;28.0-32.0;
+2018-02-12;62;Blutbild;MCH;MCH;29.3;pg;29.3;pg;28.0-32.0;
+2018-02-20;62;Blutbild;MCH;MCH;29.1;pg;29.1;pg;28.0-32.0;
+2019-07-10;63;Blutbild;MCH;MCH;28.80;pg;28.80;pg;27.0-34.0;
+2024-02-08;68;Blutbild;MCH;MCH;28.3;pg;28.3;pg;28.0-32.0;
+2024-12-01;68;Blutbild;MCH;MCH;28.9;pg;28.9;pg;28.0-33.0;
+2024-12-06;68;Blutbild;MCH;MCH;28.9;pg;28.9;pg;28.0-33.0;
+2024-12-11;68;Blutbild;MCH;MCH;28.6;pg;28.6;pg;28.0-33.0;
+2025-01-06;69;Blutbild;MCH;MCH;28.9;pg;28.9;pg;28.0-33.0;
+2013-10-18;57;Blutbild;MCHC;MCHC;33.90;g/dL;33.90;g/dl;30.00-36.00;
+2013-12-12;57;Blutbild;MCHC;MCHC;33.00;g/dL;33.00;g/dl;30.00-36.00;
+2014-10-24;58;Blutbild;MCHC;MCHC;33.60;g/dL;33.60;g/dl;30.00-36.00;
+2017-08-06;61;Blutbild;MCHC;MCHC;32.90;g/dL;32.90;g/dl;30.00-36.00;
+2018-01-29;62;Blutbild;MCHC;MCHC;32.60;g/dL;32.60;g/dl;30.00-36.00;
+2018-01-29;62;Blutbild;MCHC;MCHC;32.6;g/dL;326;g/L_;32.0-36.0;
+2018-02-12;62;Blutbild;MCHC;MCHC;33.6;g/dL;336;g/L_;32.0-36.0;
+2018-02-20;62;Blutbild;MCHC;MCHC;33.0;g/dL;330;g/L_;32.0-36.0;
+2018-04-17;62;Blutbild;MCHC;MCHC;33.30;g/dL;33.30;g/dl;30.00-36.00;
+2018-06-13;62;Blutbild;MCHC;MCHC;30.00;g/dL;30.00;g/dl;30.00-36.00;
+2018-10-04;62;Blutbild;MCHC;MCHC;32.60;g/dL;32.60;g/dl;30.00-36.00;
+2019-04-07;63;Blutbild;MCHC;MCHC;33.40;g/dL;33.40;g/dl;30.00-36.00;
+2019-07-10;63;Blutbild;MCHC;MCHC;33.80;g/dL;33.80;g/dl;30.00-36.00;
+2024-02-08;68;Blutbild;MCHC;MCHC;33.2;g/dL;33.2;g/dL;32.0-36.0;
+2024-12-01;68;Blutbild;MCHC;MCHC;33.1;g/dL;33.1;g/dl;33.0-36.0;
+2024-12-06;68;Blutbild;MCHC;MCHC;32.7;g/dL;32.7;g/dl;33.0-36.0;L
+2024-12-11;68;Blutbild;MCHC;MCHC;32.0;g/dL;32.0;g/dl;33.0-36.0;L
+2025-01-06;69;Blutbild;MCHC;MCHC;32.7;g/dL;32.7;g/dl;33.0-36.0;L
+2013-10-18;57;Blutbild;MCV;MCV;84.60;fl;84.60;fl;76.00-99.00;
+2013-12-12;57;Blutbild;MCV;MCV;84.60;fl;84.60;fl;76.00-99.00;
+2014-10-24;58;Blutbild;MCV;MCV;87.00;fl;87.00;fl;76.00-99.00;
+2017-08-06;61;Blutbild;MCV;MCV;87.50;fl;87.50;fl;76.00-99.00;
+2018-01-29;62;Blutbild;MCV;MCV;86.50;fl;86.50;fl;76.00-99.00;
+2018-01-29;62;Blutbild;MCV;MCV;86.5;fL;86.5;fL;80.0-94.0;
+2018-02-12;62;Blutbild;MCV;MCV;87.4;fL;87.4;fL;80.0-94.0;
+2018-02-20;62;Blutbild;MCV;MCV;88.1;fL;88.1;fL;80.0-94.0;
+2018-04-17;62;Blutbild;MCV;MCV;86.00;fl;86.00;fl;76.00-99.00;
+2018-06-13;62;Blutbild;MCV;MCV;95.00;fl;95.00;fl;76.00-99.00;
+2018-10-04;62;Blutbild;MCV;MCV;86.60;fl;86.60;fl;76.00-99.00;
+2019-04-07;63;Blutbild;MCV;MCV;86.50;fl;86.50;fl;76.00-99.00;
+2019-07-10;63;Blutbild;MCV;MCV;85.30;fl;85.30;fl;76.00-99.00;
+2024-02-08;68;Blutbild;MCV;MCV;85.4;fL;85.4;fL;80.0-94.0;
+2024-12-01;68;Blutbild;MCV;MCV;87.3;fl;87.3;fl;80.0-96.0;
+2024-12-06;68;Blutbild;MCV;MCV;88.4;fl;88.4;fl;80.0-96.0;
+2024-12-11;68;Blutbild;MCV;MCV;89.3;fl;89.3;fl;80.0-96.0;
+2025-01-06;69;Blutbild;MCV;MCV;88.4;fl;88.4;fl;80.0-96.0;
+2013-10-18;57;Blutbild;MPV;MPV;12.1;fL;12.10;g/dl;;
+2014-10-24;58;Blutbild;MPV;MPV;7.80;fL;7.80;g/dl;;
+2024-12-06;68;Blutbild;MPV;MPV;10.6;fl;10.6;fl;9.4-12.9;
+2018-02-13;62;Blutbild;Myoglobin;Myoglobin;59;µg/L;59;µg/L;28-72;
+2018-02-14;62;Blutbild;Myoglobin;Myoglobin;102;µg/L;102;µg/L;28-72;H
+2013-10-18;57;Blutbild;RDW;Erythrozyten RDW;14.10;;14.10;;;
+2014-10-24;58;Blutbild;RDW;Erythrozyten RDW;13.30;;13.30;;;
+2017-08-06;61;Blutbild;RDW;Erythrozyten RDW;15.20;;15.20;;;
+2024-12-01;68;Blutbild;RDW;RDW-CV;14.0;%;14.0;%;11.6-14.4;
+2024-12-06;68;Blutbild;RDW;RDW;13.7;%;13.7;%;11.6-14.4;
+2024-12-11;68;Blutbild;RDW;RDW-CV;13.8;%;13.8;%;11.6-14.4;
+2025-01-06;69;Blutbild;RDW;RDW;13.7;%;13.7;%;11.6-14.4;
+2026-07-17;70;Blutbild;RDW;RDW;13.3;%;13.3;%;11.5-14.5;
+2013-10-18;57;Blutbild;Thrombozyten;Thrombozyten;130.00;103/µl;130.00;103/µl;150.00-450.00;L
+2013-12-12;57;Blutbild;Thrombozyten;Thrombozyten;138.00;103/µl;138.00;103/µl;150.00-450.00;L
+2014-10-24;58;Blutbild;Thrombozyten;Thrombozyten;112.00;103/µl;112.00;103/µl;150.00-450.00;L
+2017-08-06;61;Blutbild;Thrombozyten;Thrombozyten;112.00;103/µl;112.00;103/µl;150.00-450.00;L
+2018-01-26;62;Blutbild;Thrombozyten;Thrombocyten;152;10^9/L;152;G/L;150-450;
+2018-01-29;62;Blutbild;Thrombozyten;Thrombozyten;152.00;103/µl;152.00;103/µl;150.00-450.00;
+2018-02-13;62;Blutbild;Thrombozyten;Thrombocyten;110;10^9/L;110;G/L;150-450;L
+2018-02-14;62;Blutbild;Thrombozyten;Thrombocyten;85.0;10^9/L;85;G/L;150-450;L
+2018-02-14;62;Blutbild;Thrombozyten;Thrombocyten;77.0;10^9/L;77;G/L;150-450;L
+2018-02-16;62;Blutbild;Thrombozyten;Thrombocyten;67.0;10^9/L;67;G/L;150-450;L
+2018-02-17;62;Blutbild;Thrombozyten;Thrombocyten;79.0;10^9/L;79;G/L;150-450;L
+2018-02-20;62;Blutbild;Thrombozyten;Thrombocyten;146;10^9/L;146;G/L;150-450;L
+2018-06-13;62;Blutbild;Thrombozyten;Thrombozyten;66.00;103/µl;66.00;103/µl;150.00-450.00;L
+2018-10-04;62;Blutbild;Thrombozyten;Thrombozyten;132.00;103/µl;132.00;103/µl;150.00-450.00;L
+2024-12-06;68;Blutbild;Thrombozyten;Thrombo;144;10^9/L;144;10^9/l;140-360;
+2026-07-17;70;Blutbild;Thrombozyten;Thrombocyten;114;10^9/L;114;G/L;150-450;L
+2026-07-18;70;Blutbild;Thrombozyten;Thrombocyten (Citrat);117;10^9/L;117;G/L;;
+2026-07-21;70;Blutbild;Thrombozyten;Thrombocyten;176;10^9/L;176;G/L;150-450;
+2024-12-01;68;Differentialblutbild;Basophile abs.;Basophile Gr.abs.;0.02;10^9/L;0.02;10^9/l;0.00-0.08;
+2024-12-06;68;Differentialblutbild;Basophile abs.;Baso;0.04;10^9/L;0.04;10^9/l;0.00-0.08;
+2024-12-11;68;Differentialblutbild;Basophile abs.;Basophile Gr.abs.;0.06;10^9/L;0.06;10^9/l;0.00-0.08;
+2025-01-06;69;Differentialblutbild;Basophile abs.;Baso;0.05;10^9/L;0.05;10^9/l;0.00-0.08;
+2013-10-18;57;Differentialblutbild;Basophile rel.;Basophile;1.00;%;1.00;%;0.00-2.00;
+2018-04-17;62;Differentialblutbild;Basophile rel.;Basophile;0.40;%;0.40;%;0.00-2.00;
+2018-06-13;62;Differentialblutbild;Basophile rel.;Basophile;0.80;%;0.80;%;0.00-2.00;
+2019-04-07;63;Differentialblutbild;Basophile rel.;Basophile;0.50;%;0.50;%;0.00-2.00;
+2019-07-10;63;Differentialblutbild;Basophile rel.;Basophile;0.40;%;0.40;%;0.00-2.00;
+2024-12-01;68;Differentialblutbild;Basophile rel.;Basophile Gr.rel.;0.1;%;0.1;%;0.0-1.5;
+2024-12-06;68;Differentialblutbild;Basophile rel.;Baso.aut.;0.3;%;0.3;%;0.0-1.5;
+2024-12-11;68;Differentialblutbild;Basophile rel.;Basophile Gr.rel.;0.5;%;0.5;%;0.0-1.5;
+2025-01-06;69;Differentialblutbild;Basophile rel.;Baso.aut.;0.3;%;0.3;%;0.0-1.5;
+2024-12-01;68;Differentialblutbild;Eosinophile abs.;Eosinophile Gr. abs.;0.05;10^9/L;0.05;10^9/l;0.06-0.46;L
+2024-12-06;68;Differentialblutbild;Eosinophile abs.;Eos;0.35;10^9/L;0.35;10^9/l;0.04-0.40;
+2024-12-11;68;Differentialblutbild;Eosinophile abs.;Eosinophile Gr. abs.;0.20;10^9/L;0.20;10^9/l;0.06-0.46;
+2025-01-06;69;Differentialblutbild;Eosinophile abs.;Eos;0.44;10^9/L;0.44;10^9/l;0.04-0.40;H
+2013-10-18;57;Differentialblutbild;Eosinophile rel.;Eosinophile;1.00;%;1.00;%;0.00-6.00;
+2018-04-17;62;Differentialblutbild;Eosinophile rel.;Eosinophile;1.60;%;1.60;%;0.00-6.00;
+2018-06-13;62;Differentialblutbild;Eosinophile rel.;Eosinophile;2.30;%;2.30;%;0.00-6.00;
+2019-04-07;63;Differentialblutbild;Eosinophile rel.;Eosinophile;3.50;%;3.50;%;0.00-6.00;
+2019-07-10;63;Differentialblutbild;Eosinophile rel.;Eosinophile;2.20;%;2.20;%;0.00-6.00;
+2024-12-01;68;Differentialblutbild;Eosinophile rel.;Eosinophile Gr. rel.;0.4;%;0.4;%;0.0-8.4;
+2024-12-06;68;Differentialblutbild;Eosinophile rel.;Eos.aut.;2.6;%;2.6;%;0.0-8.4;
+2024-12-11;68;Differentialblutbild;Eosinophile rel.;Eosinophile Gr. rel.;1.5;%;1.5;%;0.0-8.4;
+2025-01-06;69;Differentialblutbild;Eosinophile rel.;Eos.aut.;2.6;%;2.6;%;0.0-8.4;
+2024-12-06;68;Differentialblutbild;Granulozyten abs.;Granul.Abs;9.5;10^9/L;9.5;10^9/l;1.60-7.10;H
+2025-01-06;69;Differentialblutbild;Granulozyten abs.;Granul.Abs;9.5;10^9/L;9.5;10^9/l;1.60-7.10;H
+2015-07-05;59;Differentialblutbild;Granulozyten rel.;Granulozyten;48.00;;48.00;;;
+2017-08-06;61;Differentialblutbild;Granulozyten rel.;Granulozyten;3.60;;3.60;;;
+2019-04-07;63;Differentialblutbild;Granulozyten rel.;Granulocytes;62.70;;62.70;;;
+2024-12-06;68;Differentialblutbild;Granulozyten rel.;Gran.aut.;71.4;%;71.4;%;40.0-75.0;
+2025-01-06;69;Differentialblutbild;Granulozyten rel.;Gran.aut.;71.4;%;71.4;%;40.0-75.0;
+2024-12-01;68;Differentialblutbild;IG-Absolut;Unreife neutrophile Granulozyten abs.;0.05;10^9/L;0.05;10^9/l;0.00-0.10;
+2024-12-06;68;Differentialblutbild;IG-Absolut;IG-Absolut;0.09;10^9/L;0.09;10^9/l;< 0.05;H
+2024-12-11;68;Differentialblutbild;IG-Absolut;Unreife neutrophile Granulozyten abs.;0.06;10^9/L;0.06;10^9/l;0.00-0.10;
+2024-12-01;68;Differentialblutbild;IG-Wert;Gran., unreife rel.;0.4;%;0.4;%;0.0-5.0;
+2024-12-06;68;Differentialblutbild;IG-Wert;IG-Wert;0.7;%;0.7;%;< 0.4;H
+2024-12-11;68;Differentialblutbild;IG-Wert;Gran., unreife rel.;0.5;%;0.5;%;0.0-5.0;
+2018-02-20;62;Differentialblutbild;Lymphozyten abs.;Lymphocyten absolut;1.2;G/L;1.2;G/L;0.7-4.8;
+2018-06-13;62;Differentialblutbild;Lymphozyten abs.;Lymphozyten abs.;0.50;G/L;0.50;G/L;0.7-4.8;L
+2019-07-10;63;Differentialblutbild;Lymphozyten abs.;Lymphozyten abs.;3.40;G/L;3.40;G/L;0.7-4.8;
+2024-12-01;68;Differentialblutbild;Lymphozyten abs.;Lymphozyten abs.;1.83;10^9/L;1.83;10^9/l;1.00-2.90;
+2024-12-06;68;Differentialblutbild;Lymphozyten abs.;Lymph.Abs.;2.41;10^9/L;2.41;10^9/l;1.00-2.90;
+2024-12-11;68;Differentialblutbild;Lymphozyten abs.;Lymphozyten abs.;2.90;10^9/L;2.90;10^9/l;1.00-2.90;
+2025-01-06;69;Differentialblutbild;Lymphozyten abs.;Lymph.Abs.;2.41;10^9/L;2.41;10^9/l;1.00-2.90;
+2013-10-18;57;Differentialblutbild;Lymphozyten rel.;Lymphozyten;17.00;%;17.00;%;20.00-45.00;L
+2014-10-24;58;Differentialblutbild;Lymphozyten rel.;Lymphozyten;34.00;%;34.00;%;20.00-45.00;
+2017-08-06;61;Differentialblutbild;Lymphozyten rel.;Lymphozyten;39.00;%;39.00;%;20.00-45.00;
+2018-04-17;62;Differentialblutbild;Lymphozyten rel.;Lymphozyten;28.10;%;28.10;%;20.00-45.00;
+2018-06-13;62;Differentialblutbild;Lymphozyten rel.;Lymphozyten;27.70;%;27.70;%;20.00-45.00;
+2018-10-04;62;Differentialblutbild;Lymphozyten rel.;Lymphozyten;31.30;%;31.30;%;20.00-45.00;
+2019-04-07;63;Differentialblutbild;Lymphozyten rel.;Lymphozyten;24.50;%;24.50;%;20.00-45.00;
+2019-07-10;63;Differentialblutbild;Lymphozyten rel.;Lymphozyten;25.40;%;25.40;%;20.00-45.00;
+2024-12-01;68;Differentialblutbild;Lymphozyten rel.;Lymphozyten rel.;13.4;%;13.4;%;18.0-48.0;L
+2024-12-06;68;Differentialblutbild;Lymphozyten rel.;Lymph.aut.;18.1;%;18.1;%;18.0-48.0;
+2024-12-11;68;Differentialblutbild;Lymphozyten rel.;Lymphozyten rel.;22.0;%;22.0;%;18.0-48.0;
+2025-01-06;69;Differentialblutbild;Lymphozyten rel.;Lymph.aut.;18.1;%;18.1;%;18.0-48.0;
+2014-10-24;58;Differentialblutbild;Monozyten abs.;Monozyten abs.;1.40;G/L;1.40;G/L;0-0.9;H
+2018-02-20;62;Differentialblutbild;Monozyten abs.;Mono Absolut;0.7;G/L;0.7;G/L;0.0-0.9;
+2019-07-10;63;Differentialblutbild;Monozyten abs.;Monozyten abs.;0.90;G/L;0.90;G/L;0-0.9;
+2024-12-01;68;Differentialblutbild;Monozyten abs.;Monozyten abs.;1.10;10^9/L;1.10;10^9/l;0.20-0.60;H
+2024-12-06;68;Differentialblutbild;Monozyten abs.;Mono;1.01;10^9/L;1.01;10^9/l;0.20-0.60;H
+2024-12-11;68;Differentialblutbild;Monozyten abs.;Monozyten abs.;0.65;10^9/L;0.65;10^9/l;0.20-0.60;H
+2025-01-06;69;Differentialblutbild;Monozyten abs.;Mono;1.1;10^9/L;1.1;10^9/l;0.20-0.60;H
+2013-10-18;57;Differentialblutbild;Monozyten rel.;Monozyten;4.00;%;4.00;%;2.00-12.00;
+2013-12-12;57;Differentialblutbild;Monozyten rel.;Monozyten;18.00;%;18.00;%;2.00-12.00;H
+2014-10-24;58;Differentialblutbild;Monozyten rel.;Monozyten;6.10;%;6.10;%;2.00-12.00;
+2018-04-17;62;Differentialblutbild;Monozyten rel.;Monozyten;6.10;%;6.10;%;2.00-12.00;
+2018-06-13;62;Differentialblutbild;Monozyten rel.;Monozyten;5.80;%;5.80;%;2.00-12.00;
+2019-04-07;63;Differentialblutbild;Monozyten rel.;Monozyten;5.90;%;5.90;%;2.00-12.00;
+2019-07-10;63;Differentialblutbild;Monozyten rel.;Monozyten;6.80;%;6.80;%;2.00-12.00;
+2024-12-01;68;Differentialblutbild;Monozyten rel.;Monozyten rel.;8.1;%;8.1;%;4.0-11.0;
+2024-12-06;68;Differentialblutbild;Monozyten rel.;Mono.aut.;7.6;%;7.6;%;4.0-11.0;
+2024-12-11;68;Differentialblutbild;Monozyten rel.;Monozyten rel.;4.9;%;4.9;%;4.0-11.0;
+2025-01-06;69;Differentialblutbild;Monozyten rel.;Mono.aut.;7.6;%;7.6;%;4.0-11.0;
+2024-12-01;68;Differentialblutbild;NRBC;Normoblast.(NRBC)Rt.;0.0;%;0.0;%;0.0-0.0;
+2024-12-06;68;Differentialblutbild;NRBC;NRBC;0;%;0;%;< 1.0;
+2024-12-11;68;Differentialblutbild;NRBC;Normoblast.(NRBC)Rt.;0.0;%;0.0;%;0.0-0.0;
+2024-12-01;68;Differentialblutbild;NRBC-A;Normoblasten (NRBC) abs.;0.00;10^9/L;0.00;10^9/l;0.00-0.00;
+2024-12-06;68;Differentialblutbild;NRBC-A;NRBC-A;0;10^9/L;0;10^9/l;< 0.01;
+2024-12-11;68;Differentialblutbild;NRBC-A;Normoblasten (NRBC) abs.;0.00;10^9/L;0.00;10^9/l;0.00-0.00;
+2018-02-20;62;Differentialblutbild;Neutrophile abs.;Neutrophile absolut;8.3;G/L;8.3;G/L;1.5-6.7;H
+2019-07-10;63;Differentialblutbild;Neutrophile abs.;Neutrophile abs;8.70;G/L;8.70;G/L;1.5-6.7;H
+2024-12-01;68;Differentialblutbild;Neutrophile abs.;Neutroph. Gran. abs.;10.66;10^9/L;10.66;10^9/l;1.60-7.10;H
+2024-12-11;68;Differentialblutbild;Neutrophile abs.;Neutroph. Gran. abs.;9.40;10^9/L;9.40;10^9/l;1.60-7.10;H
+2013-10-18;57;Differentialblutbild;Neutrophile rel.;Neutrophile;78.00;%;78.00;%;40.00-75.00;H
+2019-04-07;63;Differentialblutbild;Neutrophile rel.;Neutrophile;65.60;%;65.60;%;40.00-75.00;
+2019-07-10;63;Differentialblutbild;Neutrophile rel.;Neutrophile;65.20;%;65.20;%;40.00-75.00;
+2024-12-01;68;Differentialblutbild;Neutrophile rel.;Neutroph. Gran. rel.;78.0;%;78.0;%;40.0-75.0;H
+2024-12-11;68;Differentialblutbild;Neutrophile rel.;Neutroph. Gran. rel.;71.1;%;71.1;%;40.0-75.0;
+2018-01-26;62;Elektrolyte;Calcium;Calcium;2.50;mmol/L;2.50;mmol/L;2.15-2.55;
+2026-07-13;70;Elektrolyte;Calcium;Calcium;2.46;mmol/L;2.46;mmol/L;2.15-2.55;
+2018-01-26;62;Elektrolyte;Chlorid;Chlorid;98;mmol/L;98;mmol/L;98-107;
+2024-12-01;68;Elektrolyte;Chlorid;Chlorid;102;mmol/L;102;mmol/l;98.0-107.0;
+2024-12-06;68;Elektrolyte;Chlorid;Chlorid;104;mmol/L;104;mmol/l;98.0-107.0;
+2025-01-06;69;Elektrolyte;Chlorid;Chlorid;104;mmol/L;104;mmol/l;98.0-107.0;
+2026-07-13;70;Elektrolyte;Chlorid;Chlorid;101;mmol/L;101;mmol/L;98-107;
+2018-01-26;62;Elektrolyte;Kalium;Kalium;5.4;mmol/L;5.4;mmol/L;3.5-5.1;H
+2018-02-12;62;Elektrolyte;Kalium;Kalium;4.8;mmol/L;4.8;mmol/L;3.5-5.1;
+2018-02-14;62;Elektrolyte;Kalium;Kalium;4.6;mmol/L;4.6;mmol/L;3.5-5.1;
+2018-02-20;62;Elektrolyte;Kalium;Kalium;3.9;mmol/L;3.9;mmol/L;3.5-5.1;
+2024-02-08;68;Elektrolyte;Kalium;Kalium;4.4;mmol/L;4.4;mmol/L;3.5-5.1;
+2024-12-01;68;Elektrolyte;Kalium;Kalium;4.2;mmol/L;4.2;mmol/l;3.50-5.10;
+2024-12-06;68;Elektrolyte;Kalium;Kalium;3.8;mmol/L;3.8;mmol/l;3.50-5.10;
+2025-01-06;69;Elektrolyte;Kalium;Kalium;3.8;mmol/L;3.8;mmol/l;3.50-5.10;
+2026-07-17;70;Elektrolyte;Kalium;Kalium;4.7;mmol/L;4.7;mmol/L;3.5-5.1;
+2026-07-18;70;Elektrolyte;Kalium;Kalium;4.3;mmol/L;4.3;mmol/L;3.5-5.1;
+2026-07-21;70;Elektrolyte;Kalium;Kalium;3.7;mmol/L;3.7;mmol/L;3.5-5.1;
+2018-02-13;62;Elektrolyte;Magnesium;Magnesium;0.78;mmol/L;0.78;mmol/L;0.66-1.07;
+2018-02-14;62;Elektrolyte;Magnesium;Magnesium;0.77;mmol/L;0.77;mmol/L;0.66-1.07;
+2018-01-26;62;Elektrolyte;Natrium;Natrium;139;mmol/L;139;mmol/L;136-145;
+2018-02-12;62;Elektrolyte;Natrium;Natrium;141;mmol/L;141;mmol/L;136-145;
+2018-02-14;62;Elektrolyte;Natrium;Natrium;143;mmol/L;143;mmol/L;136-145;
+2018-02-20;62;Elektrolyte;Natrium;Natrium;141;mmol/L;141;mmol/L;136-145;
+2024-02-08;68;Elektrolyte;Natrium;Natrium;140;mmol/L;140;mmol/L;136-145;
+2024-12-01;68;Elektrolyte;Natrium;Natrium;138;mmol/L;138;mmol/l;136.0-145.0;
+2024-12-06;68;Elektrolyte;Natrium;Natrium;140;mmol/L;140;mmol/l;136.0-145.0;
+2025-01-06;69;Elektrolyte;Natrium;Natrium;140;mmol/L;140;mmol/l;136.0-145.0;
+2026-07-13;70;Elektrolyte;Natrium;Natrium;139;mmol/L;139;mmol/L;136-145;
+2026-07-17;70;Elektrolyte;Natrium;Natrium;136;mmol/L;136;mmol/L;136-145;
+2026-07-18;70;Elektrolyte;Natrium;Natrium;139;mmol/L;139;mmol/L;136-145;
+2026-07-21;70;Elektrolyte;Natrium;Natrium;139;mmol/L;139;mmol/L;136-145;
+2018-02-13;62;Elektrolyte;Phosphat;Phosphat;1.19;mmol/L;1.19;mmol/L;0.81-1.45;
+2018-02-14;62;Elektrolyte;Phosphat;Phosphat;1.24;mmol/L;1.24;mmol/L;0.81-1.45;
+2018-01-26;62;Entzündung;CRP;CRP;7.22;mg/dL;7.22;mg/dL;< 0.50;H
+2018-01-29;62;Entzündung;CRP;CRP;4.69;mg/dL;4.69;mg/dL;< 0.50;H
+2018-02-02;62;Entzündung;CRP;CRP;1.28;mg/dL;1.28;mg/dL;< 0.50;H
+2018-02-02;62;Entzündung;CRP;CRP;1.35;mg/dL;1.35;mg/dL;< 0.50;H
+2018-02-12;62;Entzündung;CRP;CRP;0.22;mg/dL;0.22;mg/dL;< 0.50;
+2018-02-14;62;Entzündung;CRP;CRP;16.30;mg/dL;16.30;mg/dL;< 0.50;H
+2018-02-16;62;Entzündung;CRP;CRP;15.91;mg/dL;15.91;mg/dL;< 0.50;H
+2018-02-20;62;Entzündung;CRP;CRP;11.21;mg/dL;11.21;mg/dL;< 0.50;H
+2018-06-13;62;Entzündung;CRP;CRP quantitativ;0.90;mg/dL;0.90;mg/dl;0.1-0.6;H
+2019-07-10;63;Entzündung;CRP;CRP quantitativ;0.20;mg/dL;0.20;mg/dl;0.1-0.6;
+2024-02-08;68;Entzündung;CRP;CRP hs;0.58;mg/dL;0.58;mg/dL;< 0.50;H
+2024-12-01;68;Entzündung;CRP;CRP;5.28;mg/dL;5.28;mg/dl;-0.49;H
+2024-12-06;68;Entzündung;CRP;CRP;4.87;mg/dL;4.87;mg/dl;-0.49;H
+2024-12-11;68;Entzündung;CRP;CRP;1.50;mg/dL;1.50;mg/dl;-0.49;H
+2025-01-06;69;Entzündung;CRP;CRP;4.87;mg/dL;4.87;mg/dl;-0.49;H
+2025-07-07;69;Entzündung;CRP;CRP;0.39;mg/dL;0.39;mg/dL;<0.50;
+2026-07-13;70;Entzündung;CRP;CRP;0.12;mg/dL;0.12;mg/dL;< 0.50;
+2026-07-17;70;Entzündung;CRP;CRP;2.00;mg/dL;2.00;mg/dL;< 0.50;H
+2026-07-18;70;Entzündung;CRP;CRP;4.70;mg/dL;4.70;mg/dL;< 0.50;H
+2026-07-21;70;Entzündung;CRP;CRP;3.14;mg/dL;3.14;mg/dL;< 0.50;H
+2018-01-26;62;Entzündung;Procalcitonin;Procalcitonin;<0.06;ng/mL;<0.06;ng/mL;< 0.50;
+2018-01-29;62;Entzündung;Procalcitonin;Procalcitonin;<0.06;ng/mL;<0.06;ng/mL;< 0.50;
+2018-02-12;62;Entzündung;Procalcitonin;Procalcitonin;<0.06;ng/mL;<0.06;ng/mL;< 0.50;
+2018-02-13;62;Entzündung;Procalcitonin;Procalcitonin;<0.06;ng/mL;<0.06;ng/mL;< 0.50;
+2018-02-14;62;Entzündung;Procalcitonin;Procalcitonin;0.21;ng/mL;0.21;ng/mL;< 0.50;
+2018-02-20;62;Entzündung;Procalcitonin;Procalcitonin;0.06;ng/mL;0.06;ng/mL;< 0.50;
+2024-12-01;68;Gerinnung;INR;INR;1.14;;1.14;;0.8-1.3;
+2024-12-06;68;Gerinnung;INR;INR;1.25;;1.25;;< 1.14;H
+2018-01-26;62;Gerinnung;Quick;Quick;91;%;91;%;70-120;
+2018-02-12;62;Gerinnung;Quick;Quick (Prothrombinzeit);110;%;110;%;70-120;
+2018-02-13;62;Gerinnung;Quick;Quick (Prothrombinzeit);64;%;64;%;70-120;L
+2018-02-14;62;Gerinnung;Quick;Quick (Prothrombinzeit);74;%;74;%;70-120;
+2024-02-08;68;Gerinnung;Quick;Quick;93;%;93;%;70-120;
+2024-12-01;68;Gerinnung;Quick;PTZ (Prothrombinz.);82;%;82;%;>70;
+2024-12-06;68;Gerinnung;Quick;Quick;73;%;73;%;>70;
+2026-07-13;70;Gerinnung;Quick;Quick (Prothrombinzeit);>120;%;>120;%;70-120;
+2018-01-26;62;Gerinnung;aPTT;PTT Actin FS;26.8;Sek.;26.8;Sek.;23.0-31.0;
+2018-02-12;62;Gerinnung;aPTT;PTT Actin FS;26.0;Sek.;26.0;Sek.;23.0-31.0;
+2018-02-13;62;Gerinnung;aPTT;PTT Actin FS;59.8;Sek.;59.8;Sek.;23.0-31.0;H
+2018-02-14;62;Gerinnung;aPTT;PTT Actin FS;27.2;Sek.;27.2;Sek.;23.0-31.0;
+2024-02-08;68;Gerinnung;aPTT;PTT Actin FS;29.7;Sek.;29.7;Sek.;23.0-31.0;
+2024-12-01;68;Gerinnung;aPTT;aPTT;29.9;sek;29.9;sek;24.0-35.0;
+2026-07-13;70;Gerinnung;aPTT;PTT Actin FS;26.5;Sek.;26.5;Sek.;21.6-28.7;
+2025-07-07;69;Harnanalyse;Hyaline Zylinder;Hyaline Zylinder;1;/ľL;1;/ľL;<1;
+2025-07-07;69;Harnanalyse;Plattenepithel.;Plattenepithel.;2.0;/ľL;2.0;/ľL;<28.0;
+2025-07-07;69;Harnanalyse;Schleim;Schleim;197;/ľL;197;/ľL;<46;H
+2025-07-07;69;Harnanalyse;Spez. Gewicht;Spez. Gewicht;1016;;1016;;1015-1025;
+2025-07-07;69;Harnanalyse;pH-Wert;pH-Wert;5.50;;5.50;;5.00-8.00;
+2014-10-24;58;Hormone;Testosteron;Testosteron;5.70;ng/mL;5.70;ng/ml;2.5-8.0;
+2024-12-01;68;Leber;Alk. Phosphatase;Alk.Phosphatase (AP);72;U/L;72;U/l;40-129;
+2024-12-06;68;Leber;Alk. Phosphatase;Alk.Phos.;55;U/L;55;U/l;40-129;
+2025-01-06;69;Leber;Alk. Phosphatase;Alk.Phos.;55;U/L;55;U/l;40-129;
+2018-01-26;62;Leber;Bilirubin;Bilirubin gesamt;0.80;mg/dL;0.80;mg/dL;< 1.20;
+2018-02-12;62;Leber;Bilirubin;Bilirubin gesamt;0.30;mg/dL;0.30;mg/dL;< 1.20;
+2018-02-13;62;Leber;Bilirubin;Bilirubin gesamt;0.52;mg/dL;0.52;mg/dL;< 1.20;
+2018-02-14;62;Leber;Bilirubin;Bilirubin gesamt;0.79;mg/dL;0.79;mg/dL;< 1.20;
+2024-02-08;68;Leber;Bilirubin;Bilirubin gesamt;0.79;mg/dL;0.79;mg/dL;< 1.20;
+2024-12-01;68;Leber;Bilirubin;Bilirubin;1.28;mg/dL;1.28;mg/dl;0.000-1.200;H
+2024-12-06;68;Leber;Bilirubin;Bilirubin;0.92;mg/dL;0.92;mg/dl;0.000-1.200;
+2025-01-06;69;Leber;Bilirubin;Bilirubin;0.92;mg/dL;0.92;mg/dl;0.000-1.200;
+2013-10-18;57;Leber;Cholinesterase;Cholinesterase;13550;U/L;13.55;KU/l;;
+2013-12-12;57;Leber;Cholinesterase;Cholinesterase;14630;U/L;14.63;KU/l;;
+2018-06-13;62;Leber;Cholinesterase;Cholinesterase;14700;U/L;14.70;KU/l;;
+2024-12-01;68;Leber;Cholinesterase;Cholinesterase;11641;U/L;11641;U/l;5320-12920;
+2024-12-06;68;Leber;Cholinesterase;CHE;6298;U/L;6298;U/l;5320-12920;
+2025-01-06;69;Leber;Cholinesterase;CHE;6298;U/L;6298;U/l;5320-12920;
+2018-01-26;62;Leber;GGT;GGT;20;U/L;20;U/L;< 60;
+2018-02-12;62;Leber;GGT;GGT;24;U/L;24;U/L;< 60;
+2018-02-13;62;Leber;GGT;GGT;14;U/L;14;U/L;< 60;
+2018-02-14;62;Leber;GGT;GGT;13;U/L;13;U/L;< 60;
+2024-02-08;68;Leber;GGT;GGT;19;U/L;19;U/L;< 60;
+2024-12-01;68;Leber;GGT;Gamma-GT;18;U/L;18;U/l;-59;
+2024-12-06;68;Leber;GGT;GGT;27;U/L;27;U/l;-59;
+2025-01-06;69;Leber;GGT;GGT;27;U/L;27;U/l;-59;
+2025-07-07;69;Leber;GGT;GGT;22;U/L;22;U/L;<60;
+2026-07-13;70;Leber;GGT;GGT;27;U/L;27;U/L;< 60;
+2018-01-26;62;Leber;GOT;GOT (ASAT);19;U/L;19;U/L;< 50;
+2018-02-12;62;Leber;GOT;GOT (ASAT);16;U/L;16;U/L;< 50;
+2018-02-13;62;Leber;GOT;GOT (ASAT);13;U/L;13;U/L;< 50;
+2018-02-14;62;Leber;GOT;GOT (ASAT);13;U/L;13;U/L;< 50;
+2024-02-08;68;Leber;GOT;GOT (ASAT);18;U/L;18;U/L;< 50;
+2024-12-01;68;Leber;GOT;ASAT (GOT);13;U/L;13;U/l;-50;
+2024-12-06;68;Leber;GOT;AST(GOT);11;U/L;11;U/l;-50;
+2025-01-06;69;Leber;GOT;AST(GOT);11;U/L;11;U/l;-50;
+2018-01-26;62;Leber;GPT;GPT (ALAT);14;U/L;14;U/L;< 50;
+2018-02-12;62;Leber;GPT;GPT (ALAT);22;U/L;22;U/L;< 50;
+2018-02-13;62;Leber;GPT;GPT (ALAT);12;U/L;12;U/L;< 50;
+2018-02-14;62;Leber;GPT;GPT (ALAT);10;U/L;10;U/L;< 50;
+2024-02-08;68;Leber;GPT;GPT (ALAT);12;U/L;12;U/L;< 50;
+2024-12-01;68;Leber;GPT;ALAT (GPT);12;U/L;12;U/l;-50;
+2024-12-06;68;Leber;GPT;ALT(GPT);6;U/L;6;U/l;-50;
+2025-01-06;69;Leber;GPT;ALT(GPT);6;U/L;6;U/l;-50;
+2026-07-13;70;Leber;GPT;GPT (ALAT);16;U/L;16;U/L;< 50;
+2024-12-01;68;Leber;LDH;LDH;164;U/L;164;U/l;-250;
+2024-12-06;68;Leber;LDH;LDH;130;U/L;130;U/l;-250;
+2025-01-06;69;Leber;LDH;LDH;130;U/L;130;U/l;-250;
+2013-10-18;57;Lipide;Cholesterin;Cholesterin;317.00;mg/dL;317.00;mg/dl;<200;H
+2013-12-12;57;Lipide;Cholesterin;Cholesterin;196.00;mg/dL;196.00;mg/dl;<200;
+2014-10-24;58;Lipide;Cholesterin;Cholesterin;181.00;mg/dL;181.00;mg/dl;<200;
+2015-07-05;59;Lipide;Cholesterin;Cholesterin;155.00;mg/dL;155.00;mg/dl;<200;
+2017-08-06;61;Lipide;Cholesterin;Cholesterin;268.00;mg/dL;268.00;mg/dl;<200;H
+2017-11-22;61;Lipide;Cholesterin;Cholesterin;212.00;mg/dL;212.00;mg/dl;<200;H
+2018-01-26;62;Lipide;Cholesterin;Cholesterin;166;mg/dL;166;mg/dL;<200;
+2018-01-29;62;Lipide;Cholesterin;Cholesterin;166.00;mg/dL;166.00;mg/dl;<200;
+2018-06-13;62;Lipide;Cholesterin;Cholesterin;281.00;mg/dL;281.00;mg/dl;<200;H
+2019-04-07;63;Lipide;Cholesterin;Cholesterin;196.00;mg/dL;196.00;mg/dl;<200;
+2025-07-07;69;Lipide;Cholesterin;Cholesterin;200;mg/dL;200;mg/dL;<200;
+2026-07-13;70;Lipide;Cholesterin;Cholesterin;277;mg/dL;277;mg/dL;< 200;H
+2013-10-18;57;Lipide;HDL;HDL Cholesterin;52.00;mg/dL;52.00;mg/dl;>40;
+2013-12-12;57;Lipide;HDL;HDL Cholesterin;44.00;mg/dL;44.00;mg/dl;>40;
+2014-10-24;58;Lipide;HDL;HDL Cholesterin;73.00;mg/dL;73.00;mg/dl;>40;
+2015-07-05;59;Lipide;HDL;HDL Cholesterin;65.00;mg/dL;65.00;mg/dl;>40;
+2017-08-06;61;Lipide;HDL;HDL Cholesterin;57.00;mg/dL;57.00;mg/dl;>40;
+2017-11-22;61;Lipide;HDL;HDL Cholesterin;64.00;mg/dL;64.00;mg/dl;>40;
+2018-01-26;62;Lipide;HDL;HDL-Cholesterin;60;mg/dL;60;mg/dL;> 55;
+2018-01-29;62;Lipide;HDL;HDL Cholesterin;60.00;mg/dL;60.00;mg/dl;>40;
+2018-06-13;62;Lipide;HDL;HDL Cholesterin;59.00;mg/dL;59.00;mg/dl;>40;
+2019-04-07;63;Lipide;HDL;HDL Cholesterin;58.00;mg/dL;58.00;mg/dl;>40;
+2025-07-07;69;Lipide;HDL;HDL-Cholesterin;60;mg/dL;60;mg/dL;>-55;
+2026-07-13;70;Lipide;HDL;HDL-Cholesterin;60;mg/dL;60;mg/dL;> 55;
+2013-10-18;57;Lipide;LDL;LDL Cholesterin;187.00;mg/dL;187.00;mg/dl;<150;H
+2013-12-12;57;Lipide;LDL;LDL Cholesterin;84.00;mg/dL;84.00;mg/dl;<150;
+2014-10-24;58;Lipide;LDL;LDL Cholesterin;98.00;mg/dL;98.00;mg/dl;<150;
+2015-07-05;59;Lipide;LDL;LDL Cholesterin;73.00;mg/dL;73.00;mg/dl;<150;
+2017-08-06;61;Lipide;LDL;LDL Cholesterin;172.00;mg/dL;172.00;mg/dl;<150;H
+2017-11-22;61;Lipide;LDL;LDL Cholesterin;119.00;mg/dL;119.00;mg/dl;<150;
+2018-01-26;62;Lipide;LDL;LDL-Cholesterin;92;mg/dL;92;mg/dL;< 150;
+2018-01-29;62;Lipide;LDL;LDL Cholesterin;92.00;mg/dL;92.00;mg/dl;<150;
+2018-06-13;62;Lipide;LDL;LDL Cholesterin;151.00;mg/dL;151.00;mg/dl;<150;H
+2019-04-07;63;Lipide;LDL;LDL Cholesterin;87.00;mg/dL;87.00;mg/dl;<150;
+2025-07-07;69;Lipide;LDL;LDL-Cholesterin;101;mg/dL;101;mg/dL;<150;
+2026-07-13;70;Lipide;LDL;LDL-Cholesterin;139;mg/dL;139;mg/dL;< 150;
+2013-10-18;57;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);265.0;mg/dL;265.0;mg/dL;<160;H
+2013-12-12;57;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);152.0;mg/dL;152.0;mg/dL;<160;
+2014-10-24;58;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);108.0;mg/dL;108.0;mg/dL;<160;
+2015-07-05;59;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);90.0;mg/dL;90.0;mg/dL;<160;
+2017-08-06;61;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);211.0;mg/dL;211.0;mg/dL;<160;H
+2017-11-22;61;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);148.0;mg/dL;148.0;mg/dL;<160;
+2018-01-26;62;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);106.0;mg/dL;106.0;mg/dL;<160;
+2018-01-29;62;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);106.0;mg/dL;106.0;mg/dL;<160;
+2018-06-13;62;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);222.0;mg/dL;222.0;mg/dL;<160;H
+2019-04-07;63;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin (berechnet);138.0;mg/dL;138.0;mg/dL;<160;
+2025-07-07;69;Lipide;Non-HDL-Cholesterin;Non-HDL-Chol.;140;mg/dL;140;mg/dL;<160;
+2026-07-13;70;Lipide;Non-HDL-Cholesterin;Non-HDL-Cholesterin;217;mg/dL;217;mg/dL;<160;H
+2013-10-18;57;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);6.1;;6.1;;0.0-5.0;H
+2013-12-12;57;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);4.5;;4.5;;0.0-5.0;
+2014-10-24;58;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);2.5;;2.5;;0.0-5.0;
+2015-07-05;59;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);2.4;;2.4;;0.0-5.0;
+2017-08-06;61;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);4.7;;4.7;;0.0-5.0;
+2017-11-22;61;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);3.3;;3.3;;0.0-5.0;
+2018-01-26;62;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);2.8;;2.8;;0.0-5.0;
+2018-01-29;62;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);2.8;;2.8;;0.0-5.0;
+2018-06-13;62;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);4.8;;4.8;;0.0-5.0;
+2019-04-07;63;Lipide;Quotient Chol/HDL;Quotient Chol/HDL (berechnet);3.4;;3.4;;0.0-5.0;
+2025-07-07;69;Lipide;Quotient Chol/HDL;Quot. Chol./HDL;3.3;;3.3;;0.0-3.5;
+2026-07-13;70;Lipide;Quotient Chol/HDL;Quotient Cholesterin/HDL;4.6;H;4.6;H;0.0-3.5;H
+2013-10-18;57;Lipide;Quotient LDL/HDL;LD/HDL;3.60;*;3.60;*;0.0-3.0;H
+2013-12-12;57;Lipide;Quotient LDL/HDL;LD/HDL;1.90;*;1.90;*;0.0-3.0;
+2014-10-24;58;Lipide;Quotient LDL/HDL;LD/HDL;1.30;*;1.30;*;0.0-3.0;
+2015-07-05;59;Lipide;Quotient LDL/HDL;LD/HDL;1.10;*;1.10;*;0.0-3.0;
+2017-08-06;61;Lipide;Quotient LDL/HDL;LD/HDL;3.00;*;3.00;*;0.0-3.0;
+2017-11-22;61;Lipide;Quotient LDL/HDL;LD/HDL;1.90;*;1.90;*;0.0-3.0;
+2018-01-26;62;Lipide;Quotient LDL/HDL;Quotient LDL/HDL (berechnet);1.5;;1.5;;0.0-3.0;
+2018-01-29;62;Lipide;Quotient LDL/HDL;LD/HDL;1.50;*;1.50;*;0.0-3.0;
+2018-06-13;62;Lipide;Quotient LDL/HDL;LD/HDL;4.70;*;4.70;*;0.0-3.0;H
+2019-04-07;63;Lipide;Quotient LDL/HDL;LD/HDL;1.50;*;1.50;*;0.0-3.0;
+2025-07-07;69;Lipide;Quotient LDL/HDL;LDL/HDL Quotient;1.7;;1.7;;0.0-2.5;
+2026-07-13;70;Lipide;Quotient LDL/HDL;Quotient LDL/HDL (berechnet);2.3;;2.3;;0.0-3.0;
+2013-10-18;57;Lipide;Triglyceride;Triglyceride;391.00;mg/dL;391.00;mg/dl;60.00-170.00;H
+2013-12-12;57;Lipide;Triglyceride;Triglyceride;342.00;mg/dL;342.00;mg/dl;60.00-170.00;H
+2014-10-24;58;Lipide;Triglyceride;Triglyceride;117.00;mg/dL;117.00;mg/dl;60.00-170.00;
+2015-07-05;59;Lipide;Triglyceride;Triglyceride;84.00;mg/dL;84.00;mg/dl;60.00-170.00;
+2017-08-06;61;Lipide;Triglyceride;Triglyceride;196.00;mg/dL;196.00;mg/dl;60.00-170.00;H
+2017-11-22;61;Lipide;Triglyceride;Triglyceride;144.00;mg/dL;144.00;mg/dl;60.00-170.00;
+2018-01-26;62;Lipide;Triglyceride;Triglyceride;99;mg/dL;99;mg/dL;< 200;
+2018-01-29;62;Lipide;Triglyceride;Triglyceride;99.00;mg/dL;99.00;mg/dl;60.00-170.00;
+2018-06-13;62;Lipide;Triglyceride;Triglyceride;351.00;mg/dL;351.00;mg/dl;60.00-170.00;H
+2019-04-07;63;Lipide;Triglyceride;Triglyceride;136.00;mg/dL;136.00;mg/dl;60.00-170.00;
+2025-07-07;69;Lipide;Triglyceride;Triglyceride;139;mg/dL;139;mg/dL;<200;
+2026-07-13;70;Lipide;Triglyceride;Triglyceride;473;mg/dL;473;mg/dL;< 200;H
+2024-12-01;68;Niere;GFR;GFR (CKD-EPI);87;mL/min;87;ml/min/kof;>80;
+2024-12-06;68;Niere;GFR;GFR-CKD;79;mL/min;79;ml/min/kof;>80;L
+2025-01-06;69;Niere;GFR;GFR-CKD;79;mL/min;79;ml/min/kof;>80;L
+2025-07-07;69;Niere;GFR;GFR-CKD Krea;80;mL/min;80;mL/min;>-90;L
+2026-07-13;70;Niere;GFR;GFR-CKD;69;mL/min;69;mL/min;< 90;
+2026-07-17;70;Niere;GFR;GFR-CKD;69;mL/min;69;mL/min;>90;L
+2026-07-18;70;Niere;GFR;GFR-CKD;74;mL/min;74;mL/min;>90;L
+2026-07-21;70;Niere;GFR;GFR-CKD;66;mL/min;66;mL/min;>90;L
+2013-12-12;57;Niere;Harnstoff;Harnstoff;34.00;mg/dL;34.00;mg/dl;17-49;
+2018-01-26;62;Niere;Harnstoff;Harnstoff;34;mg/dL;34;mg/dL;17-49;
+2018-02-12;62;Niere;Harnstoff;Harnstoff;45;mg/dL;45;mg/dL;17-49;
+2018-02-13;62;Niere;Harnstoff;Harnstoff;28;mg/dL;28;mg/dL;17-49;
+2018-02-14;62;Niere;Harnstoff;Harnstoff;31;mg/dL;31;mg/dL;17-49;
+2018-02-14;62;Niere;Harnstoff;Harnstoff;33;mg/dL;33;mg/dL;17-49;
+2018-02-20;62;Niere;Harnstoff;Harnstoff;21;mg/dL;21;mg/dL;17-49;
+2018-04-17;62;Niere;Harnstoff;Harnstoff;34.00;mg/dL;34.00;mg/dl;17-49;
+2018-06-13;62;Niere;Harnstoff;Harnstoff;46.00;mg/dL;46.00;mg/dl;17-49;
+2018-10-04;62;Niere;Harnstoff;Harnstoff;52.00;mg/dL;52.00;mg/dl;17-49;H
+2024-02-08;68;Niere;Harnstoff;Harnstoff;24;mg/dL;24;mg/dL;17-49;
+2024-12-01;68;Niere;Harnstoff;Harnstoff;26;mg/dL;26;mg/dl;18-55;
+2024-12-06;68;Niere;Harnstoff;Harnstoff;40;mg/dL;40;mg/dl;18-55;
+2025-01-06;69;Niere;Harnstoff;Harnstoff;40;mg/dL;40;mg/dl;18-55;
+2026-07-13;70;Niere;Harnstoff;Harnstoff;39;mg/dL;39;mg/dL;17-49;
+2026-07-17;70;Niere;Harnstoff;Harnstoff;39;mg/dL;39;mg/dL;17-49;
+2026-07-18;70;Niere;Harnstoff;Harnstoff;34;mg/dL;34;mg/dL;17-49;
+2026-07-21;70;Niere;Harnstoff;Harnstoff;34;mg/dL;34;mg/dL;17-49;
+2013-10-18;57;Niere;Harnsäure;Harnsäure;8.60;mg/dL;8.60;mg/dl;2.00-7.00;H
+2014-10-24;58;Niere;Harnsäure;Harnsäure;7.60;mg/dL;7.60;mg/dl;2.00-7.00;H
+2015-07-05;59;Niere;Harnsäure;Harnsäure;6.80;mg/dL;6.80;mg/dl;2.00-7.00;
+2017-08-06;61;Niere;Harnsäure;Harnsäure;7.90;mg/dL;7.90;mg/dl;2.00-7.00;H
+2017-11-22;61;Niere;Harnsäure;Harnsäure;7.00;mg/dL;7.00;mg/dl;2.00-7.00;
+2018-01-26;62;Niere;Harnsäure;Harnsäure;5.5;mg/dL;5.5;mg/dL;3.4-7.0;
+2018-01-29;62;Niere;Harnsäure;Harnsäure;5.50;mg/dL;5.50;mg/dl;2.00-7.00;
+2018-06-13;62;Niere;Harnsäure;Harnsäure;4.70;mg/dL;4.70;mg/dl;2.00-7.00;
+2018-10-04;62;Niere;Harnsäure;Harnsäure;7.70;mg/dL;7.70;mg/dl;2.00-7.00;H
+2019-04-07;63;Niere;Harnsäure;Harnsäure;8.40;mg/dL;8.40;mg/dl;2.00-7.00;H
+2019-07-10;63;Niere;Harnsäure;Harnsäure;7.60;mg/dL;7.60;mg/dl;2.00-7.00;H
+2025-07-07;69;Niere;Harnsäure;Harnsäure;6.8;mg/dL;6.8;mg/dL;3.4-7.0;
+2026-07-13;70;Niere;Harnsäure;Harnsäure;7.1;mg/dL;7.1;mg/dL;3.4-7.0;H
+2013-10-18;57;Niere;Kreatinin;Kreatinin;1.19;mg/dL;1.19;mg/dl;0.70-1.20;
+2015-07-05;59;Niere;Kreatinin;Kreatinin;1.22;mg/dL;1.22;mg/dl;0.70-1.20;H
+2017-11-22;61;Niere;Kreatinin;Kreatinin;1.17;mg/dL;1.17;mg/dl;0.70-1.20;
+2018-01-26;62;Niere;Kreatinin;Kreatinin;1.01;mg/dL;1.01;mg/dL;0.70-1.20;
+2018-01-29;62;Niere;Kreatinin;Kreatinin;1.01;mg/dL;1.01;mg/dl;0.70-1.20;
+2018-02-12;62;Niere;Kreatinin;Kreatinin;1.04;mg/dL;1.04;mg/dL;0.70-1.20;
+2018-02-13;62;Niere;Kreatinin;Kreatinin;0.97;mg/dL;0.97;mg/dL;0.70-1.20;
+2018-02-14;62;Niere;Kreatinin;Kreatinin;0.99;mg/dL;0.99;mg/dL;0.70-1.20;
+2018-02-14;62;Niere;Kreatinin;Kreatinin;0.98;mg/dL;0.98;mg/dL;0.70-1.20;
+2018-02-20;62;Niere;Kreatinin;Kreatinin;0.95;mg/dL;0.95;mg/dL;0.70-1.20;
+2018-04-17;62;Niere;Kreatinin;Kreatinin;1.12;mg/dL;1.12;mg/dl;0.70-1.20;
+2018-10-04;62;Niere;Kreatinin;Kreatinin;1.15;mg/dL;1.15;mg/dl;0.70-1.20;
+2019-04-07;63;Niere;Kreatinin;Kreatinin;1.01;mg/dL;1.01;mg/dl;0.70-1.20;
+2024-02-08;68;Niere;Kreatinin;Kreatinin;1.12;mg/dL;1.12;mg/dL;0.70-1.20;
+2024-12-01;68;Niere;Kreatinin;Kreatinin;0.89;mg/dL;0.89;mg/dl;0.70-1.20;
+2024-12-06;68;Niere;Kreatinin;Kreatinin;0.97;mg/dL;0.97;mg/dl;0.70-1.20;
+2025-01-06;69;Niere;Kreatinin;Kreatinin;0.97;mg/dL;0.97;mg/dl;0.70-1.20;
+2025-07-07;69;Niere;Kreatinin;Kreatinin;0.97;mg/dL;0.97;mg/dL;0.70-1.20;
+2026-07-13;70;Niere;Kreatinin;Kreatinin;1.08;mg/dL;1.08;mg/dL;0.70-1.20;
+2026-07-17;70;Niere;Kreatinin;Kreatinin;1.08;mg/dL;1.08;mg/dL;0.70-1.20;
+2026-07-18;70;Niere;Kreatinin;Kreatinin;1.02;mg/dL;1.02;mg/dL;0.70-1.20;
+2026-07-21;70;Niere;Kreatinin;Kreatinin;1.12;mg/dL;1.12;mg/dL;0.70-1.20;
+2018-01-26;62;Pankreas;Amylase;Amylase;66;U/L;66;U/L;28-100;
+2018-01-26;62;Pankreas;Lipase;Lipase;39;U/L;39;U/L;< 60;
+2018-02-13;62;Pankreas;Lipase;Lipase;57;U/L;57;U/L;< 60;
+2018-02-14;62;Pankreas;Lipase;Lipase;20;U/L;20;U/L;< 60;
+2024-12-01;68;Pankreas;Pankreas-Amylase;Pankreas-Amylase;29;U/L;29;U/l;13.0-53.0;
+2024-12-06;68;Pankreas;Pankreas-Amylase;P-Amylase;19;U/L;19;U/l;13.0-53.0;
+2025-01-06;69;Pankreas;Pankreas-Amylase;P-Amylase;19;U/L;19;U/l;13.0-53.0;
+2013-12-20;58;Schilddrüse;Calcitonin;Calcitonin;<2.00;pg/mL;<2.00;pg/mL;0.00-8.4;
+2013-12-20;58;Schilddrüse;PTH;PTH;41.2;pg/mL;41.2;pg/mL;14.0-72.0;
+2013-12-20;58;Schilddrüse;T3 Frei;T3 Frei;3.4;pg/mL;3.4;pg/mL;1.80-4.20;
+2013-12-20;58;Schilddrüse;T4 Frei;T4 Frei;13.4;pg/mL;13.4;pg/mL;5.9-19.70;
+2013-12-20;58;Schilddrüse;TG-AK;TG-AK;<20.00;U/mL;<20.00;U/mL;0.00-40.00;
+2013-12-20;58;Schilddrüse;TPO-AK;TPO-AK;<10.0;U/mL;<10.0;U/mL;0.00-50.00;
+2013-12-20;58;Schilddrüse;TSH;TSH;0.95;µU/mL;0.95;µU/mL;0.27-4.20;
+2018-01-26;62;Schilddrüse;TSH;TSH;0.97;mIU/L;0.97;mIU/L;0.27-4.20;
+2026-07-13;70;Schilddrüse;TSH;TSH;0.98;mIU/L;0.98;mIU/L;0.27-4.20;
+2013-10-18;57;Sonstige;Antioxid Kap.;Antioxid Kap.;385.00;µmol/l;385.00;µmol/l;> 2200;L
+2013-12-12;57;Sonstige;GGT;Gamma-Glutaminyltransferase;34.00;U/L;34.00;U/L;0.00-61.00;
+2015-07-05;59;Sonstige;GGT;Gamma-Glutaminyltransferase;13.00;U/L;13.00;U/L;0.00-61.00;
+2017-08-06;61;Sonstige;GGT;Gamma-Glutaminyltransferase;17.00;U/L;17.00;U/L;0.00-61.00;
+2018-01-29;62;Sonstige;GGT;Gamma-Glutaminyltransferase;20.00;U/L;20.00;U/L;0.00-61.00;
+2019-04-07;63;Sonstige;GGT;Gamma-Glutaminyltransferase;23.00;U/L;23.00;U/L;0.00-61.00;
+2013-10-18;57;Sonstige;Peroxide;Peroxide;7.00;µmol/l;7.00;µmol/l;< 300;
+2013-10-18;57;Stoffwechsel;Glucose;Glukose;94.00;mg/dL;94.00;mg/dl;60.00-100.00;
+2014-10-24;58;Stoffwechsel;Glucose;Glukose;96.00;mg/dL;96.00;mg/dl;60.00-100.00;
+2015-07-05;59;Stoffwechsel;Glucose;Glukose;85.00;mg/dL;85.00;mg/dl;60.00-100.00;
+2017-08-06;61;Stoffwechsel;Glucose;Glukose;91.00;mg/dL;91.00;mg/dl;60.00-100.00;
+2018-01-29;62;Stoffwechsel;Glucose;Glukose;88.00;mg/dL;88.00;mg/dl;60.00-100.00;
+2019-04-07;63;Stoffwechsel;Glucose;Glukose;77.00;mg/dL;77.00;mg/dl;60.00-100.00;
+2024-12-01;68;Stoffwechsel;Glucose;Glucose;127;mg/dL;127;mg/dl;82-115;H
+2024-12-06;68;Stoffwechsel;Glucose;Glukose;71;mg/dL;71;mg/dl;82-115;L
+2025-01-06;69;Stoffwechsel;Glucose;Glukose;71;mg/dL;71;mg/dl;82-115;L
+2025-07-07;69;Stoffwechsel;Glucose;Glucose nüchtern;88;mg/dL;88;mg/dL;60-100;
+2024-12-01;68;Stoffwechsel;Totalprotein;Totalprotein;6.3;g/dL;6.3;g/dl;6.40-8.30;L
+2024-12-06;68;Stoffwechsel;Totalprotein;G.Eiweiss;4.7;g/dL;4.7;g/dl;6.40-8.30;L
+2025-01-06;69;Stoffwechsel;Totalprotein;G.Eiweiss;4.7;g/dL;4.7;g/dl;6.40-8.30;L
+2013-10-18;57;Tumor-Marker;PSA;PSA;1.90;ng/mL;1.90;ng/ml;0.00-4.00;
+2014-10-24;58;Tumor-Marker;PSA;PSA;1.67;ng/mL;1.67;ng/ml;0.00-4.00;
+2015-07-05;59;Tumor-Marker;PSA;PSA;2.10;ng/mL;2.10;ng/ml;0.00-4.00;
+2017-08-06;61;Tumor-Marker;PSA;PSA;2.30;ng/mL;2.30;ng/ml;0.00-4.00;
+2019-07-10;63;Tumor-Marker;PSA;PSA;1.70;ng/mL;1.70;ng/ml;0.00-4.00;
+2025-07-07;69;Tumor-Marker;PSA;PSA;3.03;ng/mL;3.03;ng/mL;<4.00;

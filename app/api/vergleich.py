@@ -1,6 +1,5 @@
 """API: /vergleich – Mehrzeitraum-Vergleich als Pivot-Tabelle."""
 
-import sqlite3
 from datetime import date, timedelta
 
 from fastapi import APIRouter

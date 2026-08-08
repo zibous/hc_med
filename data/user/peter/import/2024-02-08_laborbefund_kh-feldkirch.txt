@@ -1,0 +1,29 @@
+Laborbefund vom 08.02.2024 09:00
+KLINISCHE CHEMIE --------
+Natrium 140 mmol/L 136-145
+Kalium 4.4 mmol/L 3.5-5.1
+Kreatinin 1.12 mg/dL 0.70-1.20
+GFR-CKD/1.73m2 67 L mL/min > 90
+Harnstoff 24 mg/dL 17-49
+Bilirubin gesamt 0.79 mg/dL < 1.20
+GOT (ASAT) 18 U/L < 50
+GPT (ALAT) 12 U/L < 50
+GGT 19 U/L < 60
+CRP hs 0.58 H mg/dL < 0.50
+Interleukin 6 3.2 pg/mL < 7.0
+GERINNUNG --------
+Quick 93 % 70-120
+INR (Quick) 1.04
+PTT Actin FS 29.7 Sek. 23.0-31.0
+HÄMATOLOGIE --------
+Leukocyten 17.8 H G/L 3.7-10.0
+Erythrocyten 5.68 T/L 4.60-5.70
+Hämoglobin 16.1 g/dL 13.0-17.5
+Hämatokrit 0.49 L/L 0.41-0.53
+MCV 85.4 fL 80.0-94.0
+MCH 28.3 pg 28.0-32.0
+MCHC 33.2 g/dL 32.0-36.0
+Thrombocyten su G/L 150-450
+Text Blutbild 8
+Thrombocyten nicht messbar, da Thromboplatten vorhanden sind. Neueinsendung
+eines CITRAT-Röhrchens erbeten.

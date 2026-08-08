@@ -1,0 +1,85 @@
+1. Dezember 2024 um 04:53 Uhr | Version: 10
+
+Hämatologie
+Blutbild
+Analyse Ergebnis Einheit Referenzbereiche In
+ter
+pre
+ta
+ti
+on
+Leukozyten 13.7 10^9/l 4.20- 9.10 +
+Thrombozyten 144 1) 10^9/l 140- 360
+Thrombozyten Bemerkung Text
+2)
+Erythrozyten 5.60 10^12/l 4.50- 5.90
+Hämoglobin 16.2 g/dl 13.5- 17.5
+Hämatokrit 48.9 % 40.0- 53.0
+MCV 87.3 fl 80.0- 96.0
+MCH 28.9 pg 28.0- 33.0
+MCHC 33.1 g/dl 33.0- 36.0
+RDW-CV 14.0 % 11.6- 14.4
+Neutroph. Gran. abs. 10.66 10^9/l 1.60- 7.10 +
+Unreife neutrophile Granulozyten abs. 0.05 10^9/l
+Lymphozyten abs. 1.83 10^9/l 1.00- 2.90
+Monozyten abs. 1.10 10^9/l 0.20- 0.60 +
+Eosinophile Gr. abs. 0.05 10^9/l 0.06- 0.46 -
+Basophile Gr.abs. 0.02 10^9/l 0.00- 0.08
+Neutroph. Gran. rel. 78.0 % 40.0- 75.0 +
+Lymphozyten rel. 13.4 % 18.0- 48.0 -
+Monozyten rel. 8.1 % 4.0- 11.0
+Eosinophile Gr. rel. 0.4 % 0.0- 8.4
+Basophile Gr.rel. 0.1 % 0.0- 1.5
+Gran., unreife rel. 0.4 %
+Normoblasten (NRBC) abs. 0.00 10^9/l 0.00- 0.00
+Normoblast.(NRBC)Rt. 0.0 % 0.0- 0.0
+MPV (Mittleres Thrombozytenvolumen) 10.6 1) fl 9.4- 12.9
+1) aus ThromboExact 
+2) Patient/in hat eine EDTA-assoziierte Thrombozytenaggregation. Bitte bei 
+jeder weiteren Blutbildabnahme zusätzlich zum EDTA-Röhrchen ein 
+ThromboExact-Röhrchen abnehmen. 
+PDF-Erstellung_am_2026-07-22_08-44_Siebler_Hans-Peter.pdf Seite 1 von 4
+Patient: Hans-Peter Siebler geboren am: 16. Dezember 1955
+Gerinnung/Hämostaseologie
+Hämostaseologie Globaltests
+Analyse Ergebnis Einheit Referenzbereiche In
+ter
+pre
+ta
+ti
+on
+PTZ (Prothrombinz.) 82 % >70
+INR 1.14
+aPTT 29.9 sek 24.0- 35.0
+Klinische Chemie/Proteindiagnostik
+Klinische Chemie
+Analyse Ergebnis Einheit Referenzbereiche In
+ter
+pre
+ta
+ti
+on
+CRP 5.28 mg/dl -0.49 +
+Natrium 138 mmol/l 136.0- 145.0
+Kalium 4.2 mmol/l 3.50- 5.10
+Chlorid 102 mmol/l 98.0- 107.0
+Kreatinin 0.89 mg/dl 0.70- 1.20
+GFR (CKD-EPI) 87 ml/min/kof >80
+Harnstoff 26 mg/dl 18- 55
+ASAT (GOT) 13 U/l -50
+ALAT (GPT) 12 U/l -50
+Gamma-GT 18 U/l -59
+Alk.Phosphatase (AP) 72 U/l 40- 129
+Cholinesterase 11641 U/l 5320- 12920
+Bilirubin 1.28 mg/dl 0.000- 1.200 +
+Pankreas-Amylase 29 U/l 13.0- 53.0
+LDH 164 U/l -250
+Glucose 127 mg/dl 82- 115 +
+Proteindiagnostik
+Analyse Ergebnis Einheit Referenzbereiche In
+ter
+pre
+ta
+ti
+on
+Totalprotein 6.3 g/dl 6.40- 8.30 

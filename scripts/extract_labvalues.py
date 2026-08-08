@@ -1188,7 +1188,7 @@ def detect_format(filepath: Path) -> str:
 
 def main():
     all_results: list[dict] = []
-    file_results: list[tuple[str, str, list[dict]]] = []  # (filename, format, results)
+    file_results: list[tuple[str, str, list[dict], bool]] = []  # (filename, format, results, nuechtern)
 
     txt_files = sorted(BEFUNDE_DIR.glob("*.txt")) + sorted(BEFUNDE_DIR.glob("*.csv"))
     # Output-Datei und Vorlage ausschließen
@@ -1458,7 +1458,7 @@ def main():
 
     berechnet_total = non_hdl_added + chol_hdl_added + ldl_hdl_added
     if berechnet_total:
-        print(f"\n  📐 Berechnete Werte:")
+        print("\n  📐 Berechnete Werte:")
         if non_hdl_added:
             print(f"    Non-HDL-Cholesterin: {non_hdl_added} (Cholesterin − HDL)")
         if chol_hdl_added:

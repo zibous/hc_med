@@ -35,7 +35,7 @@ def berechne_vorjahresvergleich(conn: sqlite3.Connection) -> dict:
         aktuell_str = row["wert_norm"]
         einheit = row["einheit_norm"] or ""
         flag_aktuell = row["flag"]
-        norm = row["normbereich"] or ""
+        _ = row["normbereich"] or ""
 
         # Wert vor 12+ Monaten
         vorjahr_row = conn.execute("""

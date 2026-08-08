@@ -1,0 +1,18 @@
+patient:
+  guest:
+    vorname: "Max"
+    nachname: "Mustermann"
+    geburtsdatum: "1960-10-16"
+    geschlecht: "m"
+
+  peter:
+    vorname: "Hans-Peter"
+    nachname: "Siebler"
+    geburtsdatum: "1955-12-16"
+    geschlecht: "m"
+
+  reni:
+    vorname: "Reni"
+    nachname: "Siebler"
+    geburtsdatum: "1958-01-02"
+    geschlecht: "w"

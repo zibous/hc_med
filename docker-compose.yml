@@ -8,10 +8,10 @@ services:
       - "8065:5065"
 
     volumes:
-      - ${PWD}/data:/app/data
-      - ${PWD}/app:/app/app
-      - ${PWD}/frontend:/app/frontend
-      - ${PWD}/logs:/app/logs
+      - ./data:/app/data
+      - ./app:/app/app
+      - ./frontend:/app/frontend
+      - ./logs:/app/logs
 
     environment:
       - TZ=Europe/Vaduz

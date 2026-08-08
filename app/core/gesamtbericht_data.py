@@ -6,7 +6,7 @@ um alle relevanten Labor-Daten zusammenzuführen.
 
 import sqlite3
 
-from app.config.settings import EMPFEHLUNGEN_TESTS, GROUP_CONFIG, GROUP_DESCRIPTIONS, KURZNAMEN
+from app.config.settings import GROUP_CONFIG, KURZNAMEN
 from app.core.empfehlungen import get_test_empfehlung
 
 
@@ -720,13 +720,13 @@ def _detail_beschreibung(test: str, pct: int) -> str:
         "LDL": f"LDL-Cholesterin {intensitaet.lower()} verschlechtert",
         "Quotient Chol/HDL": f"Cholesterin-Verhältnis {intensitaet.lower()} verschlechtert",
         "Quick": f"{intensitaet} beschleunigte Blutgerinnung",
-        "Leukozyten": f"Veränderung der weißen Blutkörperchen",
-        "GFR": f"Rückgang der Nierenfiltrationsleistung – Nierenwerte kontrollieren",
-        "HbA1c": f"Anstieg des Langzeitblutzuckers – Trend zum Diabetes",
-        "HbA1c (IFCC)": f"Anstieg des Langzeitblutzuckers (IFCC)",
-        "Harnsäure": f"Anstieg der Harnsäure – Gichtrisiko",
-        "Hämatokrit": f"Veränderung der Blutdicke",
-        "Hämoglobin": f"Veränderung des roten Blutfarbstoffs",
+        "Leukozyten": "Veränderung der weißen Blutkörperchen",
+        "GFR": "Rückgang der Nierenfiltrationsleistung – Nierenwerte kontrollieren",
+        "HbA1c": "Anstieg des Langzeitblutzuckers – Trend zum Diabetes",
+        "HbA1c (IFCC)": "Anstieg des Langzeitblutzuckers (IFCC)",
+        "Harnsäure": "Anstieg der Harnsäure – Gichtrisiko",
+        "Hämatokrit": "Veränderung der Blutdicke",
+        "Hämoglobin": "Veränderung des roten Blutfarbstoffs",
     }
 
     return beschreibungen.get(test, f"{intensitaet} Veränderung")

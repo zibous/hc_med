@@ -1,0 +1,153 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# VORLAGE für neuen Laborbefund
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# ANLEITUNG:
+# 1. Diese Datei kopieren und umbenennen:
+#    YYYY-MM-DD_laborbefund_QUELLE.txt  (z.B. 2026-08-15_laborbefund_praxis-zuend.txt)
+#
+# 2. Datum im Dateinamen = Befund-Datum (wird automatisch erkannt)
+#
+# 3. Nüchtern-Status angeben (wichtig für Triglyceride/Cholesterin):
+#    # nüchtern: ja     (oder weglassen = Standard)
+#    # nüchtern: nein   (Blutabnahme NICHT nüchtern)
+#
+# 4. Nur die gemessenen Tests ausfüllen, Rest löschen oder leer lassen
+#    - Wert eintragen (Komma oder Punkt als Dezimaltrenner OK)
+#    - Path-Spalte: * für pathologisch (oder leer lassen → wird automatisch berechnet)
+#    - Einheit und Referenz sind vorausgefüllt
+#
+# 4. Datei speichern, dann auf dem Server:
+#    make labor-reset
+#
+# 5. Fertig! Dashboard zeigt neue Werte.
+#
+# HINWEIS: Zeilen mit # am Anfang und leere Wert-Felder werden ignoriert.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# nüchtern: nein
+
+Kürzel	Bezeichnung	Path	Wert	Einh.	Referenz
+
+# ─── BLUTBILD ────────────────────────────────────────────────────────────────
+LEUK	Leukozyten		 	10^9/L	3.7 - 10.0 10^9/L
+ERY	Erythrozyten		 	10^12/L	4.5 - 5.9 10^12/L
+HB	Hämoglobin		 	g/dL	13.0 - 17.5 g/dL
+HK	Hämatokrit		 	%	41 - 53 %
+MCV	MCV		 	fL	80 - 96 fL
+MCH	MCH		 	pg	28 - 33 pg
+MCHC	MCHC		 	g/dL	33.0 - 36.0 g/dL
+RDW	RDW		 	%	11.5 - 14.5 %
+THRO	Thrombozyten		 	10^9/L	150 - 450 10^9/L
+MPV	MPV		 	fL	7.0 - 12.0 fL
+EISEN	Eisen		 	µg/dL	50 - 170 µg/dL
+FERR	Ferritin		 	ng/mL	30 - 300 ng/mL
+
+# ─── DIFFERENTIALBLUTBILD ─────────────────────────────────────────────────────
+NEUT-A	Neutrophile abs.		 	10^9/L	1.5 - 6.7 10^9/L
+NEUT-R	Neutrophile rel.		 	%	40 - 75 %
+LYMP-A	Lymphozyten abs.		 	10^9/L	1.0 - 3.5 10^9/L
+LYMP-R	Lymphozyten rel.		 	%	20 - 45 %
+MONO-A	Monozyten abs.		 	10^9/L	0.2 - 0.8 10^9/L
+MONO-R	Monozyten rel.		 	%	2 - 12 %
+EOS-A	Eosinophile abs.		 	10^9/L	0.0 - 0.5 10^9/L
+EOS-R	Eosinophile rel.		 	%	0 - 7 %
+BASO-A	Basophile abs.		 	10^9/L	0.0 - 0.1 10^9/L
+BASO-R	Basophile rel.		 	%	0 - 2 %
+GRAN-A	Granulozyten abs.		 	10^9/L	1.8 - 7.0 10^9/L
+GRAN-R	Granulozyten rel.		 	%	40 - 75 %
+
+# ─── ENTZÜNDUNG ───────────────────────────────────────────────────────────────
+CRP	CRP		 	mg/dL	< 0.50 mg/dL
+IL6	Interleukin-6		 	pg/mL	< 7.0 pg/mL
+PCT	Procalcitonin		 	ng/mL	< 0.5 ng/mL
+BSG	BSG 1h		 	mm	< 20 mm
+SENK	Senkung		 	mm	< 20 mm
+
+# ─── LEBER ────────────────────────────────────────────────────────────────────
+GOT	GOT (ASAT)		 	U/L	< 50 U/L
+GPT	GPT (ALAT)		 	U/L	< 50 U/L
+GGT	GGT		 	U/L	< 60 U/L
+AP	Alk.Phosphatase (AP)		 	U/L	40 - 129 U/L
+BILI	Bilirubin gesamt		 	mg/dL	< 1.2 mg/dL
+LDH	LDH		 	U/L	< 250 U/L
+CHE	Cholinesterase		 	U/L	5300 - 12900 U/L
+
+# ─── NIERE ────────────────────────────────────────────────────────────────────
+KREA	Kreatinin		 	mg/dL	0.70 - 1.20 mg/dL
+GFR	GFR-CKD Krea		 	mL/min	> 90 mL/min
+HAST	Harnstoff		 	mg/dL	15 - 45 mg/dL
+HS	Harnsäure		 	mg/dL	3.4 - 7.0 mg/dL
+
+# ─── ELEKTROLYTE ──────────────────────────────────────────────────────────────
+NA	Natrium		 	mmol/L	136 - 145 mmol/L
+K	Kalium		 	mmol/L	3.5 - 5.1 mmol/L
+CL	Chlorid		 	mmol/L	98 - 107 mmol/L
+CA	Calcium		 	mg/dL	8.6 - 10.2 mg/dL
+MG	Magnesium		 	mg/dL	1.6 - 2.6 mg/dL
+PHOS	Phosphat		 	mg/dL	2.5 - 4.5 mg/dL
+
+# ─── STOFFWECHSEL ─────────────────────────────────────────────────────────────
+GLUC	Glucose nüchtern		 	mg/dL	60 - 100 mg/dL
+HBA1C	HbA1c (NGSP)		 	%Hb	3.8 - 5.7 %Hb
+HBA1CI	HbA1c (IFCC)		 	mmol/mol	20 - 42 mmol/mol
+TPRO	Totalprotein		 	g/dL	6.4 - 8.3 g/dL
+
+# ─── LIPIDE ───────────────────────────────────────────────────────────────────
+CHO	Cholesterin		 	mg/dL	< 200 mg/dL
+HDL	HDL-Cholesterin		 	mg/dL	> 40 mg/dL
+LDL	LDL-Cholesterin		 	mg/dL	< 150 mg/dL
+NONHDL	Non-HDL-Cholesterin		 	mg/dL	< 160 mg/dL
+TRI	Triglyceride		 	mg/dL	< 200 mg/dL
+QHDL	Quotient Chol/HDL		 		0.0 - 5.0
+QLDL	Quotient LDL/HDL		 		0.0 - 3.0
+
+# ─── PANKREAS ─────────────────────────────────────────────────────────────────
+AMY	Amylase		 	U/L	< 100 U/L
+PAMY	Pankreas-Amylase		 	U/L	< 53 U/L
+LIP	Lipase		 	U/L	< 60 U/L
+
+# ─── GERINNUNG ────────────────────────────────────────────────────────────────
+QUICK	Quick		 	%	70 - 120 %
+INR	INR		 		0.8 - 1.3
+APTT	aPTT		 	Sek.	23 - 35 Sek.
+
+# ─── SCHILDDRÜSE ──────────────────────────────────────────────────────────────
+TSH	TSH		 	µU/mL	0.27 - 4.20 µU/mL
+
+# ─── TUMOR-MARKER ─────────────────────────────────────────────────────────────
+PSA	PSA		 	ng/mL	< 4.00 ng/mL
+
+# ─── AUTOIMMUN ────────────────────────────────────────────────────────────────
+CCPR	Anti-CCP		 	U/mL	< 17 U/mL
+RF	Rheumafaktor		 	U/mL	< 14 U/mL
+ACA	Anti-Cardiolipin Ak (ACA)		 	U/mL	< 10.0 U/mL
+
+# ─── HARNANALYSE ──────────────────────────────────────────────────────────────
+U-SPEZ	Spez. Gewicht		 		1015 - 1025
+U-PH	pH-Wert		 		5.00 - 8.00
+U-ZYL	Hyaline Zylinder		 	/µL	0 - 2 /µL
+U-SCHL	Schleim		 		negativ
+U-PLAT	Plattenepithel.		 	/µL	0 - 15 /µL
+
+# ─── HORMONE ──────────────────────────────────────────────────────────────────
+TESTO	Testosteron		 	ng/mL	2.5 - 8.0 ng/mL
+MYOGL	Myoglobin		 	ng/mL	28 - 72 ng/mL
+
+# ─── OXIDATIVER STRESS ────────────────────────────────────────────────────────
+PEROX	Peroxide		 	CARR U	< 300 CARR U
+ANTIOX	Antioxid Kap.		 	µmol/L	> 2200 µmol/L
+
+# ─── KÖRPERDATEN (von Waage/Messung) ─────────────────────────────────────────
+# Diese werden normalerweise über scripts/import_scale.py importiert.
+# Nur manuell eintragen wenn keine automatische Quelle vorhanden.
+#GEW	Gewicht		 	kg	
+#BMI	BMI		 		22 - 27
+#FETT	Fettgehalt		 	%	13 - 25 %
+#FETTKG	Fett		 	kg	
+#MUSK	Muskelmasse		 	%	
+#WASS	Körperwasser		 	%	55 - 65 %
+#VISZ	Viszeralfett		 		1 - 12
+#FFM	Fettfreie Masse		 	kg	
+#PROT	Proteinanteil		 	%	
+#KNOCH	Knochenmasse		 	kg	
