@@ -8,7 +8,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from app.config.settings import PATIENT_CONFIG, TEST_DESCRIPTIONS, KURZNAMEN
+from app.config.settings import TEST_DESCRIPTIONS, KURZNAMEN, get_patient_config
 from app.core.empfehlungen import get_test_empfehlung
 from app.core.norm_bar import norm_bar_html
 from app.core.vergleich import berechne_vorjahresvergleich
@@ -173,7 +173,7 @@ async def bericht_charts(request: Request, befunde: int = 0, period: str = "", s
         "request": request,
         "now": datetime.now().strftime("%d.%m.%Y %H:%M"),
         "period_label": period_label,
-        "patient": PATIENT_CONFIG,
+        "patient": get_patient_config(),
         "tests_data": tests_data,
         "charts_json": json.dumps(tests_data, ensure_ascii=False),
         "zusammenfassung": _build_zusammenfassung(tests_data),
@@ -213,7 +213,7 @@ async def bericht(request: Request, period: str = "1m"):
         "request": request,
         "now": datetime.now().strftime("%d.%m.%Y %H:%M"),
         "period_label": PERIOD_LABELS.get(period, period),
-        "patient": PATIENT_CONFIG,
+        "patient": get_patient_config(),
         "total": total, "path_total": path_total,
         "norm_pct": round((total - path_total) / total * 100) if total > 0 else 100,
         "zeitraum_von": zeitraum[0], "zeitraum_bis": zeitraum[1],

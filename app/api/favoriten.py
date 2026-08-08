@@ -6,24 +6,29 @@ import yaml
 from fastapi import APIRouter
 
 from app.config.settings import KURZNAMEN
-from app.infrastructure.database import get_db
+from app.infrastructure.database import get_db, get_user_data_path
 
 router = APIRouter(prefix="/api", tags=["favoriten"])
 
-FAVORITEN_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "favoriten.yaml"
+
+def _favoriten_path() -> Path:
+    """Gibt den Pfad zur Favoriten-Datei des aktiven Users zurück."""
+    return get_user_data_path() / "favoriten.yaml"
 
 
 def _load_favoriten() -> list[str]:
     """Lädt die Favoriten-Liste aus der YAML-Datei."""
-    if not FAVORITEN_PATH.exists():
+    path = _favoriten_path()
+    if not path.exists():
         return []
-    data = yaml.safe_load(FAVORITEN_PATH.read_text(encoding="utf-8")) or {}
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     return data.get("favoriten", [])
 
 
 def _save_favoriten(favoriten: list[str]) -> None:
     """Speichert die Favoriten-Liste in die YAML-Datei."""
-    FAVORITEN_PATH.write_text(
+    path = _favoriten_path()
+    path.write_text(
         yaml.dump({"favoriten": favoriten}, allow_unicode=True, default_flow_style=False),
         encoding="utf-8",
     )

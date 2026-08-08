@@ -16,6 +16,8 @@ import sqlite3
 from datetime import date
 from pathlib import Path
 
+# Es hat noch einen hardcoded DB_PATH als Default, aber das ist jetzt egal weil 
+# extract_labvalues.py explizit LaborDB(db_path=DB_FILE) übergibt.
 DB_PATH = Path(__file__).parent.parent / "data" / "labor.db"
 
 

@@ -7,84 +7,129 @@ Liest die Waage-Datenbank und importiert:
 - Muskelmasse (%)
 - Körperwasser (%)
 
+Multi-User: Nutzt userlist.yaml für Pfade und Patientendaten.
 Wird beim `make labor-reset` automatisch aufgerufen.
 """
 
 import sqlite3
+import sys
+from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
 import yaml
 
 # Pfade
-SCALE_DB = Path("/dockerapps/apps_v2/hc_scale/data/miscaledata.db")
-SCALE_DB_ALT = Path(__file__).parent.parent.parent / "hc_scale" / "data" / "miscaledata.db"
-MED_DB = Path(__file__).parent.parent / "data" / "labor.db"
-CONFIG_PATH = Path(__file__).parent.parent / "data" / "labor_config.yaml"
-
-# Config laden
-_config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
-_patient = _config.get("patient", {})
-
-PATIENT_GEBURTSDATUM = date(*[int(x) for x in _patient.get("geburtsdatum", "1955-12-16").split("-")])
-PATIENT_NAME = "Peter"  # Name in hc_scale DB
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_DIR = SCRIPT_DIR.parent
+DATA_DIR = PROJECT_DIR / "data"
+USERLIST_PATH = DATA_DIR / "userlist.yaml"
 
 
-def get_scale_db() -> Path:
-    """Findet die hc_scale Datenbank."""
-    if SCALE_DB.exists():
-        return SCALE_DB
-    if SCALE_DB_ALT.exists():
-        return SCALE_DB_ALT
-    return None
+def load_userlist() -> dict:
+    """Lädt die Userliste."""
+    if not USERLIST_PATH.exists():
+        return {}
+    data = yaml.safe_load(USERLIST_PATH.read_text(encoding="utf-8")) or {}
+    return data.get("patient", {})
 
 
-def calculate_age(measurement_date: str) -> int:
+def calculate_age(measurement_date: str, geburtsdatum: date) -> int:
     """Berechnet das Alter zum Messzeitpunkt."""
     try:
         parts = measurement_date.split("-")
         d = date(int(parts[0]), int(parts[1]), int(parts[2]))
-        age = d.year - PATIENT_GEBURTSDATUM.year
-        if (d.month, d.day) < (PATIENT_GEBURTSDATUM.month, PATIENT_GEBURTSDATUM.day):
+        age = d.year - geburtsdatum.year
+        if (d.month, d.day) < (geburtsdatum.month, geburtsdatum.day):
             age -= 1
         return age
     except (ValueError, IndexError):
         return 0
 
 
-def import_scale_data():
-    """Importiert Waage-Daten aus hc_scale in die hc_med DB."""
-    scale_path = get_scale_db()
-    if not scale_path:
-        print("  ⚠️  hc_scale DB nicht gefunden – Körperdaten-Import übersprungen")
-        return 0
+def resolve_scale_db(scaledb_path: str) -> Path | None:
+    """Löst den scaledb-Pfad relativ zum DATA_DIR auf."""
+    if not scaledb_path:
+        return None
+    # Relativ zum data/ Verzeichnis auflösen
+    resolved = (DATA_DIR / scaledb_path).resolve()
+    if resolved.exists():
+        return resolved
+    # Absoluter Pfad als Fallback
+    abs_path = Path(scaledb_path)
+    if abs_path.exists():
+        return abs_path
+    return None
 
-    if not MED_DB.exists():
-        print("  ⚠️  hc_med DB nicht gefunden – erst make labor ausführen")
-        return 0
 
-    # Scale-Daten lesen (nur Peter, tägliche Werte)
+def import_scale_data(user_id: str | None = None):
+    """Importiert Waage-Daten aus hc_scale in die hc_med DB.
+
+    Args:
+        user_id: Optionaler User-ID. Wenn None, werden alle User importiert.
+    """
+    users = load_userlist()
+    if not users:
+        print("  ⚠️  userlist.yaml nicht gefunden oder leer")
+        return
+
+    if user_id:
+        if user_id not in users:
+            print(f"  ⚠️  User '{user_id}' nicht in userlist.yaml")
+            return
+        users = {user_id: users[user_id]}
+
+    total_imported = 0
+    for uid, info in users.items():
+        scaledb_str = info.get("scaledb", "")
+        if not scaledb_str:
+            continue
+
+        med_db_path = DATA_DIR / "user" / uid / "labor.db"
+        if not med_db_path.exists():
+            print(f"  ⚠️  [{uid}] labor.db nicht vorhanden – übersprungen")
+            continue
+
+        scale_path = resolve_scale_db(scaledb_str)
+        if not scale_path:
+            print(f"  ⚠️  [{uid}] Scale-DB nicht gefunden: {scaledb_str}")
+            continue
+
+        count = _import_for_user(uid, info, scale_path, med_db_path)
+        total_imported += count
+
+    if total_imported:
+        print(f"\n  ✓ Gesamt: {total_imported} Körperdaten importiert")
+
+
+def _import_for_user(uid: str, info: dict, scale_path: Path, med_db_path: Path) -> int:
+    """Importiert Scale-Daten für einen einzelnen User."""
+    vorname = info.get("vorname", "")
+    geburtsdatum_str = info.get("geburtsdatum", "1960-01-01")
+    geburtsdatum = date(*[int(x) for x in geburtsdatum_str.split("-")])
+
+    # Scale-Daten lesen (Name = Vorname des Users)
     scale_conn = sqlite3.connect(str(scale_path))
     rows = scale_conn.execute("""
         SELECT date, weight, bmi, fat, muscle, water, visceral, lbm, protein, poi
         FROM daily_miscale
         WHERE name=? AND weight > 0
         ORDER BY date
-    """, (PATIENT_NAME,)).fetchall()
+    """, (vorname,)).fetchall()
     scale_conn.close()
 
     if not rows:
-        print(f"  ⚠️  Keine Daten für '{PATIENT_NAME}' in hc_scale gefunden")
+        print(f"  ⚠️  [{uid}] Keine Daten für '{vorname}' in hc_scale")
         return 0
 
     # In hc_med DB importieren
-    med_conn = sqlite3.connect(str(MED_DB))
+    med_conn = sqlite3.connect(str(med_db_path))
     med_conn.execute("PRAGMA journal_mode=WAL")
 
     # Patient-ID holen
     patient = med_conn.execute("SELECT id FROM patienten LIMIT 1").fetchone()
     if not patient:
-        print("  ⚠️  Kein Patient in hc_med DB")
+        print(f"  ⚠️  [{uid}] Kein Patient in labor.db")
         med_conn.close()
         return 0
     patient_id = patient[0]
@@ -115,23 +160,20 @@ def import_scale_data():
         ("poi", "Knochenmasse", "kg", "10-15"),
     ]
 
-    # Nicht jeden Tag importieren – nur wöchentliche Durchschnitte für übersichtliche Charts
-    from collections import defaultdict
+    # Pro Monat: letzten Wert nehmen (kompakter)
     weekly = defaultdict(list)
     for row in rows:
-        # Woche berechnen (ISO-Woche)
         d = row[0]  # YYYY-MM-DD
-        weekly[d[:7]].append(row)  # Pro Monat gruppieren (kompakter)
+        weekly[d[:7]].append(row)
 
     insert_rows = []
     for month, month_rows in sorted(weekly.items()):
-        # Letzten Wert des Monats nehmen
         r = month_rows[-1]
         datum = r[0]
-        alter = calculate_age(datum)
+        alter = calculate_age(datum, geburtsdatum)
 
         for i, (col, test, einheit, norm) in enumerate(TESTS):
-            val = r[i + 1]  # weight=1, bmi=2, fat=3, muscle=4, water=5
+            val = r[i + 1]
             if val and val > 0:
                 # Flag berechnen
                 flag = ""
@@ -163,9 +205,11 @@ def import_scale_data():
     med_conn.commit()
     med_conn.close()
 
-    print(f"  ✓ {len(insert_rows)} Körperdaten aus hc_scale importiert ({len(weekly)} Monate)")
+    print(f"  ✓ [{uid}] {len(insert_rows)} Körperdaten importiert ({len(weekly)} Monate)")
     return len(insert_rows)
 
 
 if __name__ == "__main__":
-    import_scale_data()
+    # Optional: User-ID als Argument
+    user = sys.argv[1] if len(sys.argv) > 1 else None
+    import_scale_data(user)

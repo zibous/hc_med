@@ -2,6 +2,8 @@
 
 Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extraktion aus verschiedenen Befund-Formaten, SQLite-Datenbank, interaktivem Web-Dashboard und druckbarem Arztbericht.
 
+**Multi-User**: Jeder Patient hat ein eigenes Datenverzeichnis mit separater DB. User-Wechsel per Dropdown im Header (Cookie-basiert).
+
 ## Übersicht
 
 ```
@@ -9,33 +11,57 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 │                         hc_med – Architektur                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
-│  ┌──────────────┐     ┌──────────────┐     ┌────────────────────────┐   │
-│  │  Befund-TXT  │────▶│  Parser      │────▶│  SQLite (labor.db)     │   │
-│  │  PDF → Text  │     │  7 Formate   │     │  1300+ Messwerte       │   │
-│  │  hc_scale DB │     │  Validierung │     │  Normalisiert          │   │
-│  └──────────────┘     └──────────────┘     └────────────┬───────────┘   │
-│                                                         │               │
-│                                                         ▼               │
-│                              ┌───────────────────────────────────┐      │
-│                              │  FastAPI Backend (Port 5065)      │      │
-│                              │  8 Router-Module (je <150 Zeilen) │      │
-│                              │  Bewertung + Empfehlungen (Core)  │      │
-│                              └───────────────┬───────────────────┘      │
-│                                              │                          │
-│                                              ▼                          │
-│                              ┌───────────────────────────────────┐      │
-│                              │  Frontend (Chart.js + ES6)        │      │
-│                              │  Übersicht → Gruppe → Trend       │      │
-│                              │  Verknüpfungen · Arztbericht      │      │
-│                              └───────────────────────────────────┘      │
+│  ┌──────────────┐     ┌──────────────┐     ┌────────────────────────┐  │
+│  │  Befund-TXT  │────▶│  Parser      │────▶│  SQLite (per User)     │  │
+│  │  PDF → Text  │     │  7 Formate   │     │  data/user/{id}/       │  │
+│  │  hc_scale DB │     │  Validierung │     │  labor.db              │  │
+│  └──────────────┘     └──────────────┘     └────────────┬───────────┘  │
+│                                                         │              │
+│                                                         ▼              │
+│                              ┌───────────────────────────────────┐     │
+│                              │  FastAPI Backend (Port 5065)      │     │
+│                              │  Middleware: User aus Cookie       │     │
+│                              │  ContextVar → get_db() per User   │     │
+│                              └───────────────┬───────────────────┘     │
+│                                              │                         │
+│                                              ▼                         │
+│                              ┌───────────────────────────────────┐     │
+│                              │  Frontend (Chart.js + ES6)        │     │
+│                              │  User-Selector · Drilldown        │     │
+│                              │  Verknüpfungen · Arztbericht      │     │
+│                              └───────────────────────────────────┘     │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+## Multi-User Konzept
+
+Jeder User hat ein eigenes Verzeichnis unter `data/user/{id}/`:
+
+```
+data/
+├── labor_config.yaml          ← Shared: Gruppen, Tests, Verknüpfungen
+├── userlist.yaml              ← User-Stammdaten + scaledb-Pfade
+└── user/
+    ├── guest/                 ← Demo-User (wird versioniert)
+    │   ├── import/            ← Befund-Dateien (.txt, .csv)
+    │   └── favoriten.yaml
+    ├── peter/                 ← Echte Patientendaten (gitignored)
+    │   ├── import/            ← Befund-Dateien
+    │   ├── labor.db           ← SQLite DB (generiert)
+    │   ├── laborwerte_gesamt.csv
+    │   └── favoriten.yaml
+    └── reni/
+        ├── import/
+        └── favoriten.yaml
+```
+
+**User-Auswahl**: Cookie `hc_user` → Middleware setzt ContextVar → `get_db()` gibt automatisch die richtige DB zurück. Kein Umbau der API-Endpoints nötig.
+
 ## Datenverarbeitung – Pipeline
 
 ```
-  data/befunde/*.txt + hc_scale DB
+  data/user/{id}/import/*.txt + hc_scale DB
         │
         ▼
 ┌───────────────────────────────────────────────────────┐
@@ -43,7 +69,7 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 │  2. PARSING (pro Format ein Parser)                   │
 │  3. NORMALISIERUNG (Testnamen, Einheiten, rel/abs)    │
 │  4. VALIDIERUNG (Plausibilitäts-Ranges)               │
-│  5. AUSGABE → SQLite + CSV                            │
+│  5. AUSGABE → data/user/{id}/labor.db + CSV           │
 └───────────────────────────────────────────────────────┘
 ```
 
@@ -51,76 +77,97 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 
 ```
 app/
-├── main.py                      # FastAPI App, Logging, Lifespan, Router-Registry
+├── main.py                      # FastAPI, Middleware (User-Cookie), Router
 ├── api/                         # Router (je ein Endpoint-Bereich)
-│   ├── overview.py              (84 Z.)  /overview
-│   ├── gruppe.py                (66 Z.)  /gruppe/{name}
-│   ├── trend.py                 (70 Z.)  /trend/{test}
-│   ├── verknuepfung.py          (56 Z.)  /verknuepfungen, /verknuepfung/{name}
-│   ├── pathologisch.py          (77 Z.)  /pathologisch
-│   ├── bericht.py               (137 Z.) /bericht, /bericht/charts
-│   ├── kpidata.py               (52 Z.)  /kpidata (für dbo)
-│   └── tests_router.py          (20 Z.)  /tests
+│   ├── overview.py              /overview
+│   ├── gruppe.py                /gruppe/{name}
+│   ├── trend.py                 /trend/{test}
+│   ├── verknuepfung.py          /verknuepfungen, /verknuepfung/{name}
+│   ├── pathologisch.py          /pathologisch
+│   ├── bericht.py               /bericht, /bericht/charts
+│   ├── gesamtbericht.py         /gesamtbericht
+│   ├── favoriten.py             /favoriten (per User)
+│   ├── vergleich.py             /vergleich
+│   ├── alle_tests.py            /alle-tests
+│   ├── kpidata.py               /kpidata (für dbo)
+│   └── tests_router.py          /tests
 ├── config/
-│   └── settings.py              (18 Z.)  YAML-Config laden
+│   └── settings.py              YAML-Config + get_patient_config()
 ├── core/                        # Business Logic
-│   ├── bewertung.py             (75 Z.)  Bewertungslogik (Texte aus YAML)
-│   └── empfehlungen.py          (233 Z.) Empfehlungslogik (Verknüpfungen)
+│   ├── bewertung.py             Bewertungslogik
+│   ├── empfehlungen.py          Empfehlungslogik
+│   ├── vergleich.py             Vorjahresvergleich
+│   ├── gesamtbericht_data.py    Report-Assembly
+│   └── norm_bar.py              Normbereich-Visualisierung
 └── infrastructure/
-    └── database.py              (18 Z.)  SQLite-Zugriff
+    └── database.py              ContextVar-basiert, Multi-User get_db()
 ```
 
-## Projektstruktur (komplett)
+## Projektstruktur
 
 ```
 hc_med/
 ├── app/                         # Backend (FastAPI)
 ├── frontend/
-│   ├── templates/
-│   │   ├── index.html           # Dashboard SPA-Shell
-│   │   ├── bericht_charts.html  # Arztbericht mit Charts (Jinja2)
-│   │   └── bericht_tabelle.html # Arztbericht Tabellen (Jinja2)
+│   ├── templates/               # Jinja2 (index, Berichte)
 │   └── static/
-│       ├── css/
-│       │   ├── theme.css        # Shared HomeApps Theme (Dark/Light)
-│       │   └── style.css        # App-spezifisch
-│       └── js/
-│           ├── main.js          # Entry, View-Routing, API-Calls
-│           ├── state.js         # Navigation State (localStorage)
-│           ├── kpis.js          # KPI-Kacheln
-│           ├── cards.js         # Gruppen/Test-Karten + Tabelle
-│           ├── trend-chart.js   # Trend + Multi-Chart (Chart.js)
-│           ├── breadcrumb.js    # Drill-down Navigation
-│           └── theme-init.js    # Dark/Light Toggle
+│       ├── css/                 # theme.css (shared) + style.css
+│       └── js/                  # ES6 Modules (main.js → bundle)
 ├── scripts/
-│   ├── extract_labvalues.py     # Parser (7 Formate + Normalisierung)
+│   ├── extract_labvalues.py     # Parser (7 Formate), Aufruf: python3 ... {user}
 │   ├── labor_db.py              # SQLite DB-Modul (Schema, Import)
-│   ├── import_scale.py          # Körperdaten aus hc_scale
-│   └── validate_labor.py        # Plausibilitätsprüfung
+│   ├── import_scale.py          # Körperdaten aus hc_scale (per User)
+│   └── validate_labor.py        # Plausibilitätsprüfung (per User)
 ├── data/
-│   ├── labor.db                 # SQLite Datenbank (generiert)
-│   ├── labor_config.yaml        # Zentrale Config (Gruppen, Tests, Empfehlungen)
-│   └── befunde/                 # Quelldateien (*.txt)
+│   ├── labor_config.yaml        # Shared Config (Gruppen, Tests, Empfehlungen)
+│   ├── userlist.yaml            # User-Stammdaten + scaledb-Pfade
+│   └── user/{id}/               # Pro-User Daten
 ├── docs/
-│   └── nginx_hc_med.conf        # Nginx Config (Auth + Proxy)
-├── Dockerfile                   # python:3.12-slim, Port 5065
-├── docker-compose.yml           # Host 8065 → Container 5065
-├── Makefile                     # dev, labor-reset, jsbuild...
-└── requirements.txt             # fastapi, uvicorn, jinja2, pyyaml
+│   └── nginx_hc_med.conf
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+└── requirements.txt
 ```
 
-## Konfiguration (data/labor_config.yaml)
+## Konfiguration
 
-Zentrale Konfig-Datei – alle Texte, Beschreibungen und Empfehlungen:
+### data/userlist.yaml
 
 ```yaml
-patient:                    # Stammdaten
+patient:
+  peter:
+    vorname: "Hans-Peter"
+    nachname: "Siebler"
+    geburtsdatum: "1955-12-16"
+    geschlecht: "m"
+    scaledb: ../../hc_scale/data/miscaledata.db
+
+  reni:
+    vorname: "Reni"
+    nachname: "Siebler"
+    geburtsdatum: "1958-01-02"
+    geschlecht: "w"
+    scaledb: ../../hc_scale/data/miscaledata.db
+
+  guest:
+    vorname: "Max"
+    nachname: "Mustermann"
+    geburtsdatum: "1960-10-16"
+    geschlecht: "m"
+    scaledb: ""
+```
+
+### data/labor_config.yaml (shared)
+
+```yaml
 gruppen:                    # Gruppen-Icons, Farben, Beschreibungen
-tests:                      # Test-Beschreibungen (Alter/Geschlecht-Kontext)
+tests:                      # Test-Beschreibungen
 ereignisse:                 # KH-Aufenthalte (Marker im Chart)
 verknuepfungen:             # Zusammenhänge zwischen Tests
 empfehlungen_tests:         # Test-spezifische Empfehlungen
-bewertungen:                # Bewertungstexte (Gruppe + Trend)
+kurznamen:                  # Kurzbezeichnungen für Tabellen
+nuechtern_sensitiv:         # Tests die nüchtern-sensitiv sind
 ```
 
 ## Dashboard – Navigation
@@ -143,19 +190,23 @@ bewertungen:                # Bewertungstexte (Gruppe + Trend)
 
 ## Features
 
+- **Multi-User** mit Cookie-basiertem User-Wechsel (Dropdown im Header)
 - **7 Befund-Formate** automatisch erkannt und geparst
-- **Körperdaten** aus Mi Scale Waage (hc_scale Integration)
+- **Körperdaten** aus Mi Scale Waage (hc_scale Integration, per User)
 - **Normalisierung** (Testnamen, Einheiten, HbA1c NGSP/IFCC)
 - **Validierung** mit medizinischen Plausibilitäts-Ranges
 - **Bewertung** aktuell (letzte 5 Werte) + historisch
-- **Alters-/Geschlechtskontext** in allen Beschreibungen (Mann, 70+)
+- **Alters-/Geschlechtskontext** in allen Beschreibungen
 - **Verknüpfungen** mit Multi-Charts und personalisierten Empfehlungen
+- **Gefäßgesundheit-Score** (Radar-Chart + Faktoren-Aufschlüsselung)
 - **Krankenhaus-Marker** im Verlaufs-Chart
 - **Druckbarer Arztbericht** (PDF via Browser-Druckdialog)
+- **Gesamtbericht** mit Gruppen-Ampel und abnormen Trends
+- **Favoriten** (Stern-Markierung, per User gespeichert)
+- **Mehrzeitraum-Vergleich** (1–5 Jahre Pivot-Tabelle)
 - **KPI-Integration** ins übergeordnete DBO-Dashboard
 - **Dark/Light Theme** (shared mit allen HomeApps Dashboards)
 - **State-Persistenz** (Refresh behält aktuelle View)
-- **Nginx Auth** (extern: Basic Auth, LAN: offen, DBO: offen)
 
 ## Makefile-Befehle
 
@@ -165,35 +216,38 @@ make dev              # Uvicorn starten (Port 5065, --reload)
 make up               # Docker Container starten
 make restart          # Docker Container neustarten
 
-# Daten
-make labor-reset      # DB löschen + Befunde parsen + Scale-Import + Validierung
-make labor-validate   # Nur Plausibilitätsprüfung
-make labor-trend TEST=CRP  # Trend im Terminal
+# Daten (USER=peter ist Default)
+make labor USER=peter        # Befunde parsen → labor.db
+make labor-reset USER=peter  # DB löschen + Neuaufbau + Scale + Validierung
+make labor-reset USER=reni   # Für Reni
+make labor-validate USER=peter  # Nur Plausibilitätsprüfung
 
 # Build
 make jsbuild          # JS/CSS bundeln (esbuild via Docker)
-make jsclean          # Bundles entfernen
+make deploy           # jsbuild + restart
 
 # Git
-make git-update        # Commit + Push zu Forgejo
-make git-release       # Commit + Push zu Forgejo
+make git-update       # Commit + Push zu Forgejo
+make git-release      # Version-Tag + Push
 ```
+
+## Neuen User anlegen
+
+1. In `data/userlist.yaml` eintragen (Stammdaten + scaledb)
+2. Verzeichnis anlegen: `mkdir -p data/user/{id}/import`
+3. Befund-Dateien in `data/user/{id}/import/` ablegen
+4. `make labor-reset USER={id}`
+5. Im Dashboard über Dropdown auswählen
 
 ## Neue Befunde hinzufügen
 
-1. Textdatei in `data/befunde/` ablegen (Format: `YYYY-MM-DD_laborbefund_quelle.txt`)
-2. Auf dem Server: `make labor-reset`
+1. Textdatei in `data/user/{id}/import/` ablegen (Format: `YYYY-MM-DD_laborbefund_quelle.txt`)
+2. `make labor-reset USER={id}`
 3. Dashboard zeigt neue Werte automatisch
 
 ## Nginx (extern + Auth)
 
 ```bash
-# Passwort-Datei erstellen
-printf "%s\n%s\n" \
-  "peter:$(openssl passwd -apr1 'passwort1')" \
-  "reni:$(openssl passwd -apr1 'passwort2')" \
-  | sudo tee nginx/includes/.htpasswd_hcmed
-
 # Config: siehe docs/nginx_hc_med.conf
 # LAN (10.1.1.x): kein Login
 # Extern: Basic Auth

@@ -186,8 +186,8 @@ export async function loadView() {
       const ph = document.querySelector(".print-header");
       if (ph) {
         ph.querySelector("h1").textContent = "Mehrjahresvergleich – Laborwerte";
-        const patEl = document.getElementById("patient-name");
-        document.getElementById("print-patient").textContent = patEl ? patEl.textContent : "";
+        const patEl = document.getElementById("userSelect");
+        document.getElementById("print-patient").textContent = patEl ? (patEl.selectedOptions[0]?.text || "") : "";
         document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
       }
     } else if (state.view === "favoriten") {
@@ -200,8 +200,8 @@ export async function loadView() {
       const ph2 = document.querySelector(".print-header");
       if (ph2) {
         ph2.querySelector("h1").textContent = "Favoriten – Laborwerte";
-        const patEl2 = document.getElementById("patient-name");
-        document.getElementById("print-patient").textContent = patEl2 ? patEl2.textContent : "";
+        const patEl2 = document.getElementById("userSelect");
+        document.getElementById("print-patient").textContent = patEl2 ? (patEl2.selectedOptions[0]?.text || "") : "";
         document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
       }
     } else if (state.view === "alle-tests") {
@@ -238,8 +238,8 @@ export async function loadView() {
       const ph3 = document.querySelector(".print-header");
       if (ph3) {
         ph3.querySelector("h1").textContent = "Alle Tests – Laborwerte";
-        const patEl3 = document.getElementById("patient-name");
-        document.getElementById("print-patient").textContent = patEl3 ? patEl3.textContent : "";
+        const patEl3 = document.getElementById("userSelect");
+        document.getElementById("print-patient").textContent = patEl3 ? (patEl3.selectedOptions[0]?.text || "") : "";
         document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
       }
     } else if (state.view === "gruppe") {
@@ -304,8 +304,8 @@ export async function loadView() {
       const ph = document.querySelector(".print-header");
       if (ph) {
         ph.querySelector("h1").textContent = data.name + " – Risikoprofil";
-        const patEl = document.getElementById("patient-name");
-        document.getElementById("print-patient").textContent = patEl ? patEl.textContent : "";
+        const patEl = document.getElementById("userSelect");
+        document.getElementById("print-patient").textContent = patEl ? (patEl.selectedOptions[0]?.text || "") : "";
         document.getElementById("print-date").textContent = new Date().toLocaleDateString("de-DE");
       }
       // Drucken-Button: Öffnet druckoptimierte Version in neuem Tab
@@ -320,12 +320,19 @@ export async function loadView() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Patient-Name laden
-  fetch("api/patient").then(r => r.json()).then(p => {
-    const el = document.getElementById("patient-name");
-    // if (el && p.vorname) el.textContent = p.vorname + " " + p.nachname;
-    el.textContent = "Auswertung"
+  // User-Auswahl laden
+  fetch("api/users").then(r => r.json()).then(data => {
+    const sel = document.getElementById("userSelect");
+    if (!sel || !data.users) return;
+    sel.innerHTML = data.users.map(u =>
+      `<option value="${u.id}" ${u.id === data.active ? 'selected' : ''} ${!u.hat_daten ? 'disabled' : ''}>${u.vorname}${!u.hat_daten ? ' (keine Daten)' : ''}</option>`
+    ).join("");
+    sel.addEventListener("change", async () => {
+      await fetch(`api/user/${sel.value}`, { method: "POST" });
+      location.reload();
+    });
   }).catch(() => {});
+
   // Favoriten-Liste vorladen (für Stern-Status in Test-Karten)
   loadFavoritenListe().then(() => loadView());
 });

@@ -6,10 +6,13 @@ from contextlib import asynccontextmanager
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+import yaml
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+from app.infrastructure.database import DATA_ROOT, set_current_user, get_current_user
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = PROJECT_ROOT / "frontend" / "templates"
@@ -41,6 +44,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="hc_med", lifespan=lifespan)
+
+
+# ─── Middleware: User aus Cookie setzen ──────────────────────────────────────────
+@app.middleware("http")
+async def user_context_middleware(request: Request, call_next):
+    """Setzt den aktiven User aus dem Cookie 'hc_user' für jeden Request."""
+    user = request.cookies.get("hc_user", "peter")
+    set_current_user(user)
+    response = await call_next(request)
+    return response
 
 # Static files
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
@@ -85,10 +98,46 @@ app.include_router(alle_tests_router)
 
 @app.get("/api/status")
 async def status():
-    return {"status": "ok", "app": "hc_med"}
+    return {"status": "ok", "app": "hc_med", "user": get_current_user()}
 
 
 @app.get("/api/patient")
 async def patient_info():
-    from app.config.settings import PATIENT_CONFIG
-    return PATIENT_CONFIG
+    """Gibt die Patientendaten des aktiven Users zurück."""
+    userlist_path = DATA_ROOT / "userlist.yaml"
+    if not userlist_path.exists():
+        return {}
+    data = yaml.safe_load(userlist_path.read_text(encoding="utf-8")) or {}
+    patients = data.get("patient", {})
+    return patients.get(get_current_user(), {})
+
+
+@app.get("/api/users")
+async def list_users():
+    """Gibt alle verfügbaren User zurück (für User-Auswahl im Frontend)."""
+    userlist_path = DATA_ROOT / "userlist.yaml"
+    if not userlist_path.exists():
+        return {"users": [], "active": get_current_user()}
+    data = yaml.safe_load(userlist_path.read_text(encoding="utf-8")) or {}
+    patients = data.get("patient", {})
+    users = []
+    for key, info in patients.items():
+        user_dir = DATA_ROOT / "user" / key
+        users.append({
+            "id": key,
+            "vorname": info.get("vorname", ""),
+            "nachname": info.get("nachname", ""),
+            "hat_daten": (user_dir / "labor.db").exists(),
+        })
+    return {"users": users, "active": get_current_user()}
+
+
+@app.post("/api/user/{user_id}")
+async def switch_user(user_id: str, response: Response):
+    """Wechselt den aktiven User – setzt Cookie."""
+    user_dir = DATA_ROOT / "user" / user_id
+    if not user_dir.is_dir():
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"User '{user_id}' nicht gefunden")
+    response.set_cookie("hc_user", user_id, max_age=60 * 60 * 24 * 365, httponly=False, samesite="lax")
+    return {"ok": True, "user": user_id}

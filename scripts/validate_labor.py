@@ -7,9 +7,12 @@ Prüft ob Werte plausibel sind:
 """
 
 import sqlite3
+import sys
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent.parent / "data" / "labor.db"
+DATA_DIR = Path(__file__).parent.parent / "data"
+_user_id = sys.argv[1] if len(sys.argv) > 1 else "peter"
+DB_PATH = DATA_DIR / "user" / _user_id / "labor.db"
 
 # Plausibilitäts-Ranges pro Test (min, max in der normalisierten Einheit)
 # Werte weit außerhalb sind Parser-Fehler oder Einheiten-Probleme
@@ -47,9 +50,9 @@ PLAUSIBLE_RANGES: dict[str, tuple[float, float]] = {
     "Natrium": (120.0, 160.0),           # mmol/L
     "Kalium": (2.5, 7.0),               # mmol/L
     "Chlorid": (80.0, 120.0),            # mmol/L
-    "Calcium": (1.5, 3.5),              # mmol/L
-    "Magnesium": (0.3, 2.0),            # mmol/L
-    "Phosphat": (0.5, 3.0),             # mmol/L
+    "Calcium": (1.5, 11.0),              # mmol/L (1.5-3.5) oder mg/dL (8.6-10.2)
+    "Magnesium": (0.3, 3.0),            # mmol/L (0.3-2.0) oder mg/dL (1.6-2.6)
+    "Phosphat": (0.5, 5.0),             # mmol/L oder mg/dL
     # Stoffwechsel
     "Glucose": (30.0, 400.0),            # mg/dL
     "HbA1c": (3.0, 15.0),               # %
@@ -186,5 +189,8 @@ def print_report(stats, issues):
 
 
 if __name__ == "__main__":
+    if not DB_PATH.exists():
+        print(f"  ⚠️  [{_user_id}] labor.db nicht vorhanden: {DB_PATH}")
+        sys.exit(1)
     stats, issues = validate()
     print_report(stats, issues)

@@ -8,23 +8,45 @@ Unterstützte Formate:
 - PDF-Text-Format (2024-12-01, 2024-12-11): Aus PDF extrahiert
 
 Ausgabe: CSV mit Spalten: Datum, Alter, Gruppe, Test, Test_Standard, Wert, Wert_Norm, Einheit, Einheit_Norm, Normbereich, Flag
+
+Multi-User: Nutzt userlist.yaml. Aufruf: python3 extract_labvalues.py [user_id]
 """
 
 import csv
 import re
+import sys
 from datetime import date, datetime
 from pathlib import Path
 
-BEFUNDE_DIR = Path(__file__).parent.parent / "data" / "befunde"
-OUTPUT_FILE = BEFUNDE_DIR / "laborwerte_gesamt.csv"
-CONFIG_PATH = Path(__file__).parent.parent / "data" / "labor_config.yaml"
-
 import yaml
-_config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
-_patient = _config.get("patient", {})
 
-# Patient-Daten aus Config
-PATIENT_GEBURTSDATUM = date(*[int(x) for x in _patient.get("geburtsdatum", "1955-12-16").split("-")])
+# Pfade
+PROJECT_DIR = Path(__file__).parent.parent
+DATA_DIR = PROJECT_DIR / "data"
+CONFIG_PATH = DATA_DIR / "labor_config.yaml"
+USERLIST_PATH = DATA_DIR / "userlist.yaml"
+
+_config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+
+# User bestimmen (CLI-Argument oder Default)
+_userlist = yaml.safe_load(USERLIST_PATH.read_text(encoding="utf-8")) if USERLIST_PATH.exists() else {}
+_users = _userlist.get("patient", {})
+_user_id = sys.argv[1] if len(sys.argv) > 1 else "peter"
+_patient = _users.get(_user_id, {})
+
+if not _patient:
+    print(f"❌ User '{_user_id}' nicht in userlist.yaml gefunden")
+    print(f"   Verfügbar: {', '.join(_users.keys())}")
+    sys.exit(1)
+
+# User-spezifische Pfade
+USER_DIR = DATA_DIR / "user" / _user_id
+BEFUNDE_DIR = USER_DIR / "import"
+OUTPUT_FILE = USER_DIR / "laborwerte_gesamt.csv"
+DB_FILE = USER_DIR / "labor.db"
+
+# Patient-Daten aus userlist.yaml
+PATIENT_GEBURTSDATUM = date(*[int(x) for x in _patient.get("geburtsdatum", "1960-01-01").split("-")])
 PATIENT_GESCHLECHT = _patient.get("geschlecht", "m")
 
 
@@ -124,6 +146,7 @@ TEST_ALIASES: dict[str, str] = {
     "ggt-37": "GGT",
     "alk.phos.": "Alk. Phosphatase",
     "alk.phosphatase (ap)": "Alk. Phosphatase",
+    "alk. phosphatase": "Alk. Phosphatase",
     "bilirubin gesamt": "Bilirubin",
     "bilirubin": "Bilirubin",
     "ldh": "LDH",
@@ -1103,6 +1126,7 @@ def parse_simple_csv(filepath: Path) -> list[dict]:
     Header: Gruppe;Test;Wert;Einheit;Normbereich;Flag
     Datum wird aus dem Dateinamen extrahiert (YYYY-MM-DD_...).
     Leere Wert-Felder werden übersprungen.
+    Gruppe wird direkt aus der CSV übernommen (kein GROUP_RULES-Lookup nötig).
     """
     results = []
     text = filepath.read_text(encoding="utf-8", errors="replace")
@@ -1124,6 +1148,7 @@ def parse_simple_csv(filepath: Path) -> list[dict]:
         if len(parts) < 3:
             continue
 
+        gruppe = parts[0].strip() if len(parts) > 0 else ""
         test = parts[1].strip() if len(parts) > 1 else ""
         wert = parts[2].strip() if len(parts) > 2 else ""
         einheit = parts[3].strip() if len(parts) > 3 else ""
@@ -1136,6 +1161,7 @@ def parse_simple_csv(filepath: Path) -> list[dict]:
 
         results.append({
             "Datum": file_date,
+            "Gruppe": gruppe,
             "Test": test,
             "Wert": wert.replace(",", "."),
             "Einheit": einheit,
@@ -1187,6 +1213,13 @@ def detect_format(filepath: Path) -> str:
 
 
 def main():
+    print(f"🔬 Extrahiere Laborwerte für: {_patient.get('vorname', '')} {_patient.get('nachname', '')} [{_user_id}]")
+    print(f"   Quelle: {BEFUNDE_DIR}")
+    print(f"   Ziel:   {DB_FILE}")
+
+    # Verzeichnis sicherstellen
+    USER_DIR.mkdir(parents=True, exist_ok=True)
+
     all_results: list[dict] = []
     file_results: list[tuple[str, str, list[dict], bool]] = []  # (filename, format, results, nuechtern)
 
@@ -1231,7 +1264,9 @@ def main():
         # Normalisierung direkt pro Datei (für DB-Import mit Quelldatei)
         for row in results:
             row["Test_Standard"] = normalize_test_name(row["Test"])
-            row["Gruppe"] = classify_test(row["Test"])
+            # Gruppe nur zuweisen wenn nicht schon vom Parser gesetzt
+            if not row.get("Gruppe"):
+                row["Gruppe"] = classify_test(row["Test"])
             wert_norm, einheit_norm, _ = normalize_unit_and_value(
                 row["Test_Standard"], row["Wert"], row["Einheit"]
             )
@@ -1482,7 +1517,7 @@ def main():
     # ─── SQLite Import ──────────────────────────────────────────────────────────
     from labor_db import LaborDB
 
-    with LaborDB() as db:
+    with LaborDB(db_path=DB_FILE) as db:
         patient_id = db.get_or_create_patient(
             vorname=_patient.get("vorname", ""),
             nachname=_patient.get("nachname", ""),
@@ -1540,8 +1575,7 @@ def main():
     converted = sum(1 for r in all_results if r["Wert_Norm"] != r["Wert"])
     print(f"\n  Normalisiert: {normalized} Testnamen, {converted} Einheiten-Konversionen")
     print(f"\n✓ {len(all_results)} Laborwerte in {OUTPUT_FILE} geschrieben")
-    from labor_db import DB_PATH
-    print(f"✓ SQLite-Datenbank: {DB_PATH}")
+    print(f"✓ SQLite-Datenbank: {DB_FILE}")
 
 
 if __name__ == "__main__":

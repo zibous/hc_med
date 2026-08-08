@@ -30,6 +30,13 @@ body {
 .header-wrap { display: flex; justify-content: space-between; align-items: center; }
 .title { font-size: 2.6rem; font-weight: 700; }
 .subtitle { font-size: 1.3rem; color: var(--text-muted); margin-top: .3rem; }
+.user-select {
+  font-size: 2.2rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+  border: 1px solid transparent; background: transparent; color: var(--text);
+  cursor: pointer; appearance: auto;
+}
+.user-select:hover { border-color: var(--border); background: var(--surface); }
+.user-select:focus { outline: 2px solid var(--accent); }
 .header-badge {
   font-size: 1.2rem; color: var(--text-muted);
   background: rgba(128,128,128,.08); padding: 4px 10px;

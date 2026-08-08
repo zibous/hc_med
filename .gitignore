@@ -18,13 +18,12 @@ __pycache__/
 # -----------------------------------------------
 # Data (privat + generiert)
 # -----------------------------------------------
-data/labor.db
-data/labor.db-wal
-data/labor.db-shm
-data/befunde/
-data/import/
+data/user/peter/
+data/user/reni/
 
 # labor_config.yaml WIRD versioniert (Konfiguration, keine Patientendaten)
+# userlist.yaml WIRD versioniert (User-Struktur)
+# data/user/guest/ WIRD versioniert (Demo-User)
 
 # -----------------------------------------------
 # Frontend Build-Artefakte

@@ -546,7 +546,7 @@ def build_report_data(conn: sqlite3.Connection, befunde_count: int = 0, von: str
         Dict mit allen Report-Sektionen.
     """
     from datetime import datetime
-    from app.config.settings import PATIENT_CONFIG
+    from app.config.settings import get_patient_config
     from app.core.vergleich import berechne_vorjahresvergleich
 
     # Bemerkung direkt aus Config lesen (nicht gecacht)
@@ -579,7 +579,7 @@ def build_report_data(conn: sqlite3.Connection, befunde_count: int = 0, von: str
             datum_filter = f" AND datum >= '{aeltestes_datum}'"
 
     return {
-        "patient": PATIENT_CONFIG,
+        "patient": get_patient_config(),
         "generated_at": datetime.now().strftime("%d.%m.%Y %H:%M"),
         "period_label": period_display,
         "bemerkung": bemerkung,

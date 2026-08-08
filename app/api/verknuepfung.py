@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from app.config.settings import EREIGNISSE, VERKNUEPFUNGEN, PATIENT_CONFIG
+from app.config.settings import EREIGNISSE, VERKNUEPFUNGEN, get_patient_config
 from app.core.empfehlungen import generate_verknuepfung_empfehlung
 from app.infrastructure.database import get_db
 
@@ -113,7 +113,7 @@ async def verknuepfung_print(request: Request, name: str):
             "empfehlung": empfehlung,
             "gefaess_score": gefaess_score,
             "tests_json": json.dumps(result_tests, ensure_ascii=False),
-            "patient": PATIENT_CONFIG,
+            "patient": get_patient_config(),
             "now": datetime.now().strftime("%d.%m.%Y"),
         })
     finally:

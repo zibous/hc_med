@@ -10,8 +10,8 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 .PHONY: help dev up down build rebuild logs ps restart labor labor-import labor-csv labor-query labor-stats labor-pathologisch labor-trend labor-reset
 
-DB_FILE   = data/labor.db
-CSV_FILE  = data/befunde/laborwerte_gesamt.csv
+DB_FILE   = data/user/$(or $(USER),peter)/labor.db
+CSV_FILE  = data/user/$(or $(USER),peter)/laborwerte_gesamt.csv
 SCRIPT    = scripts/extract_labvalues.py
 
 # ---------------------------------------------------------
@@ -62,9 +62,9 @@ restart: ## Container neustarten
 # Laborwerte
 # ---------------------------------------------------------
 
-labor: ## Laborwerte extrahieren → SQLite + CSV
+labor: ## Laborwerte extrahieren → SQLite + CSV (PARAM: USER=peter)
 	@echo "🔬 Extrahiere Laborwerte..."
-	@python3 $(SCRIPT)
+	@python3 $(SCRIPT) $(or $(USER),peter)
 
 labor-import: labor ## Alias für labor (Reimport aller Befunde)
 
@@ -125,15 +125,15 @@ labor-befunde: ## Alle importierten Befund-Dateien anzeigen
 		 FROM befunde b LEFT JOIN laborwerte l ON l.befund_id = b.id \
 		 GROUP BY b.id ORDER BY b.datum;"
 
-labor-reset: ## Datenbank löschen und neu aufbauen
-	@echo "⚠️  Lösche $(DB_FILE)..."
-	@rm -f $(DB_FILE)
+labor-reset: ## Datenbank löschen und neu aufbauen (PARAM: USER=peter)
+	@echo "⚠️  Lösche DB für User: $(or $(USER),peter)..."
+	@rm -f data/user/$(or $(USER),peter)/labor.db
 	@echo "🔬 Reimport Laborwerte..."
-	@python3 $(SCRIPT)
+	@python3 $(SCRIPT) $(or $(USER),peter)
 	@echo "⚖️  Import Körperdaten (hc_scale)..."
-	@python3 scripts/import_scale.py
+	@python3 scripts/import_scale.py $(or $(USER),peter)
 	@echo "🔍 Validierung..."
-	@python3 scripts/validate_labor.py
+	@python3 scripts/validate_labor.py $(or $(USER),peter)
 
 labor-validate: ## Laborwerte auf Plausibilität prüfen
 	@python3 scripts/validate_labor.py
