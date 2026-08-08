@@ -1,11 +1,7 @@
 # Labor Dashboard Konfiguration
 # Beschreibungen, Gruppen, Farben und Icons
-
-patient:
-  vorname: "Hans-Peter"
-  nachname: "Siebler"
-  geburtsdatum: "1955-12-16"
-  geschlecht: "m"
+# Patient-Stammdaten → data/userlist.yaml
+# Ereignisse + Bemerkungen → data/user/{id}/config.yaml
 
 gruppen:
   Blutbild:
@@ -229,36 +225,6 @@ tests:
   pH-Wert: "Säuregrad des Urins. Altersunabhängig. 5–8 normal, beeinflusst durch Ernährung."
   Peroxide: "Oxidativer Stress. Steigt mit dem Alter. Antioxidantien (Gemüse, Beeren) können helfen."
   Antioxid Kap.: "Antioxidative Kapazität. Im Alter oft reduziert. Vielfältige Ernährung unterstützt die Abwehr."
-
-
-# Krankenhausaufenthalte und relevante Ereignisse
-# Werden als vertikale Marker im Trend-Chart angezeigt
-ereignisse:
-
-  - von: "2018-01-26"
-    bis: "2018-02-20"
-    label: "KH Feldkirch"
-    typ: "krankenhaus"
-    farbe: "#ef4444"
-
-  - von: "2024-11-30"
-    bis: "2024-12-06"
-    label: "KH Dornbirn"
-    typ: "krankenhaus"
-    farbe: "#ef4444"
-
-  - von: "2024-02-08"
-    bis: "2024-02-08"
-    label: "KH Dornbirn"
-    typ: "krankenhaus"
-    farbe: "#ef4444"
-
-
-  - von: "2026-07-13"
-    bis: "2026-07-21"
-    label: "KH Feldkirch"
-    typ: "krankenhaus"
-    farbe: "#ef4444"    
 
 
 # Verknüpfte Laborwerte – werden als Multi-Chart angezeigt
@@ -512,10 +478,7 @@ nuechtern_sensitiv:
 
 
 # Zusatzbemerkung für den Gesamtbericht
-# Wird nach der Gefäßgesundheit-Sektion angezeigt (auch beim Drucken)
-# Leer lassen oder entfernen wenn nicht benötigt
-gesamtbericht_bemerkung: ""
-gesamtbericht_bemerkung1: "KI Auswertung: Patient mit bekannter PAVK/Halsschlagader-Plaques zeigt akuten Entzündungsschub (CRP 3.14, Leukozyten 14.2), Thrombozytenabfall (114) bei Hyperkoagulabilität (Quick >120) und beginnendes Nierenversagen (GFR 66) bei metabolischem Kipppunkt (Triglyceride 473, HbA1c 6.2%)."
+
 
 
 

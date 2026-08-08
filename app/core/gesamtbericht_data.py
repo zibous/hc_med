@@ -546,14 +546,10 @@ def build_report_data(conn: sqlite3.Connection, befunde_count: int = 0, von: str
         Dict mit allen Report-Sektionen.
     """
     from datetime import datetime
-    from app.config.settings import get_patient_config
+    from app.config.settings import get_patient_config, get_gesamtbericht_bemerkung
     from app.core.vergleich import berechne_vorjahresvergleich
 
-    # Bemerkung direkt aus Config lesen (nicht gecacht)
-    import yaml
-    from pathlib import Path
-    _live_config = yaml.safe_load((Path(__file__).resolve().parent.parent.parent / "data" / "labor_config.yaml").read_text(encoding="utf-8"))
-    bemerkung = _live_config.get("gesamtbericht_bemerkung", "")
+    bemerkung = get_gesamtbericht_bemerkung()
 
     # Zeitraum-Filter: Von/Bis hat Vorrang vor befunde_count
     datum_filter = ""

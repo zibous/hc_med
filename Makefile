@@ -88,7 +88,7 @@ labor-aktuell: ## Aktuelle Werte (letzte Messung pro Test)
 labor-pathologisch: ## Pathologische Werte anzeigen
 	@sqlite3 -header -column $(DB_FILE) "SELECT * FROM v_pathologisch;"
 
-labor-trend: ## Trend für einen Test anzeigen (PARAM: TEST=CRP)
+labor-trend: ## Trend für einen Test anzeigen (PARAM: TEST=CRP USER=peter)
 	@if [ -z "$(TEST)" ]; then \
 		echo "Nutzung: make labor-trend TEST=CRP"; \
 		echo ""; \
@@ -138,7 +138,7 @@ labor-reset: ## Datenbank löschen und neu aufbauen (PARAM: USER=peter)
 labor-validate: ## Laborwerte auf Plausibilität prüfen
 	@python3 scripts/validate_labor.py
 
-labor-luecken: ## Fehlende Jahre und Jahre mit wenig Daten anzeigen
+labor-luecken: ## Fehlende Jahre und Jahre mit wenig Daten anzeigen (PARAM: USER=peter)
 	@echo "📊 Datenabdeckung pro Jahr:"
 	@echo ""
 	@sqlite3 -header -column $(DB_FILE) "\
@@ -240,4 +240,6 @@ git-release: git-status ## Neues Versions-Tag automatisch berechnen, erstellen u
 # ---------------------------------------------------------
 
 help: ## Hilfe anzeigen
+	@echo "Multi-User: USER=peter (default) | USER=reni | USER=guest"
+	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'

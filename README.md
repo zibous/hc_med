@@ -139,14 +139,14 @@ patient:
   peter:
     vorname: "Hans-Peter"
     nachname: "Siebler"
-    geburtsdatum: "1955-12-16"
+    geburtsdatum: "yyyy-mm-dd"
     geschlecht: "m"
     scaledb: ../../hc_scale/data/miscaledata.db
 
   reni:
     vorname: "Reni"
     nachname: "Siebler"
-    geburtsdatum: "1958-01-02"
+    geburtsdatum: "yyyy-mm-dd"
     geschlecht: "w"
     scaledb: ../../hc_scale/data/miscaledata.db
 

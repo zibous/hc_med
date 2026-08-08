@@ -3,6 +3,37 @@ import { state, navigate } from "./state.js";
 import { starIconHtml, bindStarHandlers } from "./favoriten.js";
 import { renderNormBar } from "./norm-bar.js";
 
+/** Prüft ob ein Wert nur knapp (<10% der Spanne) außerhalb des Normbereichs liegt. */
+function _isKnappDaneben(wertStr, normbereich) {
+  if (!normbereich || !wertStr) return false;
+  const val = parseFloat(String(wertStr).replace(",", ".").replace("<", "").replace(">", ""));
+  if (isNaN(val)) return false;
+  const norm = normbereich.trim();
+  // Format "lo-hi"
+  const m = norm.match(/^([\d.]+)\s*[-–]\s*([\d.]+)$/);
+  if (m) {
+    const lo = parseFloat(m[1]), hi = parseFloat(m[2]);
+    const spanne = hi - lo;
+    if (spanne <= 0) return false;
+    if (val < lo) return (lo - val) / spanne <= 0.10;
+    if (val > hi) return (val - hi) / spanne <= 0.10;
+  }
+  return false;
+}
+
+/** Prüft ob ein Wert innerhalb des Normbereichs liegt (Flag ignorieren). */
+function _isInNorm(wertStr, normbereich) {
+  if (!normbereich || !wertStr) return false;
+  const val = parseFloat(String(wertStr).replace(",", ".").replace("<", "").replace(">", ""));
+  if (isNaN(val)) return false;
+  const norm = normbereich.trim();
+  const m = norm.match(/^([\d.]+)\s*[-–]\s*([\d.]+)$/);
+  if (m) return val >= parseFloat(m[1]) && val <= parseFloat(m[2]);
+  if (norm.startsWith("<")) { const hi = parseFloat(norm.slice(1)); return !isNaN(hi) && val < hi; }
+  if (norm.startsWith(">")) { const lo = parseFloat(norm.slice(1)); return !isNaN(lo) && val > lo; }
+  return false;
+}
+
 const GROUP_ICONS = {
   Blutbild: "🩸", Differentialblutbild: "🔬", Entzündung: "🔥",
   Leber: "🫁", Niere: "💧", Elektrolyte: "⚡", Stoffwechsel: "🧬",
@@ -232,17 +263,21 @@ export function renderCards(items, mode = "gruppe") {
       // Aktueller Status: primär am letzten Wert orientiert
       const last = data.werte[data.werte.length - 1];
       const lastFlag = last?.flag || "";
+      // Flag validieren: wenn Wert im angezeigten Normbereich liegt, Flag ignorieren
+      const effectiveFlag = (lastFlag && _isInNorm(last.wert, data.normbereich)) ? "" : lastFlag;
       let status;
-      if (!lastFlag) {
+      if (!effectiveFlag) {
         // Letzter Wert OK – letzte 3 prüfen für Stabilität
         const recent3 = data.werte.slice(-3);
-        const r3Path = recent3.filter(w => w.flag === "H" || w.flag === "L").length;
+        const r3Path = recent3.filter(w => (w.flag === "H" || w.flag === "L") && !_isInNorm(w.wert, data.normbereich)).length;
         status = r3Path === 0 ? "gut" : "ok";
       } else {
         // Letzter Wert auffällig – letzte 3 prüfen für Schwere
         const recent3 = data.werte.slice(-3);
-        const r3Path = recent3.filter(w => w.flag === "H" || w.flag === "L").length;
-        status = r3Path >= 3 ? "kritisch" : r3Path >= 2 ? "auffällig" : "auffällig";
+        const r3Path = recent3.filter(w => (w.flag === "H" || w.flag === "L") && !_isInNorm(w.wert, data.normbereich)).length;
+        // Toleranz: bei <10% Abweichung vom Normbereich nie "kritisch"
+        const knapp = _isKnappDaneben(last.wert, data.normbereich);
+        status = (r3Path >= 3 && !knapp) ? "kritisch" : "auffällig";
       }
 
       // Historischer Hinweis

@@ -1,0 +1,10 @@
+# User-spezifische Konfiguration: Guest (Demo)
+
+ereignisse:
+  - von: "2018-02-01"
+    bis: "2018-02-20"
+    label: "KH Feldkirch"
+    typ: "krankenhaus"
+    farbe: "#ef4444"
+
+gesamtbericht_bemerkung: ""

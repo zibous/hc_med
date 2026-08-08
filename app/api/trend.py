@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 
-from app.config.settings import TEST_DESCRIPTIONS, EREIGNISSE, VERKNUEPFUNGEN, KURZNAMEN, NUECHTERN_SENSITIV
+from app.config.settings import TEST_DESCRIPTIONS, VERKNUEPFUNGEN, KURZNAMEN, NUECHTERN_SENSITIV, get_ereignisse
 from app.core.empfehlungen import get_test_empfehlung
 from app.core.bewertung import bewerte_trend
 from app.infrastructure.database import get_db
@@ -27,9 +27,9 @@ async def trend(test: str):
         if not rows:
             raise HTTPException(status_code=404, detail=f"Test '{test}' nicht gefunden")
 
-        # Ersten nicht-leeren UND gültigen Normbereich suchen
+        # Neuesten nicht-leeren UND gültigen Normbereich suchen
         normbereich = ""
-        for r in rows:
+        for r in reversed(rows):
             nb = (r["normbereich"] or "").strip()
             if nb and any(c.isdigit() for c in nb):
                 normbereich = nb
@@ -39,7 +39,7 @@ async def trend(test: str):
         datum_von = rows[0]["datum"]
         datum_bis = rows[-1]["datum"]
         relevante_ereignisse = [
-            e for e in EREIGNISSE
+            e for e in get_ereignisse()
             if e.get("von", "") <= datum_bis and e.get("bis", "") >= datum_von
         ]
 
