@@ -11,25 +11,25 @@ Langzeit-Verlaufsanalyse von Laborwerten (2013–2026) mit automatischer Extrakt
 │                         hc_med – Architektur                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
-│  ┌──────────────┐     ┌──────────────┐     ┌────────────────────────┐  │
-│  │  Befund-TXT  │────▶│  Parser      │────▶│  SQLite (per User)     │  │
-│  │  PDF → Text  │     │  7 Formate   │     │  data/user/{id}/       │  │
-│  │  hc_scale DB │     │  Validierung │     │  labor.db              │  │
-│  └──────────────┘     └──────────────┘     └────────────┬───────────┘  │
-│                                                         │              │
-│                                                         ▼              │
-│                              ┌───────────────────────────────────┐     │
-│                              │  FastAPI Backend (Port 5065)      │     │
-│                              │  Middleware: User aus Cookie       │     │
-│                              │  ContextVar → get_db() per User   │     │
-│                              └───────────────┬───────────────────┘     │
-│                                              │                         │
-│                                              ▼                         │
-│                              ┌───────────────────────────────────┐     │
-│                              │  Frontend (Chart.js + ES6)        │     │
-│                              │  User-Selector · Drilldown        │     │
-│                              │  Verknüpfungen · Arztbericht      │     │
-│                              └───────────────────────────────────┘     │
+│  ┌──────────────┐     ┌──────────────┐     ┌────────────────────────┐   │
+│  │  Befund-TXT  │────▶│  Parser      │────▶│  SQLite (per User)     │   │
+│  │  PDF → Text  │     │  7 Formate   │     │  data/user/{id}/       │   │
+│  │  hc_scale DB │     │  Validierung │     │  labor.db              │   │
+│  └──────────────┘     └──────────────┘     └────────────┬───────────┘   │
+│                                                         │               │
+│                                                         ▼               │
+│                              ┌───────────────────────────────────┐      │ 
+│                              │  FastAPI Backend (Port 5065)      │      │
+│                              │  Middleware: User aus Cookie      │      │
+│                              │  ContextVar → get_db() per User   │      │
+│                              └───────────────┬───────────────────┘      │
+│                                              │                          │
+│                                              ▼                          │
+│                              ┌───────────────────────────────────┐      │
+│                              │  Frontend (Chart.js + ES6)        │      │
+│                              │  User-Selector · Drilldown        │      │
+│                              │  Verknüpfungen · Arztbericht      │      │
+│                              └───────────────────────────────────┘      │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
