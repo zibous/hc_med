@@ -31,12 +31,16 @@ async def overview():
         for g in gruppen_raw:
             name = g["gruppe"]
 
-            # Letzte 3 auffällige Tests dieser Gruppe
+            # Letzte 3 auffällige Tests dieser Gruppe (nur wenn AKTUELLER Wert auffällig)
             letzte_path = conn.execute("""
-                SELECT test_standard, wert_norm, einheit_norm, flag, datum
-                FROM laborwerte
-                WHERE gruppe=? AND flag IN ('H','L')
-                ORDER BY datum DESC LIMIT 3
+                SELECT l.test_standard, l.wert_norm, l.einheit_norm, l.flag, l.datum
+                FROM laborwerte l
+                WHERE l.gruppe=? AND l.flag IN ('H','L')
+                AND l.datum = (
+                    SELECT MAX(l2.datum) FROM laborwerte l2
+                    WHERE l2.test_standard = l.test_standard
+                )
+                ORDER BY l.datum DESC LIMIT 3
             """, (name,)).fetchall()
 
             # Trend: Anzahl Messungen pro Jahr für Sparkline
@@ -46,8 +50,21 @@ async def overview():
                 GROUP BY jahr ORDER BY jahr
             """, (name,)).fetchall()
 
-            # Bewertung: Anteil pathologischer Werte
-            path_ratio = g["path_count"] / g["anzahl"] if g["anzahl"] > 0 else 0
+            # Bewertung: Anteil aktuell auffälliger Tests (nicht historisch)
+            aktuell_path = conn.execute("""
+                SELECT COUNT(DISTINCT l.test_standard) FROM laborwerte l
+                WHERE l.gruppe=? AND l.flag IN ('H','L')
+                AND l.datum = (
+                    SELECT MAX(l2.datum) FROM laborwerte l2
+                    WHERE l2.test_standard = l.test_standard
+                )
+            """, (name,)).fetchone()[0]
+            
+            aktuell_total = conn.execute("""
+                SELECT COUNT(DISTINCT test_standard) FROM laborwerte WHERE gruppe=?
+            """, (name,)).fetchone()[0]
+            
+            path_ratio = aktuell_path / aktuell_total if aktuell_total > 0 else 0
             if path_ratio == 0:
                 status = "gut"
             elif path_ratio < 0.15:

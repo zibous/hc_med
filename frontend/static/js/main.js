@@ -19,7 +19,7 @@ function renderRadarWithEmpfehlung(data) {
   // Bestehenden Container entfernen
   cleanupRadar();
 
-  // Prüfen ob Radar sinnvoll ist (nur für Gefäßgesundheit)
+  // Prüfen ob Score vorhanden und genug Tests
   const hasEnoughTests = data.gefaess_score && data.tests && Object.keys(data.tests).length >= 3;
 
   const container = document.createElement("div");
@@ -66,7 +66,7 @@ function renderRadarWithEmpfehlung(data) {
 
       scoreHtml = `<div class="gefaess-score-card">
         <div class="score-header">
-          <span class="score-label">Gefäßrisiko</span>
+          <span class="score-label">${data.name || "Risiko"}</span>
           <span class="score-value" style="color:${statusColor}">${gs.score}/${gs.max}</span>
         </div>
         <div class="score-bar">${segments.join("")}</div>

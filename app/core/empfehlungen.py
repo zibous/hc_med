@@ -98,6 +98,8 @@ def generate_verknuepfung_empfehlung(name: str, tests: dict) -> str:
         empfehlungen = _empfehlung_cholesterin(get_latest)
     elif name == "Gefäßgesundheit":
         empfehlungen = _empfehlung_gefaesse(get_latest)
+    elif name == "Stoffwechsel-Risiko":
+        empfehlungen = _empfehlung_stoffwechsel(get_latest)
 
     if not empfehlungen:
         empfehlungen = ["Keine spezifischen Auffälligkeiten in dieser Kombination."]
@@ -277,4 +279,65 @@ def _empfehlung_gefaesse(get_latest):
         e.append(f"Harnsäure {hs:.1f} leicht erhöht – fördert Gefäßentzündung. Viel trinken, weniger Fleisch.")
 
     e.append("Allgemein: 30min Bewegung/Tag (Gehen reicht), mediterrane Ernährung, Nichtrauchen, Blutdruck <135/85.")
+    return e
+
+def _empfehlung_stoffwechsel(get_latest):
+    """Empfehlungen für Stoffwechsel-Risiko Verknüpfung."""
+    e = []
+    hba1c, _ = get_latest("HbA1c")
+    glucose, _ = get_latest("Glucose")
+    trig, _ = get_latest("Triglyceride")
+    hs, _ = get_latest("Harnsäure")
+    ggt, _ = get_latest("GGT")
+    gpt, _ = get_latest("GPT")
+    got, _ = get_latest("GOT")
+
+    # Diabetes-Risiko
+    if hba1c and hba1c > 6.0:
+        e.append(f"HbA1c {hba1c:.1f}% – Diabetes-Schwelle erreicht. Diabetologische Abklärung empfohlen.")
+    elif hba1c and hba1c > 5.7:
+        e.append(f"HbA1c {hba1c:.1f}% – Prädiabetes-Bereich. Lebensstil-Intervention (Bewegung, Ernährung) kann Progression verhindern.")
+
+    if glucose and glucose > 126:
+        e.append(f"Nüchtern-Glucose {glucose:.0f} mg/dL – diabetischer Bereich.")
+    elif glucose and glucose > 100:
+        e.append(f"Nüchtern-Glucose {glucose:.0f} mg/dL – leicht erhöht (Prädiabetes).")
+
+    # Triglyceride
+    if trig and trig > 200:
+        e.append(f"Triglyceride {trig:.0f} – deutlich erhöht. Zucker/Alkohol einschränken, Omega-3 erwägen.")
+    elif trig and trig > 150:
+        e.append(f"Triglyceride {trig:.0f} – leicht erhöht. Ernährung überprüfen.")
+
+    # Harnsäure / Gicht
+    if hs and hs > 8.0:
+        e.append(f"Harnsäure {hs:.1f} – Gichtrisiko erhöht. Purin-arme Ernährung, ausreichend trinken.")
+    elif hs and hs > 7.0:
+        e.append(f"Harnsäure {hs:.1f} – oberer Grenzbereich. Fleisch/Alkohol reduzieren.")
+
+    # Leber
+    leber_auffaellig = []
+    if ggt and ggt > 60:
+        leber_auffaellig.append(f"GGT {ggt:.0f}")
+    if gpt and gpt > 50:
+        leber_auffaellig.append(f"GPT {gpt:.0f}")
+    if got and got > 50:
+        leber_auffaellig.append(f"GOT {got:.0f}")
+
+    if leber_auffaellig:
+        e.append(f"Leberenzyme erhöht ({', '.join(leber_auffaellig)}) – mögliche Fettleber. Alkohol, Zucker und Gewicht kontrollieren.")
+
+    # Kombination: metabolisches Syndrom
+    risiken = sum([
+        bool(hba1c and hba1c > 5.7),
+        bool(trig and trig > 150),
+        bool(hs and hs > 7.0),
+        bool(ggt and ggt > 60),
+    ])
+    if risiken >= 3:
+        e.append("Mehrere Stoffwechsel-Achsen gleichzeitig auffällig – metabolisches Syndrom wahrscheinlich. Ganzheitliche Therapie mit Arzt besprechen.")
+
+    if not e:
+        e.append("Stoffwechselwerte im Normalbereich – weiter so.")
+
     return e

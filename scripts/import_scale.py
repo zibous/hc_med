@@ -105,21 +105,22 @@ def import_scale_data(user_id: str | None = None):
 def _import_for_user(uid: str, info: dict, scale_path: Path, med_db_path: Path) -> int:
     """Importiert Scale-Daten für einen einzelnen User."""
     vorname = info.get("vorname", "")
+    scale_name = info.get("scale_name", vorname)  # Fallback auf vorname
     geburtsdatum_str = info.get("geburtsdatum", "1960-01-01")
     geburtsdatum = date(*[int(x) for x in geburtsdatum_str.split("-")])
 
-    # Scale-Daten lesen (Name = Vorname des Users)
+    # Scale-Daten lesen (Name = scale_name oder Vorname des Users)
     scale_conn = sqlite3.connect(str(scale_path))
     rows = scale_conn.execute("""
         SELECT date, weight, bmi, fat, muscle, water, visceral, lbm, protein, poi
         FROM daily_miscale
         WHERE name=? AND weight > 0
         ORDER BY date
-    """, (vorname,)).fetchall()
+    """, (scale_name,)).fetchall()
     scale_conn.close()
 
     if not rows:
-        print(f"  ⚠️  [{uid}] Keine Daten für '{vorname}' in hc_scale")
+        print(f"  ⚠️  [{uid}] Keine Daten für '{scale_name}' in hc_scale")
         return 0
 
     # In hc_med DB importieren

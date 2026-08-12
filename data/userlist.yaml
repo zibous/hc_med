@@ -11,7 +11,8 @@ patient:
     nachname: "Siebler"
     geburtsdatum: "1955-12-16"
     geschlecht: "m"
-    scaledb: ../../hc_scale/data/miscaledata.db 
+    scaledb: ../../hc_scale/data/miscaledata.db
+    scale_name: "Peter"
 
   reni:
     vorname: "Reni"

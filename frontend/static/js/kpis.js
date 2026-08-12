@@ -108,6 +108,11 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
       </div>
       <div class="kpi-sub">Klick für Detailanalyse mit Empfehlungen →</div>
     </div>` : ''}
+    <div class="kpi kpi-half kpi-clickable" id="kpi-stoffwechsel" style="cursor:pointer; border-left:3px solid var(--orange)">
+      <div class="kpi-label">🧬 Stoffwechsel-Risiko</div>
+      <div class="kpi-value-text">Blutzucker, Blutfette, Harnsäure, Leber – metabolisches Profil</div>
+      <div class="kpi-sub">Klick für Detailanalyse →</div>
+    </div>
     <div class="kpi kpi-half kpi-clickable" id="kpi-gesamtbericht" style="cursor:pointer; border-left:3px solid var(--accent)">
       <div class="kpi-label">📋 Gesamtbericht</div>
       <div class="kpi-value-text">Alle Befunde auf einer Seite – für den Arzttermin</div>
@@ -136,6 +141,11 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
   // Klick auf Gefäßgesundheit
   document.getElementById("kpi-gefaess")?.addEventListener("click", () => {
     navigate("verknuepfung", { verknuepfung: "Gefäßgesundheit" });
+  });
+
+  // Klick auf Stoffwechsel-Risiko
+  document.getElementById("kpi-stoffwechsel")?.addEventListener("click", () => {
+    navigate("verknuepfung", { verknuepfung: "Stoffwechsel-Risiko" });
   });
 
   // Klick auf Vergleich

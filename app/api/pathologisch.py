@@ -25,7 +25,7 @@ async def pathologisch(
         elif bis:
             datum_filter = f" AND datum <= '{bis}-12-31'"
 
-        # Letzter auffälliger Wert pro Test (unabhängig von Flag-Richtung)
+        # Letzter Wert pro Test prüfen – nur anzeigen wenn der AKTUELLE Wert auffällig ist
         query = f"""
             SELECT l.datum, l.gruppe, l.test_standard, l.wert_norm, l.einheit_norm, l.normbereich, l.flag,
                    (SELECT COUNT(*) FROM laborwerte l2 
@@ -36,7 +36,7 @@ async def pathologisch(
             {datum_filter}
             AND l.datum = (
                 SELECT MAX(l3.datum) FROM laborwerte l3 
-                WHERE l3.test_standard = l.test_standard AND l3.flag IN ('H','L')
+                WHERE l3.test_standard = l.test_standard
                 {datum_filter}
             )
             GROUP BY l.test_standard

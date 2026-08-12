@@ -274,6 +274,9 @@ verknuepfungen:
   - name: "Gefäßgesundheit"
     beschreibung: "Diese Werte bestimmen zusammen das Risiko für Arteriosklerose (verstopfte Arterien), Herzinfarkt und Schlaganfall. Die Kombination ist entscheidender als einzelne Werte."
     tests: ["LDL", "HDL", "Triglyceride", "CRP", "HbA1c", "Harnsäure"]
+  - name: "Stoffwechsel-Risiko"
+    beschreibung: "Metabolisches Syndrom – das Zusammenspiel von Blutzucker, Blutfetten, Harnsäure und Leberenzymen zeigt, ob der Stoffwechsel entgleist. Frühwarnsystem für Diabetes, Gicht und Fettleber."
+    tests: ["HbA1c", "Glucose", "Triglyceride", "Harnsäure", "GGT", "GPT", "GOT","Fettgehalt"]
 
 
 # Test-spezifische Empfehlungen bei auffälligen Werten

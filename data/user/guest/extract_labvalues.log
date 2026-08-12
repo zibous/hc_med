@@ -1,0 +1,30 @@
+2026-08-12 17:25:36,877 INFO main: Start für user=guest, data_dir=/dockerapps/apps_v2/hc_med/data
+2026-08-12 17:25:36,877 INFO main: Gefundene Dateien in /dockerapps/apps_v2/hc_med/data/user/guest/import: 7
+2026-08-12 17:25:36,882 INFO main: Rohwerte gesamt: 609
+2026-08-12 17:25:36,904 INFO main: Normalisierte Werte: 609
+2026-08-12 17:25:36,904 INFO main: Nach Deduplizierung: 609
+2026-08-12 17:25:36,911 INFO main: Compare-CSV geschrieben: /tmp/laborwerte_guest_compare.csv (602 Werte)
+2026-08-12 17:26:33,931 INFO main: Start für user=guest, data_dir=/dockerapps/apps_v2/hc_med/data
+2026-08-12 17:26:33,931 INFO main: Gefundene Dateien in /dockerapps/apps_v2/hc_med/data/user/guest/import: 7
+2026-08-12 17:26:33,936 INFO main: Rohwerte gesamt: 609
+2026-08-12 17:26:33,958 INFO main: Normalisierte Werte: 609
+2026-08-12 17:26:33,958 INFO main: Nach Deduplizierung: 609
+2026-08-12 17:26:33,966 INFO main: Compare-CSV geschrieben: /tmp/laborwerte_guest_compare.csv (602 Werte)
+2026-08-12 17:34:07,047 INFO main: Start für user=guest, data_dir=/dockerapps/apps_v2/hc_med/data
+2026-08-12 17:34:07,047 INFO main: Gefundene Dateien in /dockerapps/apps_v2/hc_med/data/user/guest/import: 7
+2026-08-12 17:34:07,052 INFO main: Rohwerte gesamt: 609
+2026-08-12 17:34:07,075 INFO main: Normalisierte Werte: 609
+2026-08-12 17:34:07,075 INFO main: Nach Deduplizierung: 609
+2026-08-12 17:34:07,078 INFO main: CSV geschrieben: /dockerapps/apps_v2/hc_med/data/user/guest/laborwerte_gesamt.csv
+2026-08-12 17:34:07,138 INFO database: DB: 602 Laborwerte, 7 Befunde geschrieben
+2026-08-12 17:34:07,138 INFO main: DB geschrieben: /dockerapps/apps_v2/hc_med/data/user/guest/labor.db
+2026-08-12 17:34:07,138 INFO main: Fertig
+2026-08-12 17:39:10,579 INFO main: Start für user=guest, data_dir=/dockerapps/apps_v2/hc_med/data
+2026-08-12 17:39:10,579 INFO main: Gefundene Dateien in /dockerapps/apps_v2/hc_med/data/user/guest/import: 7
+2026-08-12 17:39:10,584 INFO main: Rohwerte gesamt: 609
+2026-08-12 17:39:10,606 INFO main: Normalisierte Werte: 609
+2026-08-12 17:39:10,606 INFO main: Nach Deduplizierung: 609
+2026-08-12 17:39:10,609 INFO main: CSV geschrieben: /dockerapps/apps_v2/hc_med/data/user/guest/laborwerte_gesamt.csv
+2026-08-12 17:39:10,617 INFO database: DB: 602 Laborwerte, 7 Befunde geschrieben
+2026-08-12 17:39:10,620 INFO main: DB geschrieben: /dockerapps/apps_v2/hc_med/data/user/guest/labor.db
+2026-08-12 17:39:10,620 INFO main: Fertig
