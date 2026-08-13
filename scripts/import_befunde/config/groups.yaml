@@ -1,0 +1,134 @@
+# ==============================================================================
+# LABORGANISATION / GRUPPEN-ZUORDNUNG (Kompakt & Lesbar)
+# Die Regeln nach medizinischen Bereichen sortiert und kompakt aufgeschrieben
+# ==============================================================================
+
+# ─── Gruppen-Regeln nach medizinischen Bereichen sortiert ─────────────────────
+group_rules_by_category:
+  Harnanalyse:
+    [
+      "u-",
+      "uf-",
+      "harn im",
+      "blut im harn",
+      "nitrit",
+      "ketone",
+      "urobilinogen",
+      "plattenepithel",
+      "hyaline zylinder",
+      "schleim",
+      "spez. gewicht",
+      "ph-wert",
+      "eiweiß qualitat",
+    ]
+  Differentialblutbild:
+    [
+      "neutrophil",
+      "lymph",
+      "mono",
+      "eosinophil",
+      "eos",
+      "basophil",
+      "baso",
+      "gran",
+      "ig-wert",
+      "ig-absolut",
+      "nrbc",
+      "normoblast",
+      "unreife",
+    ]
+  Blutbild:
+    [
+      "leuko",
+      "leukocyt",
+      "erythro",
+      "ery",
+      "hämoglobin",
+      "hb",
+      "hämatokrit",
+      "hk",
+      "mcv",
+      "mch",
+      "mchc",
+      "rdw",
+      "thrombo",
+      "mpv",
+      "myoglobin",
+      "eisen",
+      "ferritin",
+    ]
+  Entzündung:
+    [
+      "crp",
+      "interleukin",
+      "procalcitonin",
+      "bsg",
+      "blutsenk",
+      "blutkörperchensenkung",
+      "senkung",
+    ]
+  Leber:
+    [
+      "got",
+      "gpt",
+      "ast",
+      "alt(gpt)",
+      "asat",
+      "alat",
+      "ggt",
+      "gamma-gt",
+      "gamma-glutamyl",
+      "alk.phos",
+      "alk. phos",
+      "alk.phosphatase",
+      "phosphatase",
+      "bilirubin",
+      "ldh",
+      "che",
+      "cholinesterase",
+    ]
+  Niere: ["kreatinin", "gfr", "harnstoff", "harnsäure"]
+  Elektrolyte: ["natrium", "kalium", "chlorid", "calcium", "magnesium", "phosphat"]
+  Stoffwechsel: ["gluc", "gluko", "hba1c", "totalprotein", "g.eiweiss"]
+  Lipide:
+    [
+      "cholesterin",
+      "hdl",
+      "ldl",
+      "non-hdl",
+      "triglycerid",
+      "quot. chol",
+      "q-ldl",
+      "ldl/hdl",
+      "nonhdl",
+    ]
+  Pankreas: ["amylase", "lipase"]
+  Gerinnung: ["quick", "ptz", "inr", "ptt", "aptt"]
+  Schilddrüse:
+    [
+      "tsh",
+      "t3",
+      "t4",
+      "calcitonin",
+      "pth",
+      "tg-ak",
+      "tpo-ak",
+      "thyreoglobulin",
+    ]
+  Tumor-Marker: ["psa"]
+  Autoimmun:
+    [
+      "anti-ccp",
+      "ccpr",
+      "anti-cardiolipin",
+      "ß2-glycoprotein",
+      "rheumafaktor",
+      "ana ",
+      "anca",
+      "la-screen",
+      "la-confirm",
+      "lupus",
+    ]
+  Hormone: ["testosteron"]
+  Körperdaten: ["gewicht", "fettgehalt", "fett", "bmi", "muskelmasse"]
+  Sonstige: ["peroxide", "antioxid"]

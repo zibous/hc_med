@@ -1,0 +1,21 @@
+# ─── Globale Filterlisten für die Pipeline ────────────────────────────────────
+pipeline_filters:
+  blacklist:
+    - "hans-peter"
+    - "spez. untersuchung"
+    - "arztbrief"
+    - "text blutbild"
+    - "letzte bearbeitung"
+  koerperdaten_blacklist:
+    - "gewicht"
+    - "fettgehalt"
+    - "fett"
+    - "bmi"
+    - "muskelmasse"
+  invalid_norms:
+    - "abs"
+    - "aut%"
+    - "rel%"
+    - "rel"
+    - "aut"
+    - "%"

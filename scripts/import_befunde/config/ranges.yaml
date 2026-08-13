@@ -1,0 +1,80 @@
+# ─── Plausibilitätsbereiche für Labor- und Körperdaten ────────────────────────
+plausible_ranges:
+  
+  # Blutbild
+  Leukozyten: [1.0, 50.0]         # 10^9/L
+  Erythrozyten: [2.0, 8.0]        # 10^12/L oder 10^6/µl
+  Hämoglobin: [5.0, 20.0]         # g/dL
+  Hämatokrit: [20.0, 60.0]        # %
+  MCV: [60.0, 110.0]              # fL
+  MCH: [20.0, 40.0]               # pg
+  MCHC: [28.0, 40.0]              # g/dL
+  RDW: [10.0, 20.0]               # %
+  Thrombozyten: [20.0, 600.0]     # 10^9/L
+  MPV: [6.0, 15.0]                # fL
+
+  # Entzündung
+  CRP: [0.0, 50.0]                # mg/dL
+  Interleukin-6: [0.0, 500.0]     # pg/mL
+  Procalcitonin: [0.0, 10.0]      # ng/mL
+  BSG 1h: [0.0, 120.0]            # mm
+
+  # Leber
+  GOT: [0.0, 500.0]               # U/L
+  GPT: [0.0, 500.0]               # U/L
+  GGT: [0.0, 500.0]               # U/L
+  Alk. Phosphatase: [20.0, 500.0] # U/L
+  Bilirubin: [0.0, 20.0]          # mg/dL
+  LDH: [50.0, 500.0]              # U/L
+  Cholinesterase: [3000.0, 15000.0] # U/L
+
+  # Niere
+  Kreatinin: [0.3, 5.0]           # mg/dL
+  GFR: [10.0, 150.0]              # mL/min
+  Harnstoff: [5.0, 150.0]         # mg/dL
+  Harnsäure: [1.0, 15.0]          # mg/dL
+
+  # Elektrolyte
+  Natrium: [120.0, 160.0]         # mmol/L
+  Kalium: [2.5, 7.0]              # mmol/L
+  Chlorid: [80.0, 120.0]          # mmol/L
+  Calcium: [1.5, 11.0]            # mmol/L oder mg/dL
+  Magnesium: [0.3, 3.0]           # mmol/L oder mg/dL
+  Phosphat: [0.5, 5.0]            # mmol/L oder mg/dL
+
+  # Stoffwechsel
+  Glucose: [30.0, 400.0]          # mg/dL
+  HbA1c: [3.0, 15.0]              # %
+  HbA1c (IFCC): [15.0, 120.0]     # mmol/mol
+  Totalprotein: [3.0, 10.0]       # g/dL
+
+  # Lipide
+  Cholesterin: [80.0, 400.0]      # mg/dL
+  HDL: [20.0, 120.0]              # mg/dL
+  LDL: [30.0, 300.0]              # mg/dL
+  Triglyceride: [30.0, 600.0]     # mg/dL
+  Quotient Chol/HDL: [1.0, 10.0]
+  Quotient LDL/HDL: [0.5, 8.0]
+
+  # Pankreas
+  Amylase: [5.0, 300.0]           # U/L
+  Pankreas-Amylase: [5.0, 200.0]  # U/L
+  Lipase: [5.0, 300.0]            # U/L
+
+  # Gerinnung
+  Quick: [20.0, 150.0]            # %
+  INR: [0.5, 5.0]
+  aPTT: [15.0, 80.0]              # Sek
+
+  # Schilddrüse
+  TSH: [0.01, 20.0]               # mIU/L
+
+  # Tumor-Marker
+  PSA: [0.0, 50.0]                # ng/mL
+
+  # Körperdaten
+  Gewicht: [40.0, 150.0]          # kg
+  BMI: [15.0, 45.0]
+  Fettgehalt: [3.0, 40.0]         # %
+  Muskelmasse: [20.0, 60.0]       # kg oder %
+

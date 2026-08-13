@@ -12,7 +12,7 @@ from pathlib import Path
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 _user_id = sys.argv[1] if len(sys.argv) > 1 else "peter"
-DB_PATH = DATA_DIR / "user" / _user_id / "labor.db"
+DB_PATH = DATA_DIR / "user" / _user_id / "labor_test.db"
 
 # Plausibilitäts-Ranges pro Test (min, max in der normalisierten Einheit)
 # Werte weit außerhalb sind Parser-Fehler oder Einheiten-Probleme

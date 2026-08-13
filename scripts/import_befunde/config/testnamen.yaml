@@ -1,0 +1,112 @@
+# ─── Test-Aliase nach medizinischen Bereichen sortiert ────────────────────────
+test_aliases_by_category:
+  Blutbild:
+    Leukozyten: ["leukocyten", "leuko", "leukozyten", "leukozyten abs."]
+    Lymphozyten rel.: ["lymphocyten %", "lymphozyten rel.", "lymphozyten", "lymph.aut."]
+    Lymphozyten abs.: ["lymphozyten abs.", "lymph.abs."] 
+    Erythrozyten: ["erythrocyten", "erythrozyten", "ery"]
+    RDW: ["erythrozyten rdw", "rdw", "rdw-cv"]
+    Hämoglobin: ["hämoglobin", "hgb", "hb"]
+    MCH: ["hbe (mca)", "mch"]
+    Hämatokrit: ["hämatokrit", "hk"]
+    MCV: ["mcv"]
+    MCHC: ["mchc"]
+    Thrombozyten: ["thrombocyten", "thrombozyten", "thrombocyten (citrat)", "thrombo"]
+    MPV: ["mpv", "mpv (mittleres thrombozytenvolumen)"]
+
+  Differentialblutbild:
+    Neutrophile rel.: ["neutrophile %", "neutroph. gran. rel.", "neutrophile"]
+    Neutrophile abs.:
+      [
+        "neutrophile absolut",
+        "neutroph. gran. abs.",
+        "neutrophile abs",
+        "neutrophile abs.",
+      ]
+    Granulozyten rel.: ["granulocytes", "granulozyten", "gran.aut."]
+    Granulozyten abs.: ["granul.abs"]
+    Monozyten rel.: ["monocyten %", "monozyten rel.", "monozyten", "mono.aut.", "monocyten %"]
+    Monozyten abs.: ["mono absolut", "monozyten abs.", "mono"]
+    Eosinophile rel.: ["eosinophile %", "eosinophile gr. rel.", "eosinophile", "eos.aut."]
+    Eosinophile abs.: ["eosinophile gr. abs.", "eos"]
+    Basophile rel.: ["basophile %", "basophile gr.rel.", "baso.aut.", "basophile"]
+    Basophile abs.: ["basophile gr.abs.", "baso"]
+    IG-Absolut: ["ig-absolut", "unreife neutrophile granulozyten abs."]
+    IG-Wert: ["ig-wert", "gran., unreife rel."]
+    NRBC: ["nrbc", "normoblast.(nrbc)rt."]
+    NRBC-A: ["nrbc-a", "normoblasten (nrbc) abs."]
+
+  Entzündung:
+    CRP: ["crp", "crp hs", "crp quantitativ", "crp", "crp hs"]
+    Interleukin-6: ["interleukin 6"]
+    Procalcitonin: ["procalcitonin"]
+    BSG 1h: ["bsg nach 1 h"]
+    BSG 2h: ["bsg nach 2 h"]
+    Rheumafaktor: ["rheumafaktor"]
+
+  Leber:
+    GOT: ["got (asat)", "asat (got)", "ast(got)"]
+    GPT: ["gpt (alat)", "alat (gpt)", "alt(gpt)"]
+    GGT: ["ggt", "gamma-gt", "gamma-glutaminyltransferase", "ggt-37"]
+    Alk. Phosphatase: ["alk.phos.", "alk.phosphatase (ap)", "alk. phosphatase"]
+    Bilirubin: ["bilirubin gesamt", "bilirubin"]
+    LDH: ["ldh"]
+    Cholinesterase: ["che", "cholinesterase"]
+
+  Niere:
+    Kreatinin: ["kreatinin"]
+    GFR: ["gfr-ckd/1.73m2", "gfr-ckd", "gfr-ckd krea", "gfr (ckd-epi)"]
+    Harnstoff: ["harnstoff"]
+    Harnsäure: ["harnsäure"]
+
+  Elektrolyte:
+    Natrium: ["natrium"]
+    Kalium: ["kalium"]
+    Chlorid: ["chlorid"]
+    Calcium: ["calcium"]
+    Magnesium: ["magnesium"]
+    Phosphat: ["phosphat"]
+
+  Stoffwechsel:
+    Glucose: ["glucose", "glucose nüchtern", "glukose"]
+    HbA1c: ["hba1c (ngsp)", "hbalc (ngsp)", "hba1c"]
+    HbA1c (IFCC): ["hba1c (ifcc)", "hbalc (ifcc)"]
+    Totalprotein: ["totalprotein", "g.eiweiss"]
+
+  Lipide:
+    Cholesterin: ["cholesterin"]
+    HDL: ["hdl-cholesterin", "hdl cholesterin"]
+    LDL: ["ldl-cholesterin", "ldl cholesterin"]
+    Non-HDL-Cholesterin: ["non-hdl-chol.", "non-hdl-cholesterin"]
+    Quotient Chol/HDL:
+      [
+        "quotient cholesterin/hdl",
+        "quotient hdl/cholesterin",
+        "quot. chol./hdl",
+        "index cholesterin/hdl",
+      ]
+    Quotient LDL/HDL: ["index ldl/hdl", "ldl/hdl quotient", "ld/hdl", "q-ldl"]
+    Triglyceride: ["triglyceride"]
+
+  Pankreas:
+    Amylase: ["amylase"]
+    Pankreas-Amylase: ["p-amylase", "pankreas-amylase"]
+    Lipase: ["lipase"]
+
+  Gerinnung:
+    Quick: ["quick", "quick (prothrombinzeit)", "ptz (prothrombinz.)"]
+    INR: ["inr (quick)", "inr"]
+    aPTT: ["ptt actin fs", "aptt"]
+
+  Schilddrüse:
+    TSH: ["tsh"]
+
+  Tumor-Marker:
+    PSA: ["psa"]
+
+  Autoimmun:
+    Anti-CCP: ["anti-ccp"]
+    Anti-Cardiolipin: ["anti-cardiolipin ak (aca)"]
+    Anti-β2-Glycoprotein: ["anti-ß2-glycoprotein ak"]
+    La-Screen: ["la-screen"]
+    La-Confirm: ["la-confirm"]

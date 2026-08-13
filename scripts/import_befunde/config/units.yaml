@@ -1,0 +1,54 @@
+# ─── Standard-Einheiten pro Test ──────────────────────────────────────────────
+standard_units:
+  Hämoglobin: "g/dL"
+  MCHC: "g/dL"
+  Hämatokrit: "%"
+  Leukozyten: "10^9/L"
+  Erythrozyten: "10^12/L"
+  Thrombozyten: "10^9/L"
+  CRP: "mg/dL"
+  Kreatinin: "mg/dL"
+  GFR: "mL/min"
+  Glucose: "mg/dL"
+  Natrium: "mmol/L"
+  Kalium: "mmol/L"
+  GOT: "U/L"
+  GPT: "U/L"
+  GGT: "U/L"
+  Basophile abs.: "0.00-0.08"
+  Eosinophile abs.: "0.04-0.40"
+  Monozyten abs.: "0.20-0.60"
+  Lymphozyten abs.: "0.70-4.80"
+  IG-Absolut: "0.00-0.10"
+  IG-Wert: "0.0-5.0"
+  NRBC: "< 1.0"
+  NRBC-A: "< 0.01"
+  INR: "0.8-1.3"
+  Testosteron: "ng/mL"
+  Cholesterin: "<200"
+  HDL: ">40"
+  HDL Cholesterin: ">40"
+  LDL: "<130"
+  Non-HDL-Cholesterin: "<160"
+  Quotient LDL/HDL: "0.0-3.0"
+  Harnstoff: "17-49"
+  Antioxid Kap.: "> 2200"
+  Peroxide: "< 300"
+  
+# Einheiten-Konversionen (Von welcher Einheit bei welchem Test -> Ziel & Faktor)
+unit_conversions:
+  - { von_einheit: "g/l_", test_standard: "Hämoglobin", ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "g/l",  test_standard: "Hämoglobin", ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "g/l_", test_standard: "MCHC",       ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "g/l",  test_standard: "MCHC",       ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "l/l",  test_standard: "Hämatokrit", ziel_einheit: "%",    faktor: 100.0 }
+  - { von_einheit: "/l",   test_standard: "Hämatokrit", ziel_einheit: "%",    faktor: 100.0 }
+  - { von_einheit: "ku/l", test_standard: "Cholinesterase", ziel_einheit: "U/L", faktor: 1000.0 }
+  - { von_einheit: "g/l",  test_standard: "Leukozyten", ziel_einheit: "10^9/L", faktor: 1.0 }
+  - { von_einheit: "t/l",  test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
+  - { von_einheit: "g/l",  test_standard: "Thrombozyten", ziel_einheit: "10^9/L", faktor: 1.0 }
+  - { von_einheit: "g/dl", test_standard: "MPV",        ziel_einheit: "fL",    faktor: 1.0 }
+  - { von_einheit: "t/l",  test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
+  - { von_einheit: "/l",   test_standard: "Hämatokrit", ziel_einheit: "%",        faktor: 100.0 }
+  - { von_einheit: "l/l",  test_standard: "Hämatokrit", ziel_einheit: "%",        faktor: 100.0 }
+  - { von_einheit: "106/µl", test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
