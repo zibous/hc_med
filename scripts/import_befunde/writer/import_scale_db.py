@@ -1,11 +1,13 @@
+import logging
 import sqlite3
 import sys
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
-# Zentrale Konfiguration laden
 from config.app_config import config
+
+log = logging.getLogger("labor_pipeline")
 
 def calculate_age(measurement_date: str, geburtsdatum: date) -> int:
     """Berechnet das Alter zum Messzeitpunkt."""
@@ -40,14 +42,14 @@ def import_scale_data(user_id: str):
     scaledb_str = patient_data.get("scaledb", "")
     
     if not scaledb_str:
-        print(f"  ℹ️  [{user_id}] Kein 'scaledb'-Eintrag hinterlegt – Übersprungen.")
+        log.info(f"  ℹ️  [{user_id}] Kein 'scaledb'-Eintrag hinterlegt – Übersprungen.")
         return
 
     med_db_path = config.DB_FILE
     scale_path = resolve_scale_db(scaledb_str)
     
     if not scale_path:
-        print(f"  ⚠️  [{user_id}] Scale-DB nicht gefunden unter: {scaledb_str}")
+        log.warning(f"  ⚠️  [{user_id}] Scale-DB nicht gefunden unter: {scaledb_str}")
         return
 
     vorname = patient_data.get("vorname", "")
@@ -66,7 +68,7 @@ def import_scale_data(user_id: str):
     scale_conn.close()
 
     if not rows:
-        print(f"  ⚠️  [{user_id}] Keine Waage-Daten für Name '{scale_name}' in hc_scale gefunden.")
+        log.warning(f"  ⚠️  [{user_id}] Keine Waage-Daten für Name '{scale_name}' in hc_scale gefunden.")
         return
 
     # In aktive hc_med DB einspeisen
@@ -76,7 +78,7 @@ def import_scale_data(user_id: str):
     # Echte, interne Patienten-ID holen
     patient = med_conn.execute("SELECT id FROM patienten LIMIT 1").fetchone()
     if not patient:
-        print(f"  ⚠️  [{user_id}] SQLite-Fehler: Noch kein Patient in der Datenbank vorhanden.")
+        log.warning(f"  ⚠️  [{user_id}] SQLite-Fehler: Noch kein Patient in der Datenbank vorhanden.")
         med_conn.close()
         return
     patient_id = patient[0]
@@ -150,4 +152,4 @@ def import_scale_data(user_id: str):
     med_conn.commit()
     med_conn.close()
 
-    print(f"  ✓ [{user_id}] {len(insert_rows)} Körperdaten erfolgreich aus Scale-DB geladen ({len(weekly)} Monate).")
+    log.info(f"  ✓ [{user_id}] {len(insert_rows)} Körperdaten erfolgreich aus Scale-DB geladen ({len(weekly)} Monate).")

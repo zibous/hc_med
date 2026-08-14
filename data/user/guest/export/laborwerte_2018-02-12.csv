@@ -9,23 +9,23 @@ Hämatokrit;41-53;43;%;
 Hämoglobin;13.0-17.5;14.5;g/dL;
 Leukozyten;3.7-10.0;14.2;10^9/L;H
 MCH;28-33;30;pg;
-MCHC;33.0-36.0;33.7;g/dL;
+MCHC;33.0-36.0;33.70;g/dL;
 MCV;80-96;89;fL;
-MPV;7.0-12.0;10.2;fL;
+MPV;7.0-12.0;10.20;fL;
 RDW;11.5-14.5;13.1;%;
 Thrombozyten;150-450;485;10^9/L;H
 Basophile abs.;0.0-0.1;0.02;10^9/L;
-Basophile rel.;0-2;0;%;
+Basophile rel.;0-2;0.0;%;
 Eosinophile abs.;0.0-0.5;0.0;10^9/L;
-Eosinophile rel.;0-7;0;%;
+Eosinophile rel.;0-7;0.0;%;
 Granulozyten abs.;1.8-7.0;11.9;10^9/L;H
-Granulozyten rel.;40-75;84;%;H
+Granulozyten rel.;40-75;84.0;%;H
 Lymphozyten abs.;1.0-3.5;1.4;10^9/L;
-Lymphozyten rel.;20-45;10;%;L
+Lymphozyten rel.;20-45;10.0;%;L
 Monozyten abs.;0.2-0.8;0.9;10^9/L;H
-Monozyten rel.;2-12;6;%;
+Monozyten rel.;2-12;6.0;%;
 Neutrophile abs.;1.5-6.7;11.5;10^9/L;H
-Neutrophile rel.;40-75;81;%;H
+Neutrophile rel.;40-75;81.0;%;H
 Calcium;8.6-10.2;8.8;mg/dL;
 Chlorid;98-107;99;mmol/L;
 Kalium;3.5-5.1;3.9;mmol/L;
@@ -42,11 +42,11 @@ Quick;70-120;65;%;L
 aPTT;23-35;39;Sek.;H
 Hyaline Zylinder;0-2;4;/µL;H
 Plattenepithel.;0-15;18;/µL;H
-Spez. Gewicht;1015-1025;1028;;H
+Spez. Gewicht;1015-1025;1028;g/mL;H
 pH-Wert;5.00-8.00;5.20;;
 Myoglobin;28-72;95;ng/mL;H
 Testosteron;2.5-8.0;3.1;ng/mL;
-BMI;22-27;22.9;;
+BMI;22-27;22.9;kg/m²;
 Fett;;10.9;kg;
 Fettfreie Masse;;61.1;kg;
 Fettgehalt;13-25;15.2;%;
@@ -59,28 +59,28 @@ Viszeralfett;1-12;4;;
 Alk. Phosphatase;40-129;88;U/L;
 Bilirubin;<1.2;0.8;mg/dL;
 Cholinesterase;5300-12900;6800;U/L;
-GGT;<60;42;U/L;
-GOT;<50;35;U/L;
-GPT;<50;38;U/L;
-LDH;<250;240;U/L;
-Cholesterin;<200;155;mg/dL;
-HDL;>40;34;mg/dL;L
-LDL;<150;92;mg/dL;
-Non-HDL-Cholesterin;<160;121;mg/dL;
+GGT;<60;42.00;U/L;
+GOT;<50;35.00;U/L;
+GPT;<50;38.00;U/L;
+LDH;<250;240.00;U/L;
+Cholesterin;<200;155.00;mg/dL;
+HDL;>40;34.00;mg/dL;L
+LDL;<150;92.00;mg/dL;
+Non-HDL-Cholesterin;<160;121.00;mg/dL;
 Quotient Chol/HDL;0.0-5.0;4.6;;
 Quotient LDL/HDL;0.0-3.0;2.7;*;
-Triglyceride;<200;145;mg/dL;
+Triglyceride;<200;145.00;mg/dL;
 GFR;>90;84;mL/min;L
-Harnstoff;15-45;46;mg/dL;H
-Harnsäure;3.4-7.0;6.2;mg/dL;
+Harnstoff;15-45;46.00;mg/dL;H
+Harnsäure;3.4-7.0;6.20;mg/dL;
 Kreatinin;0.70-1.20;1.15;mg/dL;
-Amylase;<100;145;U/L;H
-Lipase;<60;112;U/L;H
-Pankreas-Amylase;<53;78;U/L;H
+Amylase;<100;145.00;U/L;H
+Lipase;<60;112.00;U/L;H
+Pankreas-Amylase;<53;78.00;U/L;H
 TSH;0.27-4.20;2.10;µU/mL;
 Antioxid Kap.;>2200;1950;µmol/L;L
 Peroxide;<300;380;CARR U;H
-Glucose;60-100;118;mg/dL;H
+Glucose;60-100;118.00;mg/dL;H
 HbA1c;3.8-5.7;5.5;%Hb;
 HbA1c (IFCC);20-42;37;mmol/mol;
 Totalprotein;6.4-8.3;7.8;g/dL;

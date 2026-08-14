@@ -1,7 +1,27 @@
 import sys
+import logging
 from datetime import date
 from pathlib import Path
 import yaml
+
+
+def setup_logging(level: str = "INFO") -> logging.Logger:
+    """Konfiguriert das zentrale Logging für die Pipeline."""
+    logger = logging.getLogger("labor_pipeline")
+    if logger.handlers:
+        return logger
+
+    logger.setLevel(getattr(logging, level.upper(), logging.INFO))
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logger.level)
+
+    # Kompaktes Format: nur Nachricht (wie bisherige print-Ausgaben)
+    formatter = logging.Formatter("%(message)s")
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+    return logger
 
 class AppConfig:
 
@@ -17,9 +37,17 @@ class AppConfig:
         
         # 2. Modus & User bestimmen
         self.test_mode = "--test" in sys.argv
-        self.export_mode = "--export" in sys.argv
-        args = [arg for arg in sys.argv[1:] if arg not in ("--test", "--export")]
+        args = [arg for arg in sys.argv[1:] if arg not in ("--test", "--debug", "--quiet")]
         self.user_id = args[0] if args else "peter"
+
+        # 3. Logging konfigurieren (--debug → DEBUG, --quiet → WARNING, default → INFO)
+        if "--debug" in sys.argv:
+            log_level = "DEBUG"
+        elif "--quiet" in sys.argv:
+            log_level = "WARNING"
+        else:
+            log_level = "INFO"
+        self.log = setup_logging(log_level)
 
         # 3. Dynamische User-Pfade festlegen
         self.USER_DIR = self.DATA_DIR / "user" / self.user_id
@@ -35,8 +63,8 @@ class AppConfig:
         self._patient = userlist.get("patient", {}).get(self.user_id, {})
         
         if not self._patient:
-            print(f"❌ User '{self.user_id}' nicht in userlist.yaml gefunden")
-            print(f"   Verfügbar: {', '.join(userlist.get('patient', {}).keys())}")
+            self.log.error(f"User '{self.user_id}' nicht in userlist.yaml gefunden")
+            self.log.error(f"   Verfügbar: {', '.join(userlist.get('patient', {}).keys())}")
             sys.exit(1)
             
         self.PATIENT_GEBURTSDATUM = date(*[int(x) for x in self._patient.get("geburtsdatum", "1960-01-01").split("-")])
@@ -53,13 +81,22 @@ class AppConfig:
         return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
 
     def _load_pipeline_configs(self):
-        # A) Einheiten & Konversionen
-        units_cfg = self._load_yaml(self.CONFIG_DIR / "units.yaml")
+        # A) Einheiten, Normbereiche & Konversionen (units_neu.yaml = Haupt-Quelle)
+        units_cfg = self._load_yaml(self.CONFIG_DIR / "units_neu.yaml")
         self.STANDARD_UNITS = units_cfg.get("standard_units", {})
         self.UNIT_CONVERSIONS = {
             (item["von_einheit"].strip().lower(), item["test_standard"]): (item["ziel_einheit"], float(item["faktor"]))
             for item in units_cfg.get("unit_conversions", [])
         }
+
+        # Normbereiche: geschlechtsspezifisch auflösen
+        # Struktur: { allgemein: {...}, maennlich: {...}, weiblich: {...} }
+        # → Flachklopfen zu einem Dict, geschlechtsspezifisch überschreibt allgemein
+        ranges_raw = units_cfg.get("standard_ranges", {})
+        geschlecht_key = "maennlich" if self.PATIENT_GESCHLECHT == "m" else "weiblich"
+        self.STANDARD_RANGES = {}
+        self.STANDARD_RANGES.update(ranges_raw.get("allgemein", {}))
+        self.STANDARD_RANGES.update(ranges_raw.get(geschlecht_key, {}))
 
         # B) Test-Aliase (Flachklopfen der Kategorien)
         aliases_yaml = self._load_yaml(self.CONFIG_DIR / "testnamen.yaml").get("test_aliases_by_category", {})

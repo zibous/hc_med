@@ -187,6 +187,139 @@ def _build_gefaess_zusammenfassung(faktoren: list[dict]) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Stoffwechsel-Risiko Score
+# ---------------------------------------------------------------------------
+
+_STOFFWECHSEL_FAKTOREN = [
+    # (test_name, threshold, operator, points, label)
+    ("Glucose", 100, "gt", 1, "Glucose nüchtern"),
+    ("HbA1c", 5.7, "gt", 1, "HbA1c"),
+    ("HbA1c (IFCC)", 39, "gt", 1, "HbA1c (IFCC)"),
+    ("Triglyceride", 150, "gt", 1, "Triglyceride"),
+    ("HDL", 40, "lt", 1, "HDL"),
+    ("GPT", 50, "gt", 1, "GPT"),
+    ("GGT", 60, "gt", 1, "GGT"),
+    ("Harnsäure", 7.0, "gt", 1, "Harnsäure"),
+    ("BMI", 30, "gt", 1, "BMI"),
+]
+
+
+def berechne_stoffwechsel_score(conn: sqlite3.Connection) -> dict:
+    """Berechnet das Stoffwechsel-Risikoprofil (metabolisches Syndrom).
+
+    Faktoren: Blutzucker, HbA1c, Triglyceride, HDL, Leberwerte,
+    Harnsäure und BMI.
+
+    Returns:
+        dict mit keys: score, max, status, faktoren, zusammenfassung
+    """
+    score = 0
+    max_score = 9
+    faktoren = []
+
+    # HbA1c und HbA1c (IFCC) – nur den relevanten zählen
+    hba1c_val = _get_last_value(conn, "HbA1c")
+    hba1c_ifcc_val = _get_last_value(conn, "HbA1c (IFCC)")
+
+    for test_name, threshold, operator, points, label in _STOFFWECHSEL_FAKTOREN:
+        # Duplikat-Vermeidung: Nur einen HbA1c-Wert scoren
+        if test_name == "HbA1c (IFCC)" and hba1c_val is not None:
+            continue
+        if test_name == "HbA1c" and hba1c_val is None and hba1c_ifcc_val is None:
+            continue
+
+        wert = _get_last_value(conn, test_name)
+        if wert is None:
+            continue
+
+        aktiv = wert > threshold if operator == "gt" else wert < threshold
+        if aktiv:
+            score += points
+
+        # Formatierung
+        if test_name in ("HbA1c",):
+            wert_str = f"{wert:.1f}%"
+        elif test_name in ("Harnsäure", "BMI"):
+            wert_str = f"{wert:.1f}"
+        elif test_name in ("Glucose", "Triglyceride", "GPT", "GGT", "HbA1c (IFCC)"):
+            wert_str = f"{wert:.0f}"
+        else:
+            wert_str = f"{wert:.0f}"
+
+        faktoren.append({
+            "name": label,
+            "wert": wert_str,
+            "punkte": points if aktiv else 0,
+            "max": points,
+            "aktiv": aktiv,
+        })
+
+    if score >= 5:
+        status = "kritisch"
+    elif score >= 3:
+        status = "auffällig"
+    else:
+        status = "gut"
+
+    return {
+        "score": score,
+        "max": max_score,
+        "status": status,
+        "faktoren": faktoren,
+        "zusammenfassung": _build_stoffwechsel_zusammenfassung(faktoren),
+    }
+
+
+def _build_stoffwechsel_zusammenfassung(faktoren: list[dict]) -> str:
+    """Generiert einen Zusammenfassungssatz für das Stoffwechsel-Risikoprofil."""
+    aktive = [f for f in faktoren if f["aktiv"]]
+    if not aktive:
+        return "Kein erhöhtes Stoffwechsel-Risiko – alle metabolischen Parameter im Normbereich."
+
+    teile = []
+
+    # Blutzucker
+    zucker_aktiv = [f for f in aktive if f["name"] in ("Glucose nüchtern", "HbA1c", "HbA1c (IFCC)")]
+    if len(zucker_aktiv) >= 2:
+        teile.append("eine Insulinresistenz bzw. Prädiabetes (Nüchternglucose und Langzeitblutzucker erhöht)")
+    elif any(f["name"] == "HbA1c" or f["name"] == "HbA1c (IFCC)" for f in zucker_aktiv):
+        teile.append("einen erhöhten Langzeitblutzucker (Prädiabetes)")
+    elif any(f["name"] == "Glucose nüchtern" for f in zucker_aktiv):
+        teile.append("eine erhöhte Nüchternglucose")
+
+    # Lipide
+    if any(f["name"] == "Triglyceride" for f in aktive):
+        teile.append("erhöhte Triglyceride")
+    if any(f["name"] == "HDL" for f in aktive):
+        teile.append("ein erniedrigtes HDL")
+
+    # Leber
+    leber_aktiv = [f for f in aktive if f["name"] in ("GPT", "GGT")]
+    if len(leber_aktiv) >= 2:
+        teile.append("erhöhte Leberwerte (GPT und GGT – Hinweis auf Fettleber)")
+    elif leber_aktiv:
+        teile.append(f"einen erhöhten {leber_aktiv[0]['name']}-Wert")
+
+    # Harnsäure
+    if any(f["name"] == "Harnsäure" for f in aktive):
+        teile.append("eine Hyperurikämie (erhöhte Harnsäure)")
+
+    # BMI
+    if any(f["name"] == "BMI" for f in aktive):
+        teile.append("Adipositas (BMI > 30)")
+
+    if not teile:
+        return ""
+
+    if len(teile) == 1:
+        aufzaehlung = teile[0]
+    else:
+        aufzaehlung = ", ".join(teile[:-1]) + " sowie " + teile[-1]
+
+    return f"Das Stoffwechsel-Profil zeigt {aufzaehlung}. Eine ärztliche Beratung zur Lebensstiloptimierung ist empfohlen."
+
+
+# ---------------------------------------------------------------------------
 # Gruppen-Summary mit Traffic-Light
 # ---------------------------------------------------------------------------
 
@@ -581,6 +714,7 @@ def build_report_data(conn: sqlite3.Connection, befunde_count: int = 0, von: str
         "bemerkung": bemerkung,
         "gruppen": build_gruppen_summary(conn, datum_filter=datum_filter),
         "gefaess_score": berechne_gefaess_score(conn),
+        "stoffwechsel_score": berechne_stoffwechsel_score(conn),
         "abnormal_tests": build_abnormal_tests(conn, datum_filter=datum_filter),
         "normal_tests": _build_normal_tests(conn, datum_filter=datum_filter, exclude_tests=_get_abnormal_test_names(conn, datum_filter)),
         "verknuepfung_charts": build_verknuepfung_charts(conn),

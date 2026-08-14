@@ -1,18 +1,20 @@
+import logging
 import sqlite3
 from pathlib import Path
 
-# Zentrale Konfiguration laden
 from config.app_config import config
+
+log = logging.getLogger("labor_pipeline")
+
 
 def validate_database() -> tuple[dict, list]:
     """Prüft alle Werte in der aktiven DB auf Plausibilität anhand der Config-Ranges."""
     db_path = config.DB_FILE
-    
+
     if not db_path.exists():
-        print(f"  ⚠️  [Validator] labor.db nicht vorhanden unter: {db_path}")
+        log.warning(f"[Validator] labor.db nicht vorhanden unter: {db_path}")
         return {"total": 0, "ok": 0, "outside_range": 0, "not_numeric": 0, "no_range_defined": 0}, []
 
-    # 💡 FIX: Nutzt die zentral in app_config geladenen Ranges (aus der YAML)
     plausible_ranges = getattr(config, "PLAUSIBLE_RANGES", {})
 
     conn = sqlite3.connect(str(db_path))
@@ -31,7 +33,6 @@ def validate_database() -> tuple[dict, list]:
         test = r["test_standard"]
         wert_str = str(r["wert_norm"]).replace("<", "").replace(">", "").strip()
 
-        # Nicht-numerische Werte abfangen
         try:
             val = float(wert_str)
         except (ValueError, TypeError):
@@ -47,13 +48,11 @@ def validate_database() -> tuple[dict, list]:
             })
             continue
 
-        # Range-Definition in der YAML vorhanden?
         if test not in plausible_ranges:
             stats["no_range_defined"] += 1
             stats["ok"] += 1
             continue
 
-        # Range auswerten (erwartet ein zweielementiges Array/Tuple [min, max] aus der YAML)
         range_v = plausible_ranges[test]
         if not isinstance(range_v, (list, tuple)) or len(range_v) != 2:
             stats["no_range_defined"] += 1
@@ -86,34 +85,35 @@ def validate_database() -> tuple[dict, list]:
     conn.close()
     return stats, issues
 
+
 def print_validation_report(stats: dict, issues: list) -> None:
-    """Gibt den strukturierten Validierungsbericht auf dem Terminal aus."""
-    print("\n📊 Validierungsbericht (Plausibilitäts-Check)")
-    print("=" * 110)
-    print(f"  Gesamt-Werte:        {stats['total']}")
-    print(f"  ✅ Plausibel:         {stats['ok']}")
-    print(f"  ❌ Außerhalb Range:   {stats['outside_range']}")
-    print(f"  ⚠️  Nicht numerisch:  {stats['not_numeric']}")
-    print(f"  ℹ️  Ohne Range-Def.:  {stats['no_range_defined']}")
-    print()
+    """Gibt den strukturierten Validierungsbericht aus."""
+    log.info("\n📊 Validierungsbericht (Plausibilitäts-Check)")
+    log.info("=" * 110)
+    log.info(f"  Gesamt-Werte:        {stats['total']}")
+    log.info(f"  ✅ Plausibel:         {stats['ok']}")
+    log.info(f"  ❌ Außerhalb Range:   {stats['outside_range']}")
+    log.info(f"  ⚠️  Nicht numerisch:  {stats['not_numeric']}")
+    log.info(f"  ℹ️  Ohne Range-Def.:  {stats['no_range_defined']}")
+    log.info("")
 
     if not issues:
-        print("  🎉 Keine Plausibilitätsfehler in der Datenbank gefunden!")
+        log.info("  🎉 Keine Plausibilitätsfehler in der Datenbank gefunden!")
         return
 
     range_issues = [i for i in issues if i["typ"] == "AUSSERHALB_RANGE"]
     non_numeric = [i for i in issues if i["typ"] == "NICHT_NUMERISCH"]
 
     if range_issues:
-        print(f"  ❌ Werte außerhalb plausible Range ({len(range_issues)}):")
-        print(f"  {'Datum':<12} {'Test':<22} {'Wert':>8} {'Einheit':<8} {'Range':<14} {'Abweichung':<25} {'Original'}")
-        print("  " + "-" * 118)
+        log.warning(f"  ❌ Werte außerhalb plausible Range ({len(range_issues)}):")
+        log.info(f"  {'Datum':<12} {'Test':<22} {'Wert':>8} {'Einheit':<8} {'Range':<14} {'Abweichung':<25} {'Original'}")
+        log.info("  " + "-" * 118)
         for i in range_issues:
-            print(f"  {i['datum']:<12} {i['test']:<22} {i['wert']:>8.2f} {i['einheit'] or '':<8} {i['range']:<14} {i['abweichung']:<25} {i['original']}")
+            log.info(f"  {i['datum']:<12} {i['test']:<22} {i['wert']:>8.2f} {i['einheit'] or '':<8} {i['range']:<14} {i['abweichung']:<25} {i['original']}")
 
     if non_numeric:
-        print(f"\n  ⚠️  Nicht-numerische Werte ({len(non_numeric)}):")
-        print(f"  {'Datum':<12} {'Test':<22} {'Wert':<15} {'Original'}")
-        print("  " + "-" * 70)
+        log.warning(f"\n  ⚠️  Nicht-numerische Werte ({len(non_numeric)}):")
+        log.info(f"  {'Datum':<12} {'Test':<22} {'Wert':<15} {'Original'}")
+        log.info("  " + "-" * 70)
         for i in non_numeric:
-            print(f"  {i['datum']:<12} {i['test']:<22} {i['wert']:<15} {i['original']}")
+            log.info(f"  {i['datum']:<12} {i['test']:<22} {i['wert']:<15} {i['original']}")

@@ -51,6 +51,7 @@ async def overview():
             """, (name,)).fetchall()
 
             # Bewertung: Anteil aktuell auffälliger Tests (nicht historisch)
+            # Nur Tests berücksichtigen deren letzte Messung max. 3 Jahre alt ist
             aktuell_path = conn.execute("""
                 SELECT COUNT(DISTINCT l.test_standard) FROM laborwerte l
                 WHERE l.gruppe=? AND l.flag IN ('H','L')
@@ -58,21 +59,56 @@ async def overview():
                     SELECT MAX(l2.datum) FROM laborwerte l2
                     WHERE l2.test_standard = l.test_standard
                 )
+                AND l.datum >= date('now', '-3 years')
             """, (name,)).fetchone()[0]
-            
+
             aktuell_total = conn.execute("""
-                SELECT COUNT(DISTINCT test_standard) FROM laborwerte WHERE gruppe=?
+                SELECT COUNT(DISTINCT l.test_standard) FROM laborwerte l
+                WHERE l.gruppe=?
+                AND l.datum = (
+                    SELECT MAX(l2.datum) FROM laborwerte l2
+                    WHERE l2.test_standard = l.test_standard
+                )
+                AND l.datum >= date('now', '-3 years')
             """, (name,)).fetchone()[0]
-            
+
+            # Basis-Bewertung: Anteil der Tests deren LETZTER Wert auffällig ist
             path_ratio = aktuell_path / aktuell_total if aktuell_total > 0 else 0
             if path_ratio == 0:
                 status = "gut"
-            elif path_ratio < 0.15:
+            elif path_ratio < 0.20:
                 status = "ok"
-            elif path_ratio < 0.35:
+            elif path_ratio < 0.40:
                 status = "auffällig"
             else:
                 status = "kritisch"
+
+            # Hochstufung: Ein Test mit ≥5 Messungen UND die letzten 3 alle auffällig
+            # macht die Gruppe "kritisch" – zeigt dauerhaftes Problem an
+            if status == "auffällig" and aktuell_path > 0:
+                auff_tests = conn.execute("""
+                    SELECT DISTINCT l.test_standard FROM laborwerte l
+                    WHERE l.gruppe=? AND l.flag IN ('H','L')
+                    AND l.datum = (SELECT MAX(l2.datum) FROM laborwerte l2
+                                   WHERE l2.test_standard = l.test_standard)
+                """, (name,)).fetchall()
+
+                for t in auff_tests:
+                    total_count = conn.execute(
+                        "SELECT COUNT(*) FROM laborwerte WHERE test_standard=?", (t[0],)
+                    ).fetchone()[0]
+                    if total_count < 5:
+                        continue
+
+                    letzte3 = conn.execute("""
+                        SELECT flag FROM laborwerte
+                        WHERE test_standard=?
+                        ORDER BY datum DESC LIMIT 3
+                    """, (t[0],)).fetchall()
+                    path_count = sum(1 for r in letzte3 if r["flag"] in ("H", "L"))
+                    if path_count >= 3:
+                        status = "kritisch"
+                        break
 
             gc = GROUP_CONFIG.get(name, {})
             gruppen.append({
@@ -94,6 +130,9 @@ async def overview():
         # Gefäßgesundheit Score
         gefaess = _berechne_gefaess_score(conn)
 
+        # Stoffwechsel-Risikoprofil
+        stoffwechsel = _berechne_stoffwechsel_score(conn)
+
         return {
             "kpis": {
                 "messwerte": total,
@@ -105,6 +144,7 @@ async def overview():
             "gruppen": gruppen,
             "vergleich": vergleich,
             "gefaess": gefaess,
+            "stoffwechsel": stoffwechsel,
         }
     finally:
         conn.close()
@@ -140,5 +180,94 @@ def _berechne_gefaess_score(conn) -> dict:
     if score >= 5: status = "kritisch"
     elif score >= 3: status = "auffällig"
     else: status = "gut"
+
+    return {"score": score, "max": max_score, "status": status, "details": details}
+
+
+def _berechne_stoffwechsel_score(conn) -> dict:
+    """Berechnet ein Stoffwechsel-Risikoprofil (metabolisches Syndrom)."""
+    def get_last(test):
+        row = conn.execute(
+            "SELECT wert_norm FROM laborwerte WHERE test_standard=? ORDER BY datum DESC LIMIT 1", (test,)
+        ).fetchone()
+        if not row:
+            return None
+        try:
+            return float(str(row[0]).replace(",", ".").replace("<", "").replace(">", ""))
+        except (ValueError, TypeError):
+            return None
+
+    glucose = get_last("Glucose")
+    hba1c = get_last("HbA1c")
+    hba1c_ifcc = get_last("HbA1c (IFCC)")
+    trig = get_last("Triglyceride")
+    hdl = get_last("HDL")
+    harnsaeure = get_last("Harnsäure")
+    got = get_last("GOT")
+    gpt = get_last("GPT")
+    ggt = get_last("GGT")
+    bmi_row = conn.execute(
+        "SELECT wert_norm FROM laborwerte WHERE test_standard='BMI' ORDER BY datum DESC LIMIT 1"
+    ).fetchone()
+    bmi = None
+    if bmi_row:
+        try:
+            bmi = float(str(bmi_row[0]).replace(",", "."))
+        except (ValueError, TypeError):
+            pass
+
+    score = 0
+    max_score = 12
+    details = []
+
+    # Blutzucker / Insulinresistenz (max 3 Punkte)
+    if glucose and glucose > 125:
+        score += 2; details.append(f"Glucose {glucose:.0f} ↑↑")
+    elif glucose and glucose > 100:
+        score += 1; details.append(f"Glucose {glucose:.0f} ↑")
+
+    if hba1c and hba1c > 6.5:
+        score += 2; details.append(f"HbA1c {hba1c:.1f}% ↑↑")
+    elif hba1c and hba1c > 5.7:
+        score += 1; details.append(f"HbA1c {hba1c:.1f}% ↑")
+    elif hba1c_ifcc and hba1c_ifcc > 48:
+        score += 2; details.append(f"HbA1c(IFCC) {hba1c_ifcc:.0f} ↑↑")
+    elif hba1c_ifcc and hba1c_ifcc > 39:
+        score += 1; details.append(f"HbA1c(IFCC) {hba1c_ifcc:.0f} ↑")
+
+    # Dyslipidämie (max 3 Punkte)
+    if trig and trig > 200:
+        score += 2; details.append(f"Triglyceride {trig:.0f} ↑")
+    elif trig and trig > 150:
+        score += 1; details.append(f"Triglyceride {trig:.0f} ↑")
+
+    if hdl and hdl < 40:
+        score += 1; details.append(f"HDL {hdl:.0f} ↓")
+
+    # Leber (max 2 Punkte)
+    leber_auff = 0
+    if gpt and gpt > 50:
+        leber_auff += 1; details.append(f"GPT {gpt:.0f} ↑")
+    if ggt and ggt > 60:
+        leber_auff += 1; details.append(f"GGT {ggt:.0f} ↑")
+    if got and got > 50:
+        leber_auff += 1; details.append(f"GOT {got:.0f} ↑")
+    score += min(leber_auff, 2)
+
+    # Harnsäure (max 1 Punkt)
+    if harnsaeure and harnsaeure > 7.0:
+        score += 1; details.append(f"Harnsäure {harnsaeure:.1f} ↑")
+
+    # Adipositas (max 1 Punkt)
+    if bmi and bmi > 30:
+        score += 1; details.append(f"BMI {bmi:.1f} ↑")
+
+    # Status bestimmen
+    if score >= 6:
+        status = "kritisch"
+    elif score >= 3:
+        status = "auffällig"
+    else:
+        status = "gut"
 
     return {"score": score, "max": max_score, "status": status, "details": details}

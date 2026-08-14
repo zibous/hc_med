@@ -8,7 +8,7 @@ const BEWERTUNG_STYLES = {
   kritisch: { icon: "🚨", color: "var(--red)" },
 };
 
-export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
+export function renderKPIs(kpis, gruppen, vergleich, gefaess, stoffwechsel) {
   const el = document.getElementById("kpis");
   if (!kpis) { el.innerHTML = ""; return; }
 
@@ -108,10 +108,15 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess) {
       </div>
       <div class="kpi-sub">Klick für Detailanalyse mit Empfehlungen →</div>
     </div>` : ''}
-    <div class="kpi kpi-half kpi-clickable" id="kpi-stoffwechsel" style="cursor:pointer; border-left:3px solid var(--orange)">
-      <div class="kpi-label">🧬 Stoffwechsel-Risiko</div>
-      <div class="kpi-value-text">Blutzucker, Blutfette, Harnsäure, Leber – metabolisches Profil</div>
-      <div class="kpi-sub">Klick für Detailanalyse →</div>
+    <div class="kpi kpi-half kpi-clickable" id="kpi-stoffwechsel" style="cursor:pointer; border-left:3px solid ${stoffwechsel ? (stoffwechsel.status === 'kritisch' ? 'var(--red)' : stoffwechsel.status === 'auffällig' ? 'var(--orange)' : 'var(--green)') : 'var(--orange)'}">
+      <div class="kpi-label">🧬 Stoffwechsel-Risiko (Metabolisches Profil)</div>
+      <div class="kpi-value-text">
+        ${stoffwechsel ? `<span style="color:${stoffwechsel.status === 'kritisch' ? 'var(--red)' : stoffwechsel.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
+          Score ${stoffwechsel.score}/${stoffwechsel.max} – ${stoffwechsel.status === 'kritisch' ? 'Erhöhtes Risiko' : stoffwechsel.status === 'auffällig' ? 'Mäßiges Risiko' : 'Geringes Risiko'}
+        </span>
+        ${stoffwechsel.details.length ? ' · ' + stoffwechsel.details.join(', ') : ''}` : 'Blutzucker, Blutfette, Harnsäure, Leber – metabolisches Profil'}
+      </div>
+      <div class="kpi-sub">Klick für Detailanalyse mit Empfehlungen →</div>
     </div>
     <div class="kpi kpi-half kpi-clickable" id="kpi-gesamtbericht" style="cursor:pointer; border-left:3px solid var(--accent)">
       <div class="kpi-label">📋 Gesamtbericht</div>

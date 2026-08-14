@@ -117,7 +117,7 @@ export async function loadView() {
     if (state.view === "overview") {
       const res = await fetch("api/overview");
       const data = await res.json();
-      renderKPIs(data.kpis, data.gruppen, data.vergleich, data.gefaess);
+      renderKPIs(data.kpis, data.gruppen, data.vergleich, data.gefaess, data.stoffwechsel);
       renderCards(data.gruppen);
       renderChart(null);
       document.getElementById("view-description").textContent = "";

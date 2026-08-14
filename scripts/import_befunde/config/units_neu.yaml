@@ -1,0 +1,307 @@
+# ─── Standard-Einheiten pro Test ──────────────────────────────────────────────
+# Basis-Einheit (einheit_norm), in die alle Werte überführt werden sollen.
+standard_units:
+  BMI: "kg/m²"
+  Basophile abs.: "10^9/L"
+  Basophile rel.: "%"
+  Bilirubin direkt: "mg/dL"
+  Bilirubin gesamt: "mg/dL"
+  BSG: "mm/h"
+  Calcium: "mmol/L"
+  Chlorid: "mmol/L"
+  Cholinesterase: "U/L"
+  CK: "U/L"
+  Cholesterin: "mg/dL"
+  Cortisol morgens: "µg/dL"
+  C-Peptid: "ng/mL"
+  CRP: "mg/dL"
+  Cystatin C: "mg/L"
+  D-Dimer: "mg/L"
+  Eisen: "µg/dL"
+  Eosinophile abs.: "10^9/L"
+  Eosinophile rel.: "%"
+  Erythrozyten: "10^12/L"
+  Ferritin: "ng/mL"
+  Fibrinogen: "mg/dL"
+  Folsäure: "ng/mL"
+  Freies T3: "pg/mL"
+  Freies T4: "ng/dL"
+  GFR: "mL/min"
+  GFR-CKD (Männer): "mL/min/1.73m²"
+  GFR-CKD (Frauen): "mL/min/1.73m²"
+  GGT: "U/L"
+  Glucose: "mg/dL"
+  GOT: "U/L"
+  GPT: "U/L"
+  Granulozyten rel.: "%"
+  Hämoglobin: "g/dL"
+  Hämatokrit: "%"
+  Harnstoff: "mg/dL"
+  Harnsäure: "mg/dL"
+  HbA1c: "%"
+  HbA1c (IFCC): "mmol/mol"
+  HDL: "mg/dL"
+  HDL Cholesterin: "mg/dL"
+  hs-CRP: "mg/dL"
+  IG-Absolut: "10^9/L"
+  IG-Wert: "%"
+  INR: ""                      # Verhältniswert, keine biologische Einheit
+  Insulin nüchtern: "mU/L"
+  Kalium: "mmol/L"
+  Kreatinin: "mg/dL"
+  La-Confirm: "Sekunden"
+  La-Screen: "Sekunden"
+  LDH: "U/L"
+  LDL: "mg/dL"
+  Leukozyten: "10^9/L"
+  Lipase: "U/L"
+  Lymphozyten abs.: "10^9/L"
+  Lymphozyten rel.: "%"
+  Magnesium: "mmol/L"
+  MCH: "pg"
+  MCHC: "g/dL"
+  MCV: "fL"
+  Monozyten abs.: "10^9/L"
+  Monozyten rel.: "%"
+  MPV: "fL"
+  Natrium: "mmol/L"
+  Neutrophile abs.: "10^9/L"
+  Neutrophile rel.: "%"
+  Non-HDL-Cholesterin: "mg/dL"
+  NRBC: "%"
+  NRBC-A: "10^9/L"
+  Osmolalität Serum: "mOsmol/kg"
+  AP: "U/L"
+  Amylase: "U/L"
+  Pankreas-Amylase: "U/L"
+  Phosphat: "mmol/L"
+  Procalcitonin: "µg/L"
+  PSA: "ng/mL"
+  pH-Wert: ""                  # Logarithmischer Wert, keine biologische Einheit
+  Quick-Wert: "%"
+  Quotient Chol/HDL: ""        # Verhältniswert, keine biologische Einheit
+  Quotient LDL/HDL: ""         # Verhältniswert, keine biologische Einheit
+  RDW: "%"
+  Retikulozyten rel.: "%"
+  Spez. Gewicht: "g/mL"
+  Testosteron: "ng/mL"
+  Thrombozyten: "10^9/L"
+  Thrombozyten G/L: "10^9/L"
+  Transferrin: "mg/dL"
+  Transferrinsättigung: "%"
+  Triglyceride: "mg/dL"
+  TSH: "mIU/L"
+  Vitamin B12: "pg/mL"
+  Vitamin D (25-OH): "ng/mL"
+  aPTT: "Sekunden"
+
+# ─── Geschlechtsspezifische Standard-Normbereiche (Erwachsene) ────────────────
+# Strukturierte Referenzbereiche für die präzise Berechnung von H/L-Flags.
+standard_ranges:
+
+  # ⚪ Geschlechtsunabhängige Parameter (Allgemein)
+  allgemein:
+    # Hämatologie & Differentialblutbild
+    Leukozyten: "4.0 - 10.0"             # 10^9/L
+    Thrombozyten: "150 - 450"            # 10^9/L
+    Thrombozyten G/L: "150 - 450"        # 10^9/L
+    MCV: "80.0 - 100.0"                  # fL
+    MCH: "27.0 - 34.0"                   # pg
+    MCHC: "32.0 - 36.0"                  # g/dL
+    RDW: "11.5 - 15.0"                   # %
+    MPV: "7.0 - 11.0"                    # fL
+    Retikulozyten rel.: "0.5 - 2.0"      # %
+    Basophile abs.: "0.00 - 0.10"        # 10^9/L
+    Neutrophile abs.: "2.00 - 7.50"      # 10^9/L
+    Lymphozyten abs.: "1.00 - 4.00"      # 10^9/L
+    Monozyten abs.: "0.20 - 0.80"        # 10^9/L
+    Eosinophile abs.: "0.04 - 0.40"      # 10^9/L
+    Neutrophile rel.: "50.0 - 75.0"      # %
+    Lymphozyten rel.: "20.0 - 45.0"      # %
+    Monozyten rel.: "2.0 - 12.0"         # %
+    Eosinophile rel.: "1.0 - 4.0"        # %
+    Basophile rel.: "0.0 - 1.0"          # %
+    Granulozyten rel.: "50.0 - 70.0"     # %
+    IG-Absolut: "0.00 - 0.06"            # 10^9/L
+    IG-Wert: "0.0 - 0.5"                 # %
+    NRBC: "<1.0"                        # %
+    NRBC-A: "<0.01"                     # 10^9/L
+
+    # Entzündung, Elektrolyte & Stoffwechsel
+    CRP: "<0.5"                         # mg/dL
+    hs-CRP: "<0.1"                      # mg/dL
+    Procalcitonin: "<0.05"              # µg/L
+    Natrium: "135 - 145"                 # mmol/L
+    Kalium: "3.5 - 5.1"                  # mmol/L
+    Calcium: "2.15 - 2.55"               # mmol/L
+    Magnesium: "0.70 - 1.05"             # mmol/L
+    Chlorid: "96 - 108"                  # mmol/L
+    Phosphat: "0.85 - 1.45"              # mmol/L
+    Osmolalität Serum: "275 - 295"       # mOsmol/kg
+    Harnstoff: "17 - 49"                 # mg/dL
+    GFR: ">90"                          # mL/min
+    GFR-CKD (Männer): ">90"             # mL/min/1.73m²
+    GFR-CKD (Frauen): ">90"             # mL/min/1.73m²
+    Cystatin C: "0.55 - 1.05"            # mg/L
+    Glucose: "70 - 100"                  # mg/dL
+    HbA1c: "4.0 - 5.6"                   # %
+    HbA1c (IFCC): "20 - 38"              # mmol/mol
+    Insulin nüchtern: "3.0 - 25.0"       # mU/L
+    C-Peptid: "0.8 - 3.8"                # ng/mL
+
+    # Leber, Pankreas, Gerinnung & Sonstiges
+    AP: "40 - 130"                       # U/L
+    LDH: "135 - 250"                     # U/L
+    Amylase: "<110"                     # U/L
+    Lipase: "<60"                       # U/L
+    Bilirubin direkt: "<0.3"            # mg/dL
+    INR: "0.8 - 1.2"
+    Quick-Wert: "70 - 130"               # %
+    aPTT: "25 - 37"                      # Sekunden
+    Fibrinogen: "200 - 450"              # mg/dL
+    D-Dimer: "<0.50"                    # mg/L
+    La-Screen: "<1.2"
+    La-Confirm: "<1.2"
+    TSH: "0.40 - 4.00"                   # mIU/L
+    Freies T3: "2.2 - 4.4"               # pg/mL
+    Freies T4: "0.8 - 1.8"               # ng/dL
+    Cortisol morgens: "5.0 - 23.0"       # µg/dL
+    Eisen: "50 - 170"                    # µg/dL
+    Transferrin: "200 - 360"             # mg/dL
+    Transferrinsättigung: "16 - 45"      # %
+    Vitamin B12: "200 - 900"             # pg/mL
+    Folsäure: "3.0 - 16.0"               # ng/mL
+    Vitamin D (25-OH): "30 - 100"        # ng/mL
+    pH-Wert: "7.35 - 7.45"
+    Spez. Gewicht: "1.010 - 1.030"       # g/mL
+    Antioxid Kap.: ">2200"              # µmol/L
+    Peroxide: "<300"                    # µmol/L
+    BMI: "18.5 - 24.9"                   # kg/m²
+
+  # ♂️ Männliche Spezifikationen
+  maennlich:
+    Hämoglobin: "13.5 - 17.5"            # g/dL
+    Erythrozyten: "4.30 - 5.90"          # 10^12/L
+    Hämatokrit: "41 - 53"                # %
+    BSG: "<15"                          # mm/h (unter 50 Jahre)
+    Kreatinin: "0.70 - 1.20"             # mg/dL
+    Harnsäure: "3.5 - 7.0"               # mg/dL
+    GOT: "<50"                          # U/L
+    GPT: "<50"                          # U/L
+    GGT: "<60"                          # U/L
+    Cholinesterase: "5300 - 12900"       # U/L
+    CK: "<190"                          # U/L
+    Bilirubin gesamt: "0.1 - 1.2"        # mg/dL
+    Cholesterin: "<200"                 # mg/dL (Zielwert)
+    HDL: ">40"                          # mg/dL (optimaler Schutzwert)
+    HDL Cholesterin: ">40"              # mg/dL
+    LDL: "<115"                         # mg/dL (risikoabhängig niedriger)
+    Non-HDL-Cholesterin: "<130"         # mg/dL
+    Triglyceride: "<150"                # mg/dL
+    Quotient LDL/HDL: "0.0 - 3.0"
+    Quotient Chol/HDL: "<5.0"
+    Ferritin: "30 - 400"                 # ng/mL
+    Testosteron: "2.5 - 8.5"             # ng/mL
+
+  # ♀️ Weibliche Spezifikationen
+  weiblich:
+    Hämoglobin: "12.0 - 16.0"            # g/dL
+    Erythrozyten: "3.90 - 5.20"          # 10^12/L
+    Hämatokrit: "36 - 46"                # %
+    BSG: "<20"                          # mm/h (unter 50 Jahre)
+    Kreatinin: "0.50 - 1.10"             # mg/dL
+    Harnsäure: "2.5 - 6.0"               # mg/dL
+    GOT: "<35"                          # U/L
+    GPT: "<35"                          # U/L
+    GGT: "<40"                          # U/L
+    Cholinesterase: "4300 - 11500"       # U/L (Weicht hormonbedingt ab)
+    CK: "<170"                          # U/L
+    Bilirubin gesamt: "0.1 - 1.0"        # mg/dL
+    Cholesterin: "<200"                 # mg/dL
+    HDL: ">50"                          # mg/dL (Frauen benötigen höheren HDL-Wert)
+    HDL Cholesterin: ">50"              # mg/dL
+    LDL: "<115"                         # mg/dL
+    Non-HDL-Cholesterin: "<130"         # mg/dL
+    Triglyceride: "<150"                # mg/dL
+    Quotient LDL/HDL: "0.0 - 2.5"       # Strengere Zielvorgabe bei Frauen
+    Quotient Chol/HDL: "<4.5"
+    Ferritin: "15 - 150"                 # ng/mL (Menstruationsbedingt niedriger)
+    Testosteron: "0.1 - 0.8"             # ng/mL
+
+# ─── Einheiten-Konversionen ───────────────────────────────────────────────────
+# Regelt, wie Abweichungen im Feld einheit_original umgerechnet werden müssen.
+unit_conversions:
+  # Konversionen für Leukozyten (G/l = 10^9/L, nur Schreibweisen-Normalisierung)
+  - { von_einheit: "g/l",  test_standard: "Leukozyten", ziel_einheit: "10^9/L", faktor: 1.0 }
+  - { von_einheit: "G/l",  test_standard: "Leukozyten", ziel_einheit: "10^9/L", faktor: 1.0 }
+
+  # Konversionen für Erythrozyten (T/l = 10^12/L, Schreibweisen-Normalisierung)
+  - { von_einheit: "t/l",  test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
+  - { von_einheit: "T/l",  test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
+
+  # Konversionen für Hämoglobin (von g/L bzw. g/L_ zu g/dL)
+  - { von_einheit: "g/l_", test_standard: "Hämoglobin", ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "g/l",  test_standard: "Hämoglobin", ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "g/dl", test_standard: "Hämoglobin", ziel_einheit: "g/dL", faktor: 1.0 }
+
+  # Konversionen für MCHC (von g/L bzw. g/L_ zu g/dL)
+  - { von_einheit: "g/l_", test_standard: "MCHC",       ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "g/l",  test_standard: "MCHC",       ziel_einheit: "g/dL", faktor: 0.1 }
+  - { von_einheit: "g/dl", test_standard: "MCHC",       ziel_einheit: "g/dL", faktor: 1.0 }
+
+  # Konversionen für Hämatokrit (von Volumenanteil l/l zu Prozent %)
+  - { von_einheit: "l/l",  test_standard: "Hämatokrit", ziel_einheit: "%",    faktor: 100.0 }
+  - { von_einheit: "/l",   test_standard: "Hämatokrit", ziel_einheit: "%",    faktor: 100.0 }
+  
+  # Konversionen für Cholinesterase (von Kilo-Units ku/l zu Standard-Units U/L)
+  - { von_einheit: "ku/l", test_standard: "Cholinesterase", ziel_einheit: "U/L", faktor: 1000.0 }
+  - { von_einheit: "kU/l", test_standard: "Cholinesterase", ziel_einheit: "U/L", faktor: 1000.0 }
+  - { von_einheit: "U/l",  test_standard: "Cholinesterase", ziel_einheit: "U/L", faktor: 1.0 }
+
+  # Konversionen für Thrombozyten (von konventionell /µL oder fehlerhaftem g/l zu SI-Einheit)
+  - { von_einheit: "/µl",  test_standard: "Thrombozyten", ziel_einheit: "10^9/L", faktor: 0.001 }
+  - { von_einheit: "/µL",  test_standard: "Thrombozyten", ziel_einheit: "10^9/L", faktor: 0.001 }
+  - { von_einheit: "G/l",  test_standard: "Thrombozyten", ziel_einheit: "10^9/L", faktor: 1.0 }
+  - { von_einheit: "g/l",  test_standard: "Thrombozyten", ziel_einheit: "10^9/L", faktor: 1.0 } # OCR-Fehlerkorrektur (g statt G)
+  - { von_einheit: "G/l",  test_standard: "Thrombozyten G/L", ziel_einheit: "10^9/L", faktor: 1.0 }
+  - { von_einheit: "g/l",  test_standard: "Thrombozyten G/L", ziel_einheit: "10^9/L", faktor: 1.0 }
+
+  # Fehlerbereinigung für MPV (falls OCR-Parser "g/dl" statt "fl" ausgelesen haben)
+  - { von_einheit: "g/dl", test_standard: "MPV",        ziel_einheit: "fL",    faktor: 1.0 }
+  - { von_einheit: "g/dL", test_standard: "MPV",        ziel_einheit: "fL",    faktor: 1.0 }
+  - { von_einheit: "fl",   test_standard: "MPV",        ziel_einheit: "fL",    faktor: 1.0 }
+
+  # Schreibweisen-Normalisierung für mg/dl → mg/dL (Lipide, CRP etc.)
+  - { von_einheit: "mg/dl", test_standard: "Cholesterin",  ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "HDL",          ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "HDL Cholesterin", ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "LDL",          ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Non-HDL-Cholesterin", ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Triglyceride", ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "CRP",          ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Kreatinin",    ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Glucose",      ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Harnsäure",    ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Harnstoff",    ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Bilirubin gesamt", ziel_einheit: "mg/dL", faktor: 1.0 }
+  - { von_einheit: "mg/dl", test_standard: "Bilirubin direkt", ziel_einheit: "mg/dL", faktor: 1.0 }
+
+  # Schreibweisen-Normalisierung für u/l → U/L (Leber etc.)
+  - { von_einheit: "u/l",  test_standard: "GOT",          ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "GPT",          ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "GGT",          ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "LDH",          ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "CK",           ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "AP",           ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "Amylase",      ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "Lipase",       ziel_einheit: "U/L", faktor: 1.0 }
+  - { von_einheit: "u/l",  test_standard: "Pankreas-Amylase", ziel_einheit: "U/L", faktor: 1.0 }
+
+  # Relative Werte (%) absichern (Schreibweisen-Harmonisierung)
+  - { von_einheit: "%",    test_standard: "Basophile rel.",    ziel_einheit: "%", faktor: 1.0 }
+  - { von_einheit: "%",    test_standard: "Eosinophile rel.",  ziel_einheit: "%", faktor: 1.0 }
+  - { von_einheit: "%",    test_standard: "Granulozyten rel.", ziel_einheit: "%", faktor: 1.0 }
+  - { von_einheit: "%",    test_standard: "Lymphozyten rel.",  ziel_einheit: "%", faktor: 1.0 }
+  - { von_einheit: "%",    test_standard: "Monozyten rel.",    ziel_einheit: "%", faktor: 1.0 }
+  - { von_einheit: "%",    test_standard: "Neutrophile rel.",  ziel_einheit: "%", faktor: 1.0 }
+  - { von_einheit: "%",    test_standard: "RDW",               ziel_einheit: "%", faktor: 1.0 }

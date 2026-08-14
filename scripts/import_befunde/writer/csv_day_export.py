@@ -1,7 +1,10 @@
 import csv
+import logging
 from collections import defaultdict
 from pathlib import Path
 from config.app_config import config
+
+log = logging.getLogger("labor_pipeline")
 
 def export_values_per_day(all_results: list):
     """Gruppiert alle extrahierten Laborergebnisse nach Datum und schreibt pro Tag eine separate CSV."""
@@ -21,7 +24,7 @@ def export_values_per_day(all_results: list):
         datum = row.get("Datum", "UNBEKANNT")
         data_by_day[datum].append(row)
         
-    print(f"\n📂 Generiere Tages-Exporte unter: '{export_dir.name}/'")
+    log.info(f"\n📂 Generiere Tages-Exporte unter: '{export_dir.name}/'")
     
     # 3. Pro Tag eine strukturierte CSV schreiben
     for datum, rows in sorted(data_by_day.items()):
@@ -49,4 +52,4 @@ def export_values_per_day(all_results: list):
                     str(bewertung).strip()
                 ])
                 
-    print(f"  ✓ {len(data_by_day)} separate Tages-CSV-Dateien erfolgreich exportiert.")
+    log.info(f"  ✓ {len(data_by_day)} separate Tages-CSV-Dateien erfolgreich exportiert.")

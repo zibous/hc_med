@@ -1,4 +1,7 @@
+import logging
 from collections import defaultdict
+
+log = logging.getLogger("labor_pipeline")
 
 class LipidCalculator:
     """Berechnet fehlende Lipid-Kennzahlen (Non-HDL, Quotienten) aus bestehenden Laborwerten."""
@@ -98,13 +101,13 @@ class LipidCalculator:
         return all_results
 
     def print_summary(self):
-        """Gibt die Zusammenfassung auf der Konsole aus."""
+        """Gibt die Zusammenfassung der berechneten Lipid-Werte aus."""
         berechnet_total = self.non_hdl_added + self.chol_hdl_added + self.ldl_hdl_added
         if berechnet_total:
-            print("\n  📐 Berechnete Werte:")
+            log.info("\n  📐 Berechnete Werte:")
             if self.non_hdl_added:
-                print(f"    Non-HDL-Cholesterin: {self.non_hdl_added} (Cholesterin − HDL)")
+                log.info(f"    Non-HDL-Cholesterin: {self.non_hdl_added} (Cholesterin − HDL)")
             if self.chol_hdl_added:
-                print(f"    Quotient Chol/HDL: {self.chol_hdl_added} (Cholesterin ÷ HDL)")
+                log.info(f"    Quotient Chol/HDL: {self.chol_hdl_added} (Cholesterin ÷ HDL)")
             if self.ldl_hdl_added:
-                print(f"    Quotient LDL/HDL: {self.ldl_hdl_added} (LDL ÷ HDL)")
+                log.info(f"    Quotient LDL/HDL: {self.ldl_hdl_added} (LDL ÷ HDL)")

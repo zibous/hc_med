@@ -189,6 +189,44 @@
   </div>
   {% endif %}
 
+  <!-- Sektion 2b: Stoffwechsel-Risiko -->
+  {% if stoffwechsel_score %}
+  <h2>Stoffwechsel-Risiko</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+    <div class="score-card">
+      <div class="score-header">
+        <span class="score-label">Metabolisches Profil</span>
+        <span class="score-value {{ stoffwechsel_score.status }}">{{ stoffwechsel_score.score }}/{{ stoffwechsel_score.max }}</span>
+      </div>
+      <div class="score-bar">
+        {% for i in range(stoffwechsel_score.max) %}
+        <div class="score-seg {{ 'filled' if i < stoffwechsel_score.score else 'empty' }}"></div>
+        {% endfor %}
+      </div>
+      <div class="score-status" style="color: {{ '#dc2626' if stoffwechsel_score.status == 'kritisch' else '#d97706' if stoffwechsel_score.status == 'auffällig' else '#16a34a' }}">
+        {{ 'Erhöhtes Risiko' if stoffwechsel_score.status == 'kritisch' else 'Mäßiges Risiko' if stoffwechsel_score.status == 'auffällig' else 'Geringes Risiko' }}
+      </div>
+      {% for f in stoffwechsel_score.faktoren %}
+      <div class="faktor {{ 'aktiv' if f.aktiv else '' }}">
+        <span class="faktor-name">{{ f.name }}</span>
+        <span>{{ f.wert }}</span>
+        <span class="faktor-dots">
+          {% for i in range(f.max) %}<span class="dot {{ 'active' if i < f.punkte else '' }}"></span>{% endfor %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="display:flex; align-items:center; justify-content:center; padding:1rem;">
+      <canvas id="radarChartStoffwechsel" style="max-width:280px; max-height:280px;"></canvas>
+    </div>
+  </div>
+  {% if stoffwechsel_score.zusammenfassung %}
+  <div style="font-size:.85rem; color:#444; margin-bottom:1.5rem; padding:.7rem 1rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; line-height:1.6;">
+    <strong>Zusammenfassung:</strong> {{ stoffwechsel_score.zusammenfassung }}
+  </div>
+  {% endif %}
+  {% endif %}
+
   {% if bemerkung %}
   <div style="font-size:.85rem; color:#1a1a1a; margin-bottom:1.5rem; padding:.7rem 1rem; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; line-height:1.6;">
     <strong>Bemerkung:</strong> {{ bemerkung }}
@@ -313,6 +351,41 @@
       }
     });
   })();
+
+  // Radar Chart für Stoffwechsel-Risiko
+  {% if stoffwechsel_score %}
+  (function() {
+    const faktoren = {{ stoffwechsel_score.faktoren | tojson }};
+    const labels = faktoren.map(f => f.name);
+    const data = faktoren.map(f => {
+      const val = parseFloat(f.wert) || 0;
+      const thresholds = {"Glucose nüchtern":100, "HbA1c":5.7, "HbA1c (IFCC)":39, "Triglyceride":150, "HDL":40, "GPT":50, "GGT":60, "Harnsäure":7.0, "BMI":30};
+      const thr = thresholds[f.name] || 100;
+      if (f.name === "HDL") return Math.min(200, (val / 60) * 100);
+      return Math.min(200, (val / thr) * 100);
+    });
+    const pointColors = data.map(v => v > 120 ? "#dc2626" : v > 100 ? "#d97706" : "#059669");
+
+    const canvas = document.getElementById("radarChartStoffwechsel");
+    if (canvas) {
+      new Chart(canvas, {
+        type: "radar",
+        data: {
+          labels,
+          datasets: [
+            { label: "Aktuell (% der Norm)", data, borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,.1)", borderWidth: 2, pointBackgroundColor: pointColors, pointRadius: 5 },
+            { label: "Normgrenze (100%)", data: Array(labels.length).fill(100), borderColor: "rgba(234,88,12,.4)", backgroundColor: "transparent", borderWidth: 1.5, borderDash: [5,3], pointRadius: 0 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: true, animation: false,
+          plugins: { legend: { display: false }, title: { display: true, text: "Stoffwechsel-Profil", font: { size: 11, weight: "600" } } },
+          scales: { r: { beginAtZero: true, max: 200, ticks: { font: { size: 8 }, stepSize: 50, backdropColor: "transparent" }, pointLabels: { font: { size: 10, weight: "600" } }, grid: { color: "rgba(0,0,0,.1)" }, angleLines: { color: "rgba(0,0,0,.1)" } } }
+        }
+      });
+    }
+  })();
+  {% endif %}
 
   // Verknüpfungs-Charts
   {% for chart in verknuepfung_charts %}
