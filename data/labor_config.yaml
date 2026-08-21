@@ -104,6 +104,12 @@ gruppen:
     farbe: "#78716c"
     beschreibung: >
       Weitere Laborwerte die keiner Hauptgruppe zugeordnet sind.
+  Oxidativer_Stress:
+    icon: "🛡️"
+    farbe: "#10b981"
+    beschreibung: >
+      Peroxide und antioxidative Kapazität – zeigen das Gleichgewicht zwischen
+      freien Radikalen und Zellschutz. Steigt mit Alter, Stress und Entzündungen.
 
 tests:
   # Blutbild

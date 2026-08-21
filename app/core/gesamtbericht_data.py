@@ -190,23 +190,11 @@ def _build_gefaess_zusammenfassung(faktoren: list[dict]) -> str:
 # Stoffwechsel-Risiko Score
 # ---------------------------------------------------------------------------
 
-_STOFFWECHSEL_FAKTOREN = [
-    # (test_name, threshold, operator, points, label)
-    ("Glucose", 100, "gt", 1, "Glucose nüchtern"),
-    ("HbA1c", 5.7, "gt", 1, "HbA1c"),
-    ("HbA1c (IFCC)", 39, "gt", 1, "HbA1c (IFCC)"),
-    ("Triglyceride", 150, "gt", 1, "Triglyceride"),
-    ("HDL", 40, "lt", 1, "HDL"),
-    ("GPT", 50, "gt", 1, "GPT"),
-    ("GGT", 60, "gt", 1, "GGT"),
-    ("Harnsäure", 7.0, "gt", 1, "Harnsäure"),
-    ("BMI", 30, "gt", 1, "BMI"),
-]
-
 
 def berechne_stoffwechsel_score(conn: sqlite3.Connection) -> dict:
     """Berechnet das Stoffwechsel-Risikoprofil (metabolisches Syndrom).
 
+    Abgestufte Bewertung: schwerere Abweichungen geben mehr Punkte.
     Faktoren: Blutzucker, HbA1c, Triglyceride, HDL, Leberwerte,
     Harnsäure und BMI.
 
@@ -214,47 +202,93 @@ def berechne_stoffwechsel_score(conn: sqlite3.Connection) -> dict:
         dict mit keys: score, max, status, faktoren, zusammenfassung
     """
     score = 0
-    max_score = 9
+    max_score = 12
     faktoren = []
 
-    # HbA1c und HbA1c (IFCC) – nur den relevanten zählen
+    # HbA1c (2 Punkte max): >6.5 = 2P (Diabetes), >5.7 = 1P (Prädiabetes)
     hba1c_val = _get_last_value(conn, "HbA1c")
     hba1c_ifcc_val = _get_last_value(conn, "HbA1c (IFCC)")
 
-    for test_name, threshold, operator, points, label in _STOFFWECHSEL_FAKTOREN:
-        # Duplikat-Vermeidung: Nur einen HbA1c-Wert scoren
-        if test_name == "HbA1c (IFCC)" and hba1c_val is not None:
-            continue
-        if test_name == "HbA1c" and hba1c_val is None and hba1c_ifcc_val is None:
-            continue
-
-        wert = _get_last_value(conn, test_name)
-        if wert is None:
-            continue
-
-        aktiv = wert > threshold if operator == "gt" else wert < threshold
-        if aktiv:
-            score += points
-
-        # Formatierung
-        if test_name in ("HbA1c",):
-            wert_str = f"{wert:.1f}%"
-        elif test_name in ("Harnsäure", "BMI"):
-            wert_str = f"{wert:.1f}"
-        elif test_name in ("Glucose", "Triglyceride", "GPT", "GGT", "HbA1c (IFCC)"):
-            wert_str = f"{wert:.0f}"
+    if hba1c_val is not None:
+        if hba1c_val > 6.5:
+            punkte = 2
+        elif hba1c_val > 5.7:
+            punkte = 1
         else:
-            wert_str = f"{wert:.0f}"
+            punkte = 0
+        score += punkte
+        faktoren.append({"name": "HbA1c", "wert": f"{hba1c_val:.1f}%", "punkte": punkte, "max": 2, "aktiv": punkte > 0})
+    elif hba1c_ifcc_val is not None:
+        if hba1c_ifcc_val > 48:
+            punkte = 2
+        elif hba1c_ifcc_val > 39:
+            punkte = 1
+        else:
+            punkte = 0
+        score += punkte
+        faktoren.append({"name": "HbA1c (IFCC)", "wert": f"{hba1c_ifcc_val:.0f}", "punkte": punkte, "max": 2, "aktiv": punkte > 0})
 
-        faktoren.append({
-            "name": label,
-            "wert": wert_str,
-            "punkte": points if aktiv else 0,
-            "max": points,
-            "aktiv": aktiv,
-        })
+    # Glucose (1 Punkt): >100 nüchtern
+    glucose = _get_last_value(conn, "Glucose")
+    if glucose is not None:
+        aktiv = glucose > 100
+        if aktiv:
+            score += 1
+        faktoren.append({"name": "Glucose nüchtern", "wert": f"{glucose:.0f}", "punkte": 1 if aktiv else 0, "max": 1, "aktiv": aktiv})
 
-    if score >= 5:
+    # Triglyceride (2 Punkte max): >200 = 2P, >150 = 1P
+    trig = _get_last_value(conn, "Triglyceride")
+    if trig is not None:
+        if trig > 200:
+            punkte = 2
+        elif trig > 150:
+            punkte = 1
+        else:
+            punkte = 0
+        score += punkte
+        faktoren.append({"name": "Triglyceride", "wert": f"{trig:.0f}", "punkte": punkte, "max": 2, "aktiv": punkte > 0})
+
+    # HDL (1 Punkt): <40 = fehlender Gefäßschutz
+    hdl = _get_last_value(conn, "HDL")
+    if hdl is not None:
+        aktiv = hdl < 40
+        if aktiv:
+            score += 1
+        faktoren.append({"name": "HDL", "wert": f"{hdl:.0f}", "punkte": 1 if aktiv else 0, "max": 1, "aktiv": aktiv})
+
+    # GPT (1 Punkt): >50
+    gpt = _get_last_value(conn, "GPT")
+    if gpt is not None:
+        aktiv = gpt > 50
+        if aktiv:
+            score += 1
+        faktoren.append({"name": "GPT", "wert": f"{gpt:.0f}", "punkte": 1 if aktiv else 0, "max": 1, "aktiv": aktiv})
+
+    # GGT (1 Punkt): >60
+    ggt = _get_last_value(conn, "GGT")
+    if ggt is not None:
+        aktiv = ggt > 60
+        if aktiv:
+            score += 1
+        faktoren.append({"name": "GGT", "wert": f"{ggt:.0f}", "punkte": 1 if aktiv else 0, "max": 1, "aktiv": aktiv})
+
+    # Harnsäure (1 Punkt): >7.0
+    hs = _get_last_value(conn, "Harnsäure")
+    if hs is not None:
+        aktiv = hs > 7.0
+        if aktiv:
+            score += 1
+        faktoren.append({"name": "Harnsäure", "wert": f"{hs:.1f}", "punkte": 1 if aktiv else 0, "max": 1, "aktiv": aktiv})
+
+    # BMI (1 Punkt): >30
+    bmi = _get_last_value(conn, "BMI")
+    if bmi is not None:
+        aktiv = bmi > 30
+        if aktiv:
+            score += 1
+        faktoren.append({"name": "BMI", "wert": f"{bmi:.1f}", "punkte": 1 if aktiv else 0, "max": 1, "aktiv": aktiv})
+
+    if score >= 6:
         status = "kritisch"
     elif score >= 3:
         status = "auffällig"

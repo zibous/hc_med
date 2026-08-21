@@ -71,7 +71,7 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess, stoffwechsel) {
     <div class="kpi">
       <div class="kpi-label">Messungen</div>
       <div class="kpi-value blue">${kpis.messwerte}</div>
-      <div class="kpi-sub">${kpis.befunde} Befunde · ${kpis.zeitraum_von?.slice(0,4)}–${kpis.zeitraum_bis?.slice(0,4)}</div>
+      <div class="kpi-sub">${kpis.befunde} Befunde · ${kpis.zeitraum_von?.slice(0, 4)}–${kpis.zeitraum_bis?.slice(0, 4)}</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Im Normbereich</div>
@@ -86,14 +86,14 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess, stoffwechsel) {
     <div class="kpi">
       <div class="kpi-label">Handlungsbedarf</div>
       <div class="kpi-value-text" style="font-size:1.4rem">${criticalHtml}</div>
-      <div class="kpi-sub">${critical.length} von ${(gruppen||[]).length} Gruppen</div>
+      <div class="kpi-sub">${critical.length} von ${(gruppen || []).length} Gruppen</div>
     </div>
     ${vergleich ? `<div class="kpi kpi-half kpi-clickable" id="kpi-vergleich" style="cursor:pointer">
       <div class="kpi-label">Vergleich zum Vorjahr</div>
       <div class="kpi-value-text">
-        ${vergleich.verbessert?.length ? `<span style="color:var(--green)">↑ Verbessert (${vergleich.verbessert.length}): ${vergleich.verbessert.slice(0,4).map(v => v.test).join(', ')}</span>` : ''}
+        ${vergleich.verbessert?.length ? `<span style="color:var(--green)">↑ Verbessert (${vergleich.verbessert.length}): ${vergleich.verbessert.slice(0, 4).map(v => v.test).join(', ')}</span>` : ''}
         ${vergleich.verbessert?.length && vergleich.verschlechtert?.length ? ' · ' : ''}
-        ${vergleich.verschlechtert?.length ? `<span style="color:var(--red)">↓ Verschlechtert (${vergleich.verschlechtert.length}): ${vergleich.verschlechtert.slice(0,4).map(v => v.test).join(', ')}</span>` : ''}
+        ${vergleich.verschlechtert?.length ? `<span style="color:var(--red)">↓ Verschlechtert (${vergleich.verschlechtert.length}): ${vergleich.verschlechtert.slice(0, 4).map(v => v.test).join(', ')}</span>` : ''}
         ${!vergleich.verbessert?.length && !vergleich.verschlechtert?.length ? '<span style="color:var(--green)">→ Alle Werte stabil</span>' : ''}
       </div>
       <div class="kpi-sub">${vergleich.stabil_count || 0} Tests unverändert · Klick für Mehrjahresvergleich →</div>
@@ -104,7 +104,7 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess, stoffwechsel) {
         <span style="color:${gefaess.status === 'kritisch' ? 'var(--red)' : gefaess.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
           Score ${gefaess.score}/${gefaess.max} – ${gefaess.status === 'kritisch' ? 'Erhöhtes Risiko' : gefaess.status === 'auffällig' ? 'Mäßiges Risiko' : 'Geringes Risiko'}
         </span>
-        ${gefaess.details.length ? ' · ' + gefaess.details.join(', ') : ''}
+        ${(() => { const d = gefaess.details || (gefaess.faktoren || []).filter(f => f.aktiv).map(f => f.name + ' ' + f.wert); return d.length ? ' · ' + d.join(', ') : ''; })()}
       </div>
       <div class="kpi-sub">Klick für Detailanalyse mit Empfehlungen →</div>
     </div>` : ''}
@@ -114,7 +114,7 @@ export function renderKPIs(kpis, gruppen, vergleich, gefaess, stoffwechsel) {
         ${stoffwechsel ? `<span style="color:${stoffwechsel.status === 'kritisch' ? 'var(--red)' : stoffwechsel.status === 'auffällig' ? 'var(--orange)' : 'var(--green)'}">
           Score ${stoffwechsel.score}/${stoffwechsel.max} – ${stoffwechsel.status === 'kritisch' ? 'Erhöhtes Risiko' : stoffwechsel.status === 'auffällig' ? 'Mäßiges Risiko' : 'Geringes Risiko'}
         </span>
-        ${stoffwechsel.details.length ? ' · ' + stoffwechsel.details.join(', ') : ''}` : 'Blutzucker, Blutfette, Harnsäure, Leber – metabolisches Profil'}
+        ${(() => { const d = stoffwechsel.details || (stoffwechsel.faktoren || []).filter(f => f.aktiv).map(f => f.name + ' ' + f.wert); return d.length ? ' · ' + d.join(', ') : ''; })()}` : 'Blutzucker, Blutfette, Harnsäure, Leber – metabolisches Profil'}
       </div>
       <div class="kpi-sub">Klick für Detailanalyse mit Empfehlungen →</div>
     </div>

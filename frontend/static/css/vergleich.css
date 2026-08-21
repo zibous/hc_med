@@ -1,0 +1,166 @@
+/* ==========================================================================
+   VERGLEICH – Mehrjahresvergleich Pivot-Tabelle
+   ========================================================================== */
+
+/* Pathologisch-Tabelle (shared) */
+.path-list {
+    padding: 1.6rem;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    width: 100%;
+    grid-column: 1 / -1;
+}
+
+.path-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.3rem;
+}
+
+.path-table th {
+    text-align: left;
+    padding: .8rem .6rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+
+.path-table th:hover {
+    color: var(--accent);
+}
+
+.path-table th .sort-arrow {
+    margin-left: .3rem;
+    font-size: 1rem;
+}
+
+.path-table td {
+    padding: .7rem .6rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.path-row:hover {
+    background: rgba(128, 128, 128, .06);
+}
+
+/* Vergleich Pivot-Tabelle */
+.vgl-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.25rem;
+}
+
+.vgl-table th {
+    text-align: left;
+    padding: .8rem 1rem;
+    border-bottom: 2px solid var(--border);
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    white-space: nowrap;
+}
+
+.vgl-table td {
+    padding: .7rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.vgl-row:hover {
+    background: rgba(128, 128, 128, .06);
+}
+
+.vgl-gruppe {
+    font-size: 1.15rem;
+    white-space: nowrap;
+}
+
+.vgl-test {
+    min-width: 10rem;
+}
+
+.vgl-aktuell {
+    font-size: 1.3rem;
+    white-space: nowrap;
+}
+
+.vgl-aktuell.high {
+    color: var(--red);
+}
+
+.vgl-aktuell.low {
+    color: var(--accent);
+}
+
+.vgl-cell {
+    white-space: nowrap;
+    font-size: 1.2rem;
+}
+
+.vgl-cell.empty {
+    color: var(--text-muted);
+}
+
+.vgl-cell.verschlechtert,
+.vgl-cell.neu_auffällig {
+    background: rgba(239, 68, 68, .06);
+}
+
+.vgl-cell.verbessert,
+.vgl-cell.normalisiert {
+    background: rgba(16, 185, 129, .06);
+}
+
+.vgl-wert {
+    margin-right: .3rem;
+}
+
+.vgl-flag {
+    font-weight: 700;
+    margin-right: .2rem;
+}
+
+.vgl-pct {
+    font-size: 1.05rem;
+    opacity: .7;
+    margin-right: .3rem;
+}
+
+.vgl-icon {
+    font-weight: 700;
+}
+
+.vgl-datum {
+    font-size: .85rem;
+    color: var(--text-muted);
+    opacity: .7;
+}
+
+.vgl-norm {
+    font-size: .85rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.vgl-legende {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+    font-size: 1.2rem;
+    padding: .6rem 0;
+}
+
+/* Chart-Container unter der Tabelle */
+.vgl-chart-wrap {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}

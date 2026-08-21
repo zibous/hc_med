@@ -36,6 +36,7 @@ group_rules_by_category:
       "nrbc",
       "normoblast",
       "unreife",
+      "mittelgroße zellen",
     ]
   Blutbild:
     [
@@ -56,6 +57,7 @@ group_rules_by_category:
       "myoglobin",
       "eisen",
       "ferritin",
+      "mittleres zellvolumen",
     ]
   Entzündung:
     [
@@ -131,4 +133,4 @@ group_rules_by_category:
     ]
   Hormone: ["testosteron"]
   Körperdaten: ["gewicht", "fettgehalt", "fett", "bmi", "muskelmasse"]
-  Sonstige: ["peroxide", "antioxid"]
+  Oxidativer_Stress: ["peroxide", "antioxid"]

@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from app.config.settings import GROUP_CONFIG, GROUP_DESCRIPTIONS
+from app.core.gesamtbericht_data import berechne_gefaess_score, berechne_stoffwechsel_score
 from app.core.vergleich import berechne_vorjahresvergleich
 from app.infrastructure.database import get_db
 
@@ -128,10 +129,10 @@ async def overview():
         vergleich = berechne_vorjahresvergleich(conn)
 
         # Gefäßgesundheit Score
-        gefaess = _berechne_gefaess_score(conn)
+        gefaess = berechne_gefaess_score(conn)
 
         # Stoffwechsel-Risikoprofil
-        stoffwechsel = _berechne_stoffwechsel_score(conn)
+        stoffwechsel = berechne_stoffwechsel_score(conn)
 
         return {
             "kpis": {
@@ -148,126 +149,3 @@ async def overview():
         }
     finally:
         conn.close()
-
-
-def _berechne_gefaess_score(conn) -> dict:
-    """Berechnet einen Gefäßgesundheit-Score aus den aktuellen Werten."""
-    def get_last(test):
-        row = conn.execute(
-            "SELECT wert_norm FROM laborwerte WHERE test_standard=? ORDER BY datum DESC LIMIT 1", (test,)
-        ).fetchone()
-        if not row: return None
-        try: return float(str(row[0]).replace(",", ".").replace("<", "").replace(">", ""))
-        except: return None
-
-    ldl = get_last("LDL")
-    hdl = get_last("HDL")
-    trig = get_last("Triglyceride")
-    crp = get_last("CRP")
-    hba1c = get_last("HbA1c")
-    hs = get_last("Harnsäure")
-
-    score = 0
-    max_score = 8
-    details = []
-    if trig and trig > 200: score += 2; details.append(f"Triglyceride {trig:.0f} ↑")
-    if crp and crp > 0.5: score += 2; details.append(f"CRP {crp:.1f} ↑")
-    if hba1c and hba1c > 5.7: score += 1; details.append(f"HbA1c {hba1c:.1f}% ↑")
-    if ldl and ldl > 130: score += 1; details.append(f"LDL {ldl:.0f} ↑")
-    if hs and hs > 7.0: score += 1; details.append(f"Harnsäure {hs:.1f} ↑")
-    if hdl and hdl < 40: score += 1; details.append(f"HDL {hdl:.0f} ↓")
-
-    if score >= 5: status = "kritisch"
-    elif score >= 3: status = "auffällig"
-    else: status = "gut"
-
-    return {"score": score, "max": max_score, "status": status, "details": details}
-
-
-def _berechne_stoffwechsel_score(conn) -> dict:
-    """Berechnet ein Stoffwechsel-Risikoprofil (metabolisches Syndrom)."""
-    def get_last(test):
-        row = conn.execute(
-            "SELECT wert_norm FROM laborwerte WHERE test_standard=? ORDER BY datum DESC LIMIT 1", (test,)
-        ).fetchone()
-        if not row:
-            return None
-        try:
-            return float(str(row[0]).replace(",", ".").replace("<", "").replace(">", ""))
-        except (ValueError, TypeError):
-            return None
-
-    glucose = get_last("Glucose")
-    hba1c = get_last("HbA1c")
-    hba1c_ifcc = get_last("HbA1c (IFCC)")
-    trig = get_last("Triglyceride")
-    hdl = get_last("HDL")
-    harnsaeure = get_last("Harnsäure")
-    got = get_last("GOT")
-    gpt = get_last("GPT")
-    ggt = get_last("GGT")
-    bmi_row = conn.execute(
-        "SELECT wert_norm FROM laborwerte WHERE test_standard='BMI' ORDER BY datum DESC LIMIT 1"
-    ).fetchone()
-    bmi = None
-    if bmi_row:
-        try:
-            bmi = float(str(bmi_row[0]).replace(",", "."))
-        except (ValueError, TypeError):
-            pass
-
-    score = 0
-    max_score = 12
-    details = []
-
-    # Blutzucker / Insulinresistenz (max 3 Punkte)
-    if glucose and glucose > 125:
-        score += 2; details.append(f"Glucose {glucose:.0f} ↑↑")
-    elif glucose and glucose > 100:
-        score += 1; details.append(f"Glucose {glucose:.0f} ↑")
-
-    if hba1c and hba1c > 6.5:
-        score += 2; details.append(f"HbA1c {hba1c:.1f}% ↑↑")
-    elif hba1c and hba1c > 5.7:
-        score += 1; details.append(f"HbA1c {hba1c:.1f}% ↑")
-    elif hba1c_ifcc and hba1c_ifcc > 48:
-        score += 2; details.append(f"HbA1c(IFCC) {hba1c_ifcc:.0f} ↑↑")
-    elif hba1c_ifcc and hba1c_ifcc > 39:
-        score += 1; details.append(f"HbA1c(IFCC) {hba1c_ifcc:.0f} ↑")
-
-    # Dyslipidämie (max 3 Punkte)
-    if trig and trig > 200:
-        score += 2; details.append(f"Triglyceride {trig:.0f} ↑")
-    elif trig and trig > 150:
-        score += 1; details.append(f"Triglyceride {trig:.0f} ↑")
-
-    if hdl and hdl < 40:
-        score += 1; details.append(f"HDL {hdl:.0f} ↓")
-
-    # Leber (max 2 Punkte)
-    leber_auff = 0
-    if gpt and gpt > 50:
-        leber_auff += 1; details.append(f"GPT {gpt:.0f} ↑")
-    if ggt and ggt > 60:
-        leber_auff += 1; details.append(f"GGT {ggt:.0f} ↑")
-    if got and got > 50:
-        leber_auff += 1; details.append(f"GOT {got:.0f} ↑")
-    score += min(leber_auff, 2)
-
-    # Harnsäure (max 1 Punkt)
-    if harnsaeure and harnsaeure > 7.0:
-        score += 1; details.append(f"Harnsäure {harnsaeure:.1f} ↑")
-
-    # Adipositas (max 1 Punkt)
-    if bmi and bmi > 30:
-        score += 1; details.append(f"BMI {bmi:.1f} ↑")
-
-    # Status bestimmen
-    if score >= 6:
-        status = "kritisch"
-    elif score >= 3:
-        status = "auffällig"
-    else:
-        status = "gut"
-
-    return {"score": score, "max": max_score, "status": status, "details": details}

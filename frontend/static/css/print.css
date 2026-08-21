@@ -1,0 +1,213 @@
+/* ==========================================================================
+   PRINT – Druckoptimierung für PDF-Ausgabe
+   ========================================================================== */
+
+@media print {
+    @page {
+        margin: 1.5cm;
+    }
+
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 11pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .header,
+    .footer,
+    .breadcrumb-row,
+    .help-btn,
+    .print-btn,
+    .favoriten-karte {
+        display: none !important;
+    }
+
+    .container {
+        padding: 0 !important;
+    }
+
+    /* Print Header */
+    .print-header {
+        display: block !important;
+        border-bottom: 2px solid #059669;
+        padding-bottom: .8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .print-header h1 {
+        font-size: 18pt;
+        margin: 0;
+        color: #0f172a;
+    }
+
+    .print-header .print-meta {
+        font-size: 10pt;
+        color: #64748b;
+        margin-top: .3rem;
+    }
+
+    /* Chart + Radar */
+    .chart-card,
+    .radar-col,
+    .empfehlung-box {
+        background: #fff !important;
+        border-color: #d1d5db !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+    }
+
+    .chart-card {
+        border-left: 3px solid #14b8a6 !important;
+        padding: 1rem !important;
+    }
+
+    .radar-col {
+        border-left: 3px solid #3b82f6 !important;
+    }
+
+    .chart-card canvas {
+        height: 280px !important;
+        background: #fff !important;
+    }
+
+    .radar-empfehlung-row {
+        grid-template-columns: 250px 1fr;
+        gap: 1.5rem;
+    }
+
+    .empfehlung-box {
+        color: #1e293b !important;
+        border-color: #059669 !important;
+        background: #f0fdf4 !important;
+        font-size: 10pt;
+    }
+
+    .empfehlung-liste li {
+        color: #1e293b;
+        margin-bottom: .3rem;
+    }
+
+    .view-description {
+        color: #374151 !important;
+        font-size: 10pt;
+    }
+
+    /* Score Cards */
+    .gefaess-score-card {
+        background: #fff !important;
+        border-color: #d1d5db !important;
+    }
+
+    .score-seg.filled {
+        background: #dc2626 !important;
+    }
+
+    .score-seg.empty {
+        background: #e5e7eb !important;
+    }
+
+    .score-faktor.aktiv {
+        background: #fef2f2 !important;
+    }
+
+    .score-faktor-name,
+    .score-faktor-wert {
+        color: #1e293b !important;
+    }
+
+    .score-faktor.aktiv .score-faktor-name,
+    .score-faktor.aktiv .score-faktor-wert {
+        color: #dc2626 !important;
+    }
+
+    /* Vergleich-Tabelle */
+    .vgl-table {
+        font-size: 7.5pt;
+    }
+
+    .vgl-table th {
+        font-size: 7pt;
+        padding: .2rem .3rem;
+    }
+
+    .vgl-table td {
+        padding: .2rem .3rem;
+    }
+
+    .vgl-legende {
+        font-size: 7pt;
+        margin-bottom: .4rem;
+    }
+
+    .vgl-datum {
+        font-size: 6pt;
+    }
+
+    .vgl-norm {
+        font-size: 6pt;
+    }
+
+    /* Vergleich Chart-Container */
+    .vgl-chart-wrap {
+        page-break-inside: avoid;
+        background: #fff !important;
+        border: none !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        padding: .5rem !important;
+        margin-top: 2cm !important;
+    }
+
+    /* Containers */
+    .path-list,
+    .cards {
+        background: #fff !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    .card-title {
+        font-size: 12pt !important;
+        margin-bottom: .5rem !important;
+    }
+
+    /* Cell Highlights */
+    .vgl-cell.verschlechtert,
+    .vgl-cell.neu_auffällig {
+        background: #fef2f2 !important;
+    }
+
+    .vgl-cell.verbessert,
+    .vgl-cell.normalisiert {
+        background: #f0fdf4 !important;
+    }
+
+    .vgl-row:hover {
+        background: none !important;
+    }
+
+    /* Norm-Bar */
+    .norm-bar-track {
+        background: #e5e7eb !important;
+    }
+
+    .norm-bar-low {
+        background: linear-gradient(90deg, #fca5a5, #fecaca) !important;
+    }
+
+    .norm-bar-ok {
+        background: linear-gradient(90deg, #6ee7b7, #a7f3d0) !important;
+    }
+
+    .norm-bar-high {
+        background: linear-gradient(90deg, #fecaca, #fca5a5) !important;
+    }
+
+    .norm-bar-dot {
+        border-color: #fff !important;
+        box-shadow: 0 0 0 1px #374151 !important;
+    }
+}
