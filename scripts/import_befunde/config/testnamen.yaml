@@ -2,17 +2,17 @@
 test_aliases_by_category:
   Blutbild:
     Leukozyten: ["leukocyten", "leuko", "leukozyten", "leukozyten abs."]
-    Lymphozyten rel.: ["lymphocyten %", "lymphozyten rel.", "lymphozyten", "lymph.aut."]
-    Lymphozyten abs.: ["lymphozyten abs.", "lymph.abs."] 
+    Lymphozyten rel.: ["lymphocyten %", "lymphozyten rel.", "lymphozyten", "lymph.aut.", "lymphozyten prozentual"]
+    Lymphozyten abs.: ["lymphozyten abs.", "lymph.abs.", "lymphocyten absolut", "lymphozyten absolut"] 
     Erythrozyten: ["erythrocyten", "erythrozyten", "ery"]
-    RDW: ["erythrozyten rdw", "rdw", "rdw-cv"]
+    RDW: ["erythrozyten rdw", "rdw", "rdw-cv", "ery-verteilungsbreite (cv)"]
     Hämoglobin: ["hämoglobin", "hgb", "hb"]
-    MCH: ["hbe (mca)", "mch"]
+    MCH: ["hbe (mca)", "mch", "mittlerer hb-gehalt/ery"]
     Hämatokrit: ["hämatokrit", "hk"]
-    MCV: ["mcv"]
-    MCHC: ["mchc"]
-    Thrombozyten: ["thrombocyten", "thrombozyten", "thrombocyten (citrat)", "thrombo"]
-    MPV: ["mpv", "mpv (mittleres thrombozytenvolumen)"]
+    MCV: ["mcv", "mittleres zellvolumen"]
+    MCHC: ["mchc", "mittlere hb-konzentration"]
+    Thrombozyten: ["thrombocyten", "thrombozyten", "thrombocyten (citrat)", "thrombo", "thrombozyten g/l", "thrombozyten               g/l"]
+    MPV: ["mpv", "mpv (mittleres thrombozytenvolumen)", "mittleres thrombozytenvol.", "mittleres thrombozytenvolumen"]
 
   Differentialblutbild:
     Neutrophile rel.: ["neutrophile %", "neutroph. gran. rel.", "neutrophile"]
@@ -23,10 +23,10 @@ test_aliases_by_category:
         "neutrophile abs",
         "neutrophile abs.",
       ]
-    Granulozyten rel.: ["granulocytes", "granulozyten", "gran.aut."]
-    Granulozyten abs.: ["granul.abs"]
-    Monozyten rel.: ["monocyten %", "monozyten rel.", "monozyten", "mono.aut.", "monocyten %"]
-    Monozyten abs.: ["mono absolut", "monozyten abs.", "mono"]
+    Granulozyten rel.: ["granulocytes", "granulozyten", "gran.aut.", "granulozyten prozentual"]
+    Granulozyten abs.: ["granul.abs", "granulozyten absolut"]
+    Monozyten rel.: ["monocyten %", "monozyten rel.", "monozyten", "mono.aut.", "monocyten %", "mittelgroße zellen prozentual"]
+    Monozyten abs.: ["mono absolut", "monozyten abs.", "mono", "mittelgroße zellen absolut"]
     Eosinophile rel.: ["eosinophile %", "eosinophile gr. rel.", "eosinophile", "eos.aut."]
     Eosinophile abs.: ["eosinophile gr. abs.", "eos"]
     Basophile rel.: ["basophile %", "basophile gr.rel.", "baso.aut.", "basophile"]
@@ -45,9 +45,9 @@ test_aliases_by_category:
     Rheumafaktor: ["rheumafaktor"]
 
   Leber:
-    GOT: ["got (asat)", "asat (got)", "ast(got)"]
-    GPT: ["gpt (alat)", "alat (gpt)", "alt(gpt)"]
-    GGT: ["ggt", "gamma-gt", "gamma-glutaminyltransferase", "ggt-37"]
+    GOT: ["got (asat)", "asat (got)", "ast(got)", "got (ifcc/37°c)"]
+    GPT: ["gpt (alat)", "alat (gpt)", "alt(gpt)", "gpt (ifcc/37°c)"]
+    GGT: ["ggt", "gamma-gt", "gamma-glutaminyltransferase", "ggt-37", "gamma-gt (ifcc/37°c)"]
     Alk. Phosphatase: ["alk.phos.", "alk.phosphatase (ap)", "alk. phosphatase"]
     Bilirubin: ["bilirubin gesamt", "bilirubin"]
     LDH: ["ldh"]
@@ -102,7 +102,7 @@ test_aliases_by_category:
     TSH: ["tsh"]
 
   Tumor-Marker:
-    PSA: ["psa"]
+    PSA: ["psa", "psa (abbott)"]
 
   Autoimmun:
     Anti-CCP: ["anti-ccp"]

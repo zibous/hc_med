@@ -396,6 +396,25 @@
     color: #fff;
 }
 
+/* Suche */
+.test-search {
+    padding: .5rem 1rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.2rem;
+    min-width: 18rem;
+    outline: none;
+}
+.test-search:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+.test-search::placeholder {
+    color: var(--text-muted);
+}
+
 /* Help Modal */
 .breadcrumb-row {
     display: flex;

@@ -238,6 +238,8 @@ unit_conversions:
   # Konversionen für Erythrozyten (T/l = 10^12/L, Schreibweisen-Normalisierung)
   - { von_einheit: "t/l",  test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
   - { von_einheit: "T/l",  test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
+  - { von_einheit: "/l'L", test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
+  - { von_einheit: "/l'l", test_standard: "Erythrozyten", ziel_einheit: "10^12/L", faktor: 1.0 }
 
   # Konversionen für Hämoglobin (von g/L bzw. g/L_ zu g/dL)
   - { von_einheit: "g/l_", test_standard: "Hämoglobin", ziel_einheit: "g/dL", faktor: 0.1 }

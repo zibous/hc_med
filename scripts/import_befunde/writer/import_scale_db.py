@@ -9,6 +9,7 @@ from config.app_config import config
 
 log = logging.getLogger("labor_pipeline")
 
+
 def calculate_age(measurement_date: str, geburtsdatum: date) -> int:
     """Berechnet das Alter zum Messzeitpunkt."""
     try:
@@ -21,12 +22,13 @@ def calculate_age(measurement_date: str, geburtsdatum: date) -> int:
     except (ValueError, IndexError):
         return 0
 
+
 def resolve_scale_db(scaledb_path: str) -> Path | None:
     """Löst den scaledb-Pfad relativ zum DATA_DIR auf."""
     if not scaledb_path:
         return None
-    # Das DATA_DIR liegt parallel zum Skriptordner
-    data_dir = config.PROJECT_DIR / "data"
+    # DATA_DIR = hc_med/data/ (korrekte Basis für relative Pfade aus userlist.yaml)
+    data_dir = config.DATA_DIR
     resolved = (data_dir / scaledb_path).resolve()
     if resolved.exists():
         return resolved
@@ -35,19 +37,20 @@ def resolve_scale_db(scaledb_path: str) -> Path | None:
         return abs_path
     return None
 
+
 def import_scale_data(user_id: str):
     """Importiert Waage-Daten aus hc_scale in die aktive hc_med DB."""
     # Patientendaten und Scale-DB direkt aus der zentralen config ziehen
     patient_data = getattr(config, "_patient", {})
     scaledb_str = patient_data.get("scaledb", "")
-    
+
     if not scaledb_str:
         log.info(f"  ℹ️  [{user_id}] Kein 'scaledb'-Eintrag hinterlegt – Übersprungen.")
         return
 
     med_db_path = config.DB_FILE
     scale_path = resolve_scale_db(scaledb_str)
-    
+
     if not scale_path:
         log.warning(f"  ⚠️  [{user_id}] Scale-DB nicht gefunden unter: {scaledb_str}")
         return
@@ -59,16 +62,21 @@ def import_scale_data(user_id: str):
 
     # Scale-Daten einlesen
     scale_conn = sqlite3.connect(str(scale_path))
-    rows = scale_conn.execute("""
+    rows = scale_conn.execute(
+        """
         SELECT date, weight, bmi, fat, muscle, water, visceral, lbm, protein, poi
         FROM daily_miscale
         WHERE name=? AND weight > 0
         ORDER BY date
-    """, (scale_name,)).fetchall()
+    """,
+        (scale_name,),
+    ).fetchall()
     scale_conn.close()
 
     if not rows:
-        log.warning(f"  ⚠️  [{user_id}] Keine Waage-Daten für Name '{scale_name}' in hc_scale gefunden.")
+        log.warning(
+            f"  ⚠️  [{user_id}] Keine Waage-Daten für Name '{scale_name}' in hc_scale gefunden."
+        )
         return
 
     # In aktive hc_med DB einspeisen
@@ -78,18 +86,23 @@ def import_scale_data(user_id: str):
     # Echte, interne Patienten-ID holen
     patient = med_conn.execute("SELECT id FROM patienten LIMIT 1").fetchone()
     if not patient:
-        log.warning(f"  ⚠️  [{user_id}] SQLite-Fehler: Noch kein Patient in der Datenbank vorhanden.")
+        log.warning(
+            f"  ⚠️  [{user_id}] SQLite-Fehler: Noch kein Patient in der Datenbank vorhanden."
+        )
         med_conn.close()
         return
     patient_id = patient[0]
 
     # Befund-Kopf für den Waage-Import absichern
-    med_conn.execute("""
+    med_conn.execute(
+        """
         INSERT OR IGNORE INTO befunde (patient_id, datum, quelldatei, labor, format)
         VALUES (?, ?, 'hc_scale_import', 'Mi Scale Waage', 'scale')
-    """, (patient_id, rows[-1][0]))
+    """,
+        (patient_id, rows[-1][0]),
+    )
     med_conn.commit()
-    
+
     befund_id = med_conn.execute(
         "SELECT id FROM befunde WHERE quelldatei='hc_scale_import'"
     ).fetchone()[0]
@@ -130,26 +143,44 @@ def import_scale_data(user_id: str):
                     parts = norm.split("-")
                     if len(parts) == 2:
                         lo, hi = float(parts[0]), float(parts[1])
-                        if val < lo: flag = "L"
-                        elif val > hi: flag = "H"
+                        if val < lo:
+                            flag = "L"
+                        elif val > hi:
+                            flag = "H"
                 except ValueError:
                     pass
 
-                insert_rows.append((
-                    befund_id, patient_id, datum, alter,
-                    "Körperdaten", test, test,
-                    f"{val:.1f}", einheit, f"{val:.1f}", einheit,
-                    norm, flag,
-                ))
+                insert_rows.append(
+                    (
+                        befund_id,
+                        patient_id,
+                        datum,
+                        alter,
+                        "Körperdaten",
+                        test,
+                        test,
+                        f"{val:.1f}",
+                        einheit,
+                        f"{val:.1f}",
+                        einheit,
+                        norm,
+                        flag,
+                    )
+                )
 
-    med_conn.executemany("""
+    med_conn.executemany(
+        """
         INSERT INTO laborwerte
         (befund_id, patient_id, datum, alter_bei_messung, gruppe,
          test_standard, test_original, wert_norm, einheit_norm,
          wert_original, einheit_original, normbereich, flag)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, insert_rows)
+    """,
+        insert_rows,
+    )
     med_conn.commit()
     med_conn.close()
 
-    log.info(f"  ✓ [{user_id}] {len(insert_rows)} Körperdaten erfolgreich aus Scale-DB geladen ({len(weekly)} Monate).")
+    log.info(
+        f"  ✓ [{user_id}] {len(insert_rows)} Körperdaten erfolgreich aus Scale-DB geladen ({len(weekly)} Monate)."
+    )

@@ -1,6 +1,6 @@
 // alle-tests.js – Alle Tests als sortierbare Tabelle mit Jahres-Bereich-Filter
-import { state, navigate } from "./state.js";
 import { renderNormBar } from "./norm-bar.js";
+import { navigate, state } from "./state.js";
 
 /**
  * Rendert die "Alle Tests"-Ansicht als Tabelle mit Von/Bis-Jahr-Dropdowns.
@@ -38,9 +38,19 @@ export async function renderAlleTests() {
 
     let sortCol = state.alleTestsSortCol || "gruppe";
     let sortDir = state.alleTestsSortDir || 1;
+    let searchTerm = state.alleTestsSearch || "";
 
     function renderTable(items, col, dir) {
-      const sorted = [...items].sort((a, b) => {
+      // Suchfilter anwenden
+      const filtered = searchTerm
+        ? items.filter(f =>
+          f.test.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          f.gruppe.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (f.kurzname || "").toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        : items;
+
+      const sorted = [...filtered].sort((a, b) => {
         let va = a[col] || "", vb = b[col] || "";
         if (col === "wert") {
           va = parseFloat(String(va).replace(/[<>,]/g, "").replace(",", ".")) || 0;
@@ -79,8 +89,11 @@ export async function renderAlleTests() {
 
       el.innerHTML = `<div class="path-list">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
-          <div class="card-title" style="font-size:1.8rem;">📋 Alle Tests (${sorted.length})</div>
-          <button class="print-btn" onclick="window.print()">🖨️ Drucken</button>
+          <div class="card-title" style="font-size:1.8rem;">📋 Alle Tests (${sorted.length}${searchTerm ? ' / ' + items.length : ''})</div>
+          <div style="display:flex;align-items:center;gap:0.8rem;">
+            <input type="search" id="testSearch" class="test-search" placeholder="🔍 Test suchen..." value="${searchTerm}" autocomplete="off">
+            <button class="print-btn" onclick="window.print()">🖨️ Drucken</button>
+          </div>
         </div>
         <table class="path-table">
           <thead><tr>
@@ -118,6 +131,24 @@ export async function renderAlleTests() {
           navigate("trend", { test: row.dataset.test, gruppe: row.dataset.gruppe });
         });
       });
+
+      // Suche
+      const searchInput = document.getElementById("testSearch");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          searchTerm = e.target.value;
+          state.alleTestsSearch = searchTerm;
+          localStorage.setItem("lab_state", JSON.stringify(state));
+          const cursorPos = e.target.selectionStart;
+          renderTable(items, sortCol, sortDir);
+          // Focus + Cursor-Position wiederherstellen
+          const newInput = document.getElementById("testSearch");
+          if (newInput) {
+            newInput.focus();
+            newInput.setSelectionRange(cursorPos, cursorPos);
+          }
+        });
+      }
     }
 
     renderTable(tests, sortCol, sortDir);

@@ -43,7 +43,9 @@ class LaborDataNormalizer:
                     v = float(str(current_value).replace("<", "").replace(">", ""))
                     if v > 20:
                         row["Test_Standard"] = "HbA1c (IFCC)"
-                        row["Einheit_Norm"] = config.STANDARD_UNITS.get("HbA1c (IFCC)", "mmol/mol")
+                        row["Einheit_Norm"] = config.STANDARD_UNITS.get(
+                            "HbA1c (IFCC)", "mmol/mol"
+                        )
                 except ValueError:
                     pass
 
@@ -53,6 +55,25 @@ class LaborDataNormalizer:
                 v = float(str(current_value).replace("<", "").replace(">", ""))
                 if v > 15:
                     row["Test_Standard"] = "HbA1c (IFCC)"
-                    row["Einheit_Norm"] = config.STANDARD_UNITS.get("HbA1c (IFCC)", "mmol/mol")
+                    row["Einheit_Norm"] = config.STANDARD_UNITS.get(
+                        "HbA1c (IFCC)", "mmol/mol"
+                    )
             except ValueError:
+                pass
+
+        # HbA1c (IFCC) → HbA1c (NGSP): mmol/mol in % umrechnen und zusammenführen
+        # Formel: NGSP(%) = IFCC(mmol/mol) / 10.929 + 2.15
+        if row["Test_Standard"] == "HbA1c (IFCC)":
+            try:
+                v = float(
+                    str(row.get("Wert_Norm") or row.get("Wert", ""))
+                    .replace("<", "")
+                    .replace(">", "")
+                )
+                ngsp = round(v / 10.929 + 2.15, 1)
+                row["Test_Standard"] = "HbA1c"
+                row["Wert_Norm"] = str(ngsp)
+                row["Einheit_Norm"] = "%"
+                row["Normbereich"] = "4.0 - 5.6"
+            except (ValueError, TypeError):
                 pass

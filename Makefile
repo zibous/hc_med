@@ -12,7 +12,8 @@ SHELL := /bin/bash
 
 DB_FILE   = data/user/$(or $(USER),peter)/labor.db
 CSV_FILE  = data/user/$(or $(USER),peter)/laborwerte_gesamt.csv
-SCRIPT    = scripts/extract_labvalues.py
+SCRIPT    = scripts/import_befunde/main.py
+SCRIPT_DIR = scripts/import_befunde
 
 # ---------------------------------------------------------
 # Docker
@@ -63,8 +64,12 @@ restart: ## Container neustarten
 # ---------------------------------------------------------
 
 labor: ## Laborwerte extrahieren → SQLite + CSV (PARAM: USER=peter)
-	@echo "🔬 Extrahiere Laborwerte..."
+	@echo "🔬 Extrahiere Laborwerte für User: $(or $(USER),peter)..."
 	@python3 $(SCRIPT) $(or $(USER),peter)
+
+labor-test: ## Laborwerte extrahieren im Test-Modus (PARAM: USER=peter)
+	@echo "🧪 Test-Import für User: $(or $(USER),peter)..."
+	@python3 $(SCRIPT) $(or $(USER),peter) --test
 
 labor-import: labor ## Alias für labor (Reimport aller Befunde)
 
@@ -130,10 +135,7 @@ labor-reset: ## Datenbank löschen und neu aufbauen (PARAM: USER=peter)
 	@rm -f data/user/$(or $(USER),peter)/labor.db
 	@echo "🔬 Reimport Laborwerte..."
 	@python3 $(SCRIPT) $(or $(USER),peter)
-	@echo "⚖️  Import Körperdaten (hc_scale)..."
-	@python3 scripts/import_scale.py $(or $(USER),peter)
-	@echo "🔍 Validierung..."
-	@python3 scripts/validate_labor.py $(or $(USER),peter)
+	@echo "✅ Fertig!"
 
 labor-validate: ## Laborwerte auf Plausibilität prüfen
 	@python3 scripts/validate_labor.py
