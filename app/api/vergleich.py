@@ -25,7 +25,9 @@ def _parse_float(val: str) -> float | None:
         return None
 
 
-def _bewertung(aktuell_flag: str, vergleich_flag: str, aktuell_val: float, vergleich_val: float) -> str:
+def _bewertung(
+    aktuell_flag: str, vergleich_flag: str, aktuell_val: float, vergleich_val: float
+) -> str:
     """Bewertet die Veränderung zwischen zwei Zeitpunkten.
 
     Returns: 'verbessert', 'verschlechtert', 'stabil', 'neu_auffällig', 'normalisiert'
@@ -95,17 +97,20 @@ async def vergleich_pivot():
     conn = get_db()
     try:
         heute = date.today()
-        vor_12m = (heute - timedelta(days=365)).isoformat()
+        vor_18m = (heute - timedelta(days=548)).isoformat()
 
-        # Alle Tests mit aktuellem Wert (letzter Wert im letzten Jahr)
-        aktuelle = conn.execute("""
+        # Alle Tests mit aktuellem Wert (letzter Wert in den letzten 18 Monaten)
+        aktuelle = conn.execute(
+            """
             SELECT test_standard, gruppe, wert_norm, einheit_norm, normbereich, flag, datum
             FROM laborwerte l1
             WHERE datum = (SELECT MAX(datum) FROM laborwerte l2 WHERE l2.test_standard = l1.test_standard)
             AND datum >= ?
             GROUP BY test_standard
             ORDER BY gruppe, test_standard
-        """, (vor_12m,)).fetchall()
+        """,
+            (vor_18m,),
+        ).fetchall()
 
         results = []
         for row in aktuelle:
@@ -116,11 +121,14 @@ async def vergleich_pivot():
                 continue
 
             # Letzte N Messungen VOR dem aktuellen Wert
-            history_rows = conn.execute("""
+            history_rows = conn.execute(
+                """
                 SELECT wert_norm, flag, datum FROM laborwerte
                 WHERE test_standard = ? AND datum < ?
                 ORDER BY datum DESC LIMIT ?
-            """, (test, aktuell_datum, _MAX_HISTORY)).fetchall()
+            """,
+                (test, aktuell_datum, _MAX_HISTORY),
+            ).fetchall()
 
             if not history_rows:
                 continue  # Nur 1 Messung → kein Vergleich möglich
@@ -145,12 +153,14 @@ async def vergleich_pivot():
                 label = _datum_label(hist_datum, heute)
 
                 if hist_val is None:
-                    entry["zeitraeume"].append({
-                        "label": label,
-                        "wert": hist["wert_norm"],
-                        "datum": hist_datum,
-                        "bewertung": None,
-                    })
+                    entry["zeitraeume"].append(
+                        {
+                            "label": label,
+                            "wert": hist["wert_norm"],
+                            "datum": hist_datum,
+                            "bewertung": None,
+                        }
+                    )
                     continue
 
                 bewertung = _bewertung(
@@ -161,20 +171,26 @@ async def vergleich_pivot():
                 if idx == 0 and bewertung != "stabil":
                     hat_aenderung = True
 
-                pct = round((aktuell_val - hist_val) / hist_val * 100) if hist_val != 0 else 0
+                pct = (
+                    round((aktuell_val - hist_val) / hist_val * 100)
+                    if hist_val != 0
+                    else 0
+                )
 
-                entry["zeitraeume"].append({
-                    "label": label,
-                    "wert": hist["wert_norm"],
-                    "flag": hist["flag"] or "",
-                    "datum": hist_datum,
-                    "pct": pct,
-                    "bewertung": bewertung,
-                })
+                entry["zeitraeume"].append(
+                    {
+                        "label": label,
+                        "wert": hist["wert_norm"],
+                        "flag": hist["flag"] or "",
+                        "datum": hist_datum,
+                        "pct": pct,
+                        "bewertung": bewertung,
+                    }
+                )
 
-            # NUR Tests mit aktuellem Flag (H/L) anzeigen
+            # Tests anzeigen wenn: Flag H/L ODER signifikante Veränderung zur Vormessung
             aktuell_flag = row["flag"] or ""
-            if aktuell_flag in ("H", "L"):
+            if aktuell_flag in ("H", "L") or hat_aenderung:
                 results.append(entry)
 
         # Sortierung: verschlechtert/neu_auffällig zuerst

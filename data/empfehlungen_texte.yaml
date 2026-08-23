@@ -1,0 +1,81 @@
+# ─── Empfehlungstexte für Verknüpfungen ──────────────────────────────────────
+# Platzhalter: {val}, {bmi}, {kg}, {corr}, {label}, {test}, {ratio}, etc.
+# Jede Kategorie entspricht einer Verknüpfung.
+
+gewicht:
+  bmi_hoch: "BMI {bmi:.1f} liegt über Normalbereich. Gewichtsreduktion um {kg:.0f} kg würde normalisieren."
+  bmi_ok: "BMI {bmi:.1f} ist im Normalbereich – sehr gut."
+  glucose_hoch: "Glucose {val:.0f} mg/dL grenzwertig."
+  hba1c_hoch: "HbA1c {val:.1f}% zeigt beginnende Zuckerstoffwechselstörung. Kontrolle empfohlen."
+  trig_hoch: "Triglyceride {val:.0f} mg/dL deutlich erhöht."
+  korrelation_positiv: "📊 Korrelation: Gewicht und {label} bewegen sich gleichgerichtet (r={corr:.2f}). Gewichtsreduktion würde {test} wahrscheinlich verbessern."
+  korrelation_negativ: "📊 Korrelation: Gewichtsabnahme ging mit Anstieg von {label} einher (r={corr:.2f}). Andere Ursache prüfen."
+  alles_ok: "Alle Werte im Zusammenspiel unauffällig – weiter so!"
+
+bauchfett:
+  vf_hoch: "Viszeralfett Level {val:.0f} erhöht."
+  vf_hoch_crp: "CRP {crp:.2f} mg/dL erhöht – Bauchfett als Ursache wahrscheinlich."
+  vf_ok: "Viszeralfett Level {val:.1f} im guten Bereich."
+  vf_ok_crp: "CRP {crp:.2f} mg/dL erhöht, aber Bauchfett ist NICHT die Ursache. Andere Quellen suchen (Zähne, Gelenke, Infekt)."
+
+muskeln_niere:
+  gfr_niedrig: "GFR {val:.0f} mL/min eingeschränkt. Nephrologische Kontrolle empfohlen."
+  gfr_leicht: "GFR {val:.0f} mL/min leicht reduziert – bei Alter 70 akzeptabel, regelmäßig kontrollieren."
+  muskel_krea: "Bei {muskel:.0f}% Muskelmasse ist Kreatinin {krea:.2f} plausibel. GFR-Formel kann unterschätzen."
+
+koerperfett:
+  fett_gut: "Körperfett {val:.1f}% gut für das Alter."
+  hdl_optimal: "HDL {val:.0f} mg/dL optimal – schützt die Gefäße."
+  hdl_niedrig: "HDL {val:.0f} zu niedrig."
+  ldl_hoch: "LDL {val:.0f} erhöht."
+
+niere:
+  gfr_stadium3: "GFR {val:.0f}: Stadium 3. Regelmäßige Kontrolle empfohlen."
+  gfr_leicht: "GFR {val:.0f}: Leichte Einschränkung, alterstypisch. Blutdruck kontrollieren."
+  krea_hoch: "Kreatinin {val:.2f} leicht erhöht – mit GFR zusammen betrachten."
+
+entzuendung:
+  crp_stark: "CRP {val:.1f} stark erhöht – akuter Infekt/Gewebeschaden wahrscheinlich."
+  crp_leicht: "CRP {val:.2f} leicht erhöht. Mögliche Ursachen: Entzündung, Übergewicht, Stress."
+  leuko_hoch: "Leukozyten {val:.1f} erhöht. Bei anhaltender Erhöhung ohne Infekt: abklären."
+
+lipid:
+  chol_hoch: "Gesamt-Cholesterin {val:.0f} über Zielwert. LDL/HDL-Verhältnis entscheidend."
+  ratio_schlecht: "LDL/HDL {ratio:.1f} ungünstig (Ziel <3)."
+  ratio_gut: "LDL/HDL {ratio:.1f} ist gut."
+  trig_hoch: "Triglyceride {val:.0f} erhöht."
+
+cholesterin:
+  formel: "Formel: HDL ({hdl:.0f}) + LDL ({ldl:.0f}) + Trig÷5 ({trig:.0f}÷5={trig5:.0f}) = {berechnet:.0f} (gemessen: {chol:.0f})."
+  trig_haupttreiber: "Triglyceride ({trig:.0f}) sind Haupttreiber – NICHT LDL ({ldl:.0f})."
+  trig_massnahmen: "Triglyceride separat behandeln. Therapie mit Arzt besprechen."
+  trig_hoch: "Triglyceride {val:.0f} deutlich erhöht."
+  hdl_gut: "HDL {val:.0f} gut (schützt Gefäße)."
+  ldl_ok: "LDL {val:.0f} im Zielbereich."
+
+gefaesse:
+  risiko_gering: "Geringes Gefäßrisiko (Score {score}/8) – gut!"
+  prio1_trig: "PRIORITÄT 1: Triglyceride ({val:.0f}) senken. Effekt in 4-8 Wochen messbar."
+  prio2_crp: "PRIORITÄT 2: Entzündung (CRP {val:.1f}) reduzieren – destabilisiert bestehende Plaques. Ursache suchen."
+  prio3_hba1c: "PRIORITÄT 3: Blutzucker (HbA1c {val:.1f}%) schädigt Gefäßinnenwand."
+  ldl_hoch: "LDL {val:.0f} leicht über Zielwert 130. Bei zusätzlichen Risikofaktoren mit Arzt über Therapie sprechen."
+  hdl_gut: "HDL {val:.0f} ist gut – schützt die Gefäße aktiv."
+  hs_hoch: "Harnsäure {val:.1f} leicht erhöht – fördert Gefäßentzündung."
+  allgemein: "Regelmäßige Kontrolle empfohlen. Blutdruck <135/85 anstreben."
+
+stoffwechsel:
+  hba1c_diabetes: "HbA1c {val:.1f}% – Diabetes-Schwelle erreicht. Diabetologische Abklärung empfohlen."
+  hba1c_praediabetes: "HbA1c {val:.1f}% – Prädiabetes-Bereich."
+  glucose_diabetes: "Nüchtern-Glucose {val:.0f} mg/dL – diabetischer Bereich."
+  glucose_praediabetes: "Nüchtern-Glucose {val:.0f} mg/dL – leicht erhöht (Prädiabetes)."
+  trig_deutlich: "Triglyceride {val:.0f} – deutlich erhöht."
+  trig_leicht: "Triglyceride {val:.0f} – leicht erhöht."
+  hs_gicht: "Harnsäure {val:.1f} – Gichtrisiko erhöht."
+  hs_grenzwert: "Harnsäure {val:.1f} – oberer Grenzbereich."
+  leber_hoch: "Leberenzyme erhöht ({details}) – mögliche Fettleber."
+  metabolisch: "Mehrere Stoffwechsel-Achsen gleichzeitig auffällig – metabolisches Syndrom wahrscheinlich. Mit Arzt besprechen."
+  alles_ok: "Stoffwechselwerte im Normalbereich – weiter so."
+
+# Fallback
+default:
+  keine_auffaelligkeiten: "Keine spezifischen Auffälligkeiten in dieser Kombination."

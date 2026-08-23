@@ -1,8 +1,35 @@
 """Empfehlungslogik für Laborwerte und Verknüpfungen."""
 
 import sqlite3
+from datetime import datetime
+from pathlib import Path
+
+import yaml
 
 from app.config.settings import EMPFEHLUNGEN_TESTS
+
+# ─── Text-Templates aus YAML laden ───────────────────────────────────────────
+_TEXTE_PATH = (
+    Path(__file__).resolve().parent.parent.parent / "data" / "empfehlungen_texte.yaml"
+)
+with open(_TEXTE_PATH, "r", encoding="utf-8") as _f:
+    TEXTE = yaml.safe_load(_f)
+
+
+def _t(kategorie: str, key: str, **kwargs) -> str:
+    """Holt ein Text-Template und füllt Platzhalter."""
+    template = TEXTE.get(kategorie, {}).get(key, "")
+    if not template:
+        return ""
+    try:
+        return template.format(**kwargs)
+    except (KeyError, ValueError):
+        return template
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Trend-Empfehlung (einzelner Test)
+# ═══════════════════════════════════════════════════════════════════════════════
 
 
 def get_test_empfehlung(
@@ -59,10 +86,25 @@ def _cholesterin_dynamic(val: float, conn: sqlite3.Connection) -> str:
     trig = float(str(trig_row[0]).replace(",", "."))
     berechnet = hdl + ldl + (trig / 5)
 
-    text = f"Aktuell: HDL {hdl:.0f} + LDL {ldl:.0f} + Trig÷5 ({trig:.0f}÷5={trig/5:.0f}) = {berechnet:.0f} mg/dL (gemessen: {val:.0f}). "
+    text = _t(
+        "cholesterin",
+        "formel",
+        hdl=hdl,
+        ldl=ldl,
+        trig=trig,
+        trig5=trig / 5,
+        berechnet=berechnet,
+        chol=val,
+    )
     if trig > 200 and ldl < 150:
-        text += f"Haupttreiber des hohen Gesamtwerts sind die Triglyceride ({trig:.0f}), LDL ({ldl:.0f}) ist OK. Triglyceride separat behandeln. "
+        text += " " + _t("cholesterin", "trig_haupttreiber", trig=trig, ldl=ldl)
+        text += " " + _t("cholesterin", "trig_massnahmen")
     return text
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Verknüpfungs-Empfehlungen
+# ═══════════════════════════════════════════════════════════════════════════════
 
 
 def generate_verknuepfung_empfehlung(name: str, tests: dict) -> str:
@@ -121,9 +163,14 @@ def generate_verknuepfung_empfehlung(name: str, tests: dict) -> str:
         empfehlungen = _empfehlung_stoffwechsel(get_latest)
 
     if not empfehlungen:
-        empfehlungen = ["Keine spezifischen Auffälligkeiten in dieser Kombination."]
+        empfehlungen = [_t("default", "keine_auffaelligkeiten")]
 
     return " · ".join(empfehlungen)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Einzelne Verknüpfungs-Funktionen
+# ═══════════════════════════════════════════════════════════════════════════════
 
 
 def _empfehlung_gewicht(get_latest, get_series=None):
@@ -134,37 +181,262 @@ def _empfehlung_gewicht(get_latest, get_series=None):
     trig, _ = get_latest("Triglyceride")
 
     if bmi and bmi > 25:
-        e.append(
-            f"BMI {bmi:.1f} liegt über Normalbereich. Gewichtsreduktion um {((bmi-23)*1.8):.0f} kg würde normalisieren."
-        )
+        e.append(_t("gewicht", "bmi_hoch", bmi=bmi, kg=(bmi - 23) * 1.8))
     elif bmi:
-        e.append(f"BMI {bmi:.1f} ist im Normalbereich – sehr gut.")
+        e.append(_t("gewicht", "bmi_ok", bmi=bmi))
     if glucose and glucose > 100:
-        e.append(
-            f"Glucose {glucose:.0f} mg/dL grenzwertig. Weniger Zucker/Weißmehl, Bewegung nach Mahlzeiten."
-        )
+        e.append(_t("gewicht", "glucose_hoch", val=glucose))
     if hba1c and hba1c > 5.7:
-        e.append(
-            f"HbA1c {hba1c:.1f}% zeigt beginnende Zuckerstoffwechselstörung. Kontrolle empfohlen."
-        )
+        e.append(_t("gewicht", "hba1c_hoch", val=hba1c))
     if trig and trig > 200:
-        e.append(
-            f"Triglyceride {trig:.0f} mg/dL deutlich erhöht. Weniger Alkohol, Zucker, gesättigte Fette."
-        )
+        e.append(_t("gewicht", "trig_hoch", val=trig))
 
-    # Korrelationsanalyse: Gewicht vs. Laborwerte
+    # Korrelationsanalyse
     if get_series:
         korrelationen = _analyse_gewicht_korrelation(get_series)
         if korrelationen:
             e.extend(korrelationen)
 
-    return e or ["Alle Werte im Zusammenspiel unauffällig – weiter so!"]
+    return e or [_t("gewicht", "alles_ok")]
+
+
+def _empfehlung_bauchfett(get_latest):
+    e = []
+    vf, _ = get_latest("Viszeralfett")
+    crp, _ = get_latest("CRP")
+    if vf and vf > 12:
+        e.append(_t("bauchfett", "vf_hoch", val=vf))
+        if crp and crp > 0.5:
+            e.append(_t("bauchfett", "vf_hoch_crp", crp=crp))
+    elif vf:
+        e.append(_t("bauchfett", "vf_ok", val=vf))
+        if crp and crp > 0.5:
+            e.append(_t("bauchfett", "vf_ok_crp", crp=crp))
+    return e
+
+
+def _empfehlung_muskeln_niere(get_latest):
+    e = []
+    muskel, _ = get_latest("Muskelmasse")
+    krea, _ = get_latest("Kreatinin")
+    gfr, _ = get_latest("GFR")
+    if gfr and gfr < 60:
+        e.append(_t("muskeln_niere", "gfr_niedrig", val=gfr))
+    elif gfr and gfr < 90:
+        e.append(_t("muskeln_niere", "gfr_leicht", val=gfr))
+    if muskel and krea:
+        e.append(_t("muskeln_niere", "muskel_krea", muskel=muskel, krea=krea))
+    return e
+
+
+def _empfehlung_koerperfett(get_latest):
+    e = []
+    fett, _ = get_latest("Fettgehalt")
+    hdl, _ = get_latest("HDL")
+    ldl, _ = get_latest("LDL")
+    if fett and fett < 20:
+        e.append(_t("koerperfett", "fett_gut", val=fett))
+    if hdl and hdl >= 60:
+        e.append(_t("koerperfett", "hdl_optimal", val=hdl))
+    elif hdl and hdl < 40:
+        e.append(_t("koerperfett", "hdl_niedrig", val=hdl))
+    if ldl and ldl > 150:
+        e.append(_t("koerperfett", "ldl_hoch", val=ldl))
+    return e
+
+
+def _empfehlung_niere(get_latest):
+    e = []
+    gfr, _ = get_latest("GFR")
+    krea, _ = get_latest("Kreatinin")
+    if gfr and gfr < 60:
+        e.append(_t("niere", "gfr_stadium3", val=gfr))
+    elif gfr and gfr < 90:
+        e.append(_t("niere", "gfr_leicht", val=gfr))
+    if krea and krea > 1.2:
+        e.append(_t("niere", "krea_hoch", val=krea))
+    return e
+
+
+def _empfehlung_entzuendung(get_latest):
+    e = []
+    crp, _ = get_latest("CRP")
+    leuko, _ = get_latest("Leukozyten")
+    if crp and crp > 5:
+        e.append(_t("entzuendung", "crp_stark", val=crp))
+    elif crp and crp > 0.5:
+        e.append(_t("entzuendung", "crp_leicht", val=crp))
+    if leuko and leuko > 11:
+        e.append(_t("entzuendung", "leuko_hoch", val=leuko))
+    return e
+
+
+def _empfehlung_lipid(get_latest):
+    e = []
+    chol, _ = get_latest("Cholesterin")
+    hdl, _ = get_latest("HDL")
+    ldl, _ = get_latest("LDL")
+    trig, _ = get_latest("Triglyceride")
+    if chol and chol > 200:
+        e.append(_t("lipid", "chol_hoch", val=chol))
+    if ldl and hdl:
+        ratio = ldl / hdl
+        if ratio > 3:
+            e.append(_t("lipid", "ratio_schlecht", ratio=ratio))
+        else:
+            e.append(_t("lipid", "ratio_gut", ratio=ratio))
+    if trig and trig > 200:
+        e.append(_t("lipid", "trig_hoch", val=trig))
+    return e
+
+
+def _empfehlung_cholesterin(get_latest):
+    e = []
+    chol, _ = get_latest("Cholesterin")
+    hdl, _ = get_latest("HDL")
+    ldl, _ = get_latest("LDL")
+    trig, _ = get_latest("Triglyceride")
+
+    if chol and hdl and ldl and trig:
+        berechnet = hdl + ldl + (trig / 5)
+        e.append(
+            _t(
+                "cholesterin",
+                "formel",
+                hdl=hdl,
+                ldl=ldl,
+                trig=trig,
+                trig5=trig / 5,
+                berechnet=berechnet,
+                chol=chol,
+            )
+        )
+    if trig and trig > 200 and ldl and ldl < 150:
+        e.append(_t("cholesterin", "trig_haupttreiber", trig=trig, ldl=ldl))
+        e.append(_t("cholesterin", "trig_massnahmen"))
+    elif trig and trig > 200:
+        e.append(_t("cholesterin", "trig_hoch", val=trig))
+    if hdl and hdl >= 55:
+        e.append(_t("cholesterin", "hdl_gut", val=hdl))
+    if ldl and ldl < 130:
+        e.append(_t("cholesterin", "ldl_ok", val=ldl))
+    return e
+
+
+def _empfehlung_gefaesse(get_latest):
+    e = []
+    ldl, _ = get_latest("LDL")
+    hdl, _ = get_latest("HDL")
+    trig, _ = get_latest("Triglyceride")
+    crp, _ = get_latest("CRP")
+    hba1c, _ = get_latest("HbA1c")
+    hs, _ = get_latest("Harnsäure")
+
+    # Risiko-Score
+    risiko = 0
+    if trig and trig > 200:
+        risiko += 2
+    if crp and crp > 0.5:
+        risiko += 2
+    if hba1c and hba1c > 5.7:
+        risiko += 1
+    if ldl and ldl > 130:
+        risiko += 1
+    if hs and hs > 7.0:
+        risiko += 1
+    if hdl and hdl < 40:
+        risiko += 1
+
+    if risiko < 3:
+        e.append(_t("gefaesse", "risiko_gering", score=risiko))
+
+    # Spezifische Empfehlungen
+    if trig and trig > 200:
+        e.append(_t("gefaesse", "prio1_trig", val=trig))
+    if crp and crp > 1.0:
+        e.append(_t("gefaesse", "prio2_crp", val=crp))
+    if hba1c and hba1c > 5.7:
+        e.append(_t("gefaesse", "prio3_hba1c", val=hba1c))
+    if ldl and ldl > 130:
+        e.append(_t("gefaesse", "ldl_hoch", val=ldl))
+    if hdl and hdl >= 55:
+        e.append(_t("gefaesse", "hdl_gut", val=hdl))
+    if hs and hs > 7.0:
+        e.append(_t("gefaesse", "hs_hoch", val=hs))
+
+    e.append(_t("gefaesse", "allgemein"))
+    return e
+
+
+def _empfehlung_stoffwechsel(get_latest):
+    e = []
+    hba1c, _ = get_latest("HbA1c")
+    glucose, _ = get_latest("Glucose")
+    trig, _ = get_latest("Triglyceride")
+    hs, _ = get_latest("Harnsäure")
+    ggt, _ = get_latest("GGT")
+    gpt, _ = get_latest("GPT")
+    got, _ = get_latest("GOT")
+
+    # Diabetes
+    if hba1c and hba1c > 6.0:
+        e.append(_t("stoffwechsel", "hba1c_diabetes", val=hba1c))
+    elif hba1c and hba1c > 5.7:
+        e.append(_t("stoffwechsel", "hba1c_praediabetes", val=hba1c))
+
+    if glucose and glucose > 126:
+        e.append(_t("stoffwechsel", "glucose_diabetes", val=glucose))
+    elif glucose and glucose > 100:
+        e.append(_t("stoffwechsel", "glucose_praediabetes", val=glucose))
+
+    # Triglyceride
+    if trig and trig > 200:
+        e.append(_t("stoffwechsel", "trig_deutlich", val=trig))
+    elif trig and trig > 150:
+        e.append(_t("stoffwechsel", "trig_leicht", val=trig))
+
+    # Harnsäure
+    if hs and hs > 8.0:
+        e.append(_t("stoffwechsel", "hs_gicht", val=hs))
+    elif hs and hs > 7.0:
+        e.append(_t("stoffwechsel", "hs_grenzwert", val=hs))
+
+    # Leber
+    leber_auffaellig = []
+    if ggt and ggt > 60:
+        leber_auffaellig.append(f"GGT {ggt:.0f}")
+    if gpt and gpt > 50:
+        leber_auffaellig.append(f"GPT {gpt:.0f}")
+    if got and got > 50:
+        leber_auffaellig.append(f"GOT {got:.0f}")
+    if leber_auffaellig:
+        e.append(_t("stoffwechsel", "leber_hoch", details=", ".join(leber_auffaellig)))
+
+    # Metabolisches Syndrom
+    risiken = sum(
+        [
+            bool(hba1c and hba1c > 5.7),
+            bool(trig and trig > 150),
+            bool(hs and hs > 7.0),
+            bool(ggt and ggt > 60),
+        ]
+    )
+    if risiken >= 3:
+        e.append(_t("stoffwechsel", "metabolisch"))
+
+    if not e:
+        e.append(_t("stoffwechsel", "alles_ok"))
+
+    return e
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Korrelationsanalyse
+# ═══════════════════════════════════════════════════════════════════════════════
 
 
 def _analyse_gewicht_korrelation(get_series) -> list[str]:
     """Prüft ob Gewichtsänderungen mit Laborwert-Änderungen korrelieren."""
-    from datetime import datetime
-
     gewicht_series = get_series("Gewicht")
     if len(gewicht_series) < 3:
         return []
@@ -181,24 +453,27 @@ def _analyse_gewicht_korrelation(get_series) -> list[str]:
         if len(labor_series) < 3:
             continue
 
-        # Gemeinsame Zeitpunkte finden (±60 Tage)
         pairs = _match_series(gewicht_series, labor_series, max_days=60)
         if len(pairs) < 3:
             continue
 
-        # Pearson-Korrelation berechnen
         corr = _simple_correlation(pairs)
         if corr is None:
             continue
 
         if corr > 0.6:
             korrelationen.append(
-                f"📊 Korrelation: Gewicht und {label} bewegen sich gleichgerichtet (r={corr:.2f}). "
-                f"Gewichtsreduktion würde {test_name} wahrscheinlich verbessern."
+                _t(
+                    "gewicht",
+                    "korrelation_positiv",
+                    label=label,
+                    corr=corr,
+                    test=test_name,
+                )
             )
         elif corr < -0.6:
             korrelationen.append(
-                f"📊 Korrelation: Gewichtsabnahme ging mit Anstieg von {label} einher (r={corr:.2f}). Andere Ursache prüfen."
+                _t("gewicht", "korrelation_negativ", label=label, corr=corr)
             )
 
     return korrelationen
@@ -206,8 +481,6 @@ def _analyse_gewicht_korrelation(get_series) -> list[str]:
 
 def _match_series(series_a, series_b, max_days=60) -> list[tuple]:
     """Findet Wertepaare mit ähnlichem Datum (±max_days)."""
-    from datetime import datetime
-
     pairs = []
     for datum_a, val_a in series_a:
         best_diff = None
@@ -250,292 +523,3 @@ def _simple_correlation(pairs: list[tuple]):
         return None
 
     return num / (den_x * den_y)
-
-
-def _empfehlung_bauchfett(get_latest):
-    e = []
-    vf, _ = get_latest("Viszeralfett")
-    crp, _ = get_latest("CRP")
-    if vf and vf > 12:
-        e.append(
-            f"Viszeralfett Level {vf:.0f} erhöht. Ausdauersport und Intervallfasten helfen."
-        )
-        if crp and crp > 0.5:
-            e.append(
-                f"CRP {crp:.2f} mg/dL erhöht – Bauchfett als Ursache wahrscheinlich. Weniger Viszeralfett senkt CRP."
-            )
-    elif vf:
-        e.append(f"Viszeralfett Level {vf:.1f} im guten Bereich.")
-        if crp and crp > 0.5:
-            e.append(
-                f"CRP {crp:.2f} mg/dL erhöht, aber Bauchfett ist NICHT die Ursache. Andere Quellen suchen (Zähne, Gelenke, Infekt)."
-            )
-    return e
-
-
-def _empfehlung_muskeln_niere(get_latest):
-    e = []
-    muskel, _ = get_latest("Muskelmasse")
-    krea, _ = get_latest("Kreatinin")
-    gfr, _ = get_latest("GFR")
-    if gfr and gfr < 60:
-        e.append(
-            f"GFR {gfr:.0f} mL/min eingeschränkt. Nephrologische Kontrolle empfohlen."
-        )
-    elif gfr and gfr < 90:
-        e.append(
-            f"GFR {gfr:.0f} mL/min leicht reduziert – bei Alter 70 akzeptabel, regelmäßig kontrollieren."
-        )
-    if muskel and krea:
-        e.append(
-            f"Bei {muskel:.0f}% Muskelmasse ist Kreatinin {krea:.2f} plausibel. GFR-Formel kann unterschätzen."
-        )
-    return e
-
-
-def _empfehlung_koerperfett(get_latest):
-    e = []
-    fett, _ = get_latest("Fettgehalt")
-    hdl, _ = get_latest("HDL")
-    ldl, _ = get_latest("LDL")
-    if fett and fett < 20:
-        e.append(
-            f"Körperfett {fett:.1f}% gut für das Alter. Unterstützt gute Blutfettwerte."
-        )
-    if hdl and hdl >= 60:
-        e.append(f"HDL {hdl:.0f} mg/dL optimal – schützt die Gefäße.")
-    elif hdl and hdl < 40:
-        e.append(f"HDL {hdl:.0f} zu niedrig. Mehr Bewegung und ungesättigte Fette.")
-    if ldl and ldl > 150:
-        e.append(f"LDL {ldl:.0f} erhöht. Weniger gesättigte Fette, mehr Ballaststoffe.")
-    return e
-
-
-def _empfehlung_niere(get_latest):
-    e = []
-    gfr, _ = get_latest("GFR")
-    krea, _ = get_latest("Kreatinin")
-    if gfr and gfr < 60:
-        e.append(
-            f"GFR {gfr:.0f}: Stadium 3. Eiweiß begrenzen, viel trinken, regelmäßige Kontrolle."
-        )
-    elif gfr and gfr < 90:
-        e.append(
-            f"GFR {gfr:.0f}: Leichte Einschränkung, alterstypisch. 2L/Tag trinken, Blutdruck kontrollieren."
-        )
-    if krea and krea > 1.2:
-        e.append(f"Kreatinin {krea:.2f} leicht erhöht – mit GFR zusammen betrachten.")
-    return e
-
-
-def _empfehlung_entzuendung(get_latest):
-    e = []
-    crp, _ = get_latest("CRP")
-    leuko, _ = get_latest("Leukozyten")
-    if crp and crp > 5:
-        e.append(
-            f"CRP {crp:.1f} stark erhöht – akuter Infekt/Gewebeschaden wahrscheinlich."
-        )
-    elif crp and crp > 0.5:
-        e.append(
-            f"CRP {crp:.2f} leicht erhöht. Mögliche Ursachen: Entzündung, Übergewicht, Stress."
-        )
-    if leuko and leuko > 11:
-        e.append(
-            f"Leukozyten {leuko:.1f} erhöht. Bei anhaltender Erhöhung ohne Infekt: abklären."
-        )
-    return e
-
-
-def _empfehlung_lipid(get_latest):
-    e = []
-    chol, _ = get_latest("Cholesterin")
-    hdl, _ = get_latest("HDL")
-    ldl, _ = get_latest("LDL")
-    trig, _ = get_latest("Triglyceride")
-    if chol and chol > 200:
-        e.append(
-            f"Gesamt-Cholesterin {chol:.0f} über Zielwert. LDL/HDL-Verhältnis entscheidend."
-        )
-    if ldl and hdl:
-        ratio = ldl / hdl
-        if ratio > 3:
-            e.append(
-                f"LDL/HDL {ratio:.1f} ungünstig (Ziel <3). Bewegung und pflanzliche Ernährung."
-            )
-        else:
-            e.append(f"LDL/HDL {ratio:.1f} ist gut.")
-    if trig and trig > 200:
-        e.append(
-            f"Triglyceride {trig:.0f} erhöht. Weniger Zucker, Alkohol, raffinierte KH."
-        )
-    return e
-
-
-def _empfehlung_cholesterin(get_latest):
-    e = []
-    chol, _ = get_latest("Cholesterin")
-    hdl, _ = get_latest("HDL")
-    ldl, _ = get_latest("LDL")
-    trig, _ = get_latest("Triglyceride")
-
-    if chol and hdl and ldl and trig:
-        berechnet = hdl + ldl + (trig / 5)
-        e.append(
-            f"Formel: HDL ({hdl:.0f}) + LDL ({ldl:.0f}) + Trig÷5 ({trig:.0f}÷5={trig/5:.0f}) = {berechnet:.0f} (gemessen: {chol:.0f})."
-        )
-    if trig and trig > 200 and ldl and ldl < 150:
-        e.append(
-            f"Triglyceride ({trig:.0f}) sind Haupttreiber – NICHT LDL ({ldl:.0f})."
-        )
-        e.append(
-            "Maßnahmen: Alkohol meiden, Zucker/Weißmehl einschränken, Omega-3 (2g/Tag), Bewegung."
-        )
-    elif trig and trig > 200:
-        e.append(f"Triglyceride {trig:.0f} deutlich erhöht.")
-    if hdl and hdl >= 55:
-        e.append(f"HDL {hdl:.0f} gut (schützt Gefäße).")
-    if ldl and ldl < 130:
-        e.append(f"LDL {ldl:.0f} im Zielbereich.")
-    return e
-
-
-def _empfehlung_gefaesse(get_latest):
-    e = []
-    ldl, _ = get_latest("LDL")
-    hdl, _ = get_latest("HDL")
-    trig, _ = get_latest("Triglyceride")
-    crp, _ = get_latest("CRP")
-    hba1c, _ = get_latest("HbA1c")
-    hs, _ = get_latest("Harnsäure")
-
-    # Risiko-Score (vereinfacht)
-    risiko = 0
-    if trig and trig > 200:
-        risiko += 2
-    if crp and crp > 0.5:
-        risiko += 2
-    if hba1c and hba1c > 5.7:
-        risiko += 1
-    if ldl and ldl > 130:
-        risiko += 1
-    if hs and hs > 7.0:
-        risiko += 1
-    if hdl and hdl < 40:
-        risiko += 1
-
-    if risiko >= 5:
-        pass  # Score-Anzeige erfolgt über die Score-Card im Frontend
-    elif risiko >= 3:
-        pass  # Score-Anzeige erfolgt über die Score-Card im Frontend
-    else:
-        e.append(f"Geringes Gefäßrisiko (Score {risiko}/8) – gut!")
-
-    # Spezifische Empfehlungen
-    if trig and trig > 200:
-        e.append(
-            f"PRIORITÄT 1: Triglyceride ({trig:.0f}) senken – Zucker/Alkohol meiden, Omega-3, Bewegung. Effekt in 4-8 Wochen messbar."
-        )
-    if crp and crp > 1.0:
-        e.append(
-            f"PRIORITÄT 2: Entzündung (CRP {crp:.1f}) reduzieren – destabilisiert bestehende Plaques. Ursache suchen."
-        )
-    if hba1c and hba1c > 5.7:
-        e.append(
-            f"PRIORITÄT 3: Blutzucker (HbA1c {hba1c:.1f}%) schädigt Gefäßinnenwand. Zucker/Weißmehl reduzieren, nach Essen bewegen."
-        )
-    if ldl and ldl > 130:
-        e.append(
-            f"LDL {ldl:.0f} leicht über Zielwert 130. Bei zusätzlichen Risikofaktoren mit Arzt über Therapie sprechen."
-        )
-    if hdl and hdl >= 55:
-        e.append(
-            f"HDL {hdl:.0f} ist gut – schützt die Gefäße aktiv. Weiter mit Bewegung und ungesättigten Fetten."
-        )
-    if hs and hs > 7.0:
-        e.append(
-            f"Harnsäure {hs:.1f} leicht erhöht – fördert Gefäßentzündung. Viel trinken, weniger Fleisch."
-        )
-
-    e.append(
-        "Allgemein: 30min Bewegung/Tag (Gehen reicht), mediterrane Ernährung, Nichtrauchen, Blutdruck <135/85."
-    )
-    return e
-
-
-def _empfehlung_stoffwechsel(get_latest):
-    """Empfehlungen für Stoffwechsel-Risiko Verknüpfung."""
-    e = []
-    hba1c, _ = get_latest("HbA1c")
-    glucose, _ = get_latest("Glucose")
-    trig, _ = get_latest("Triglyceride")
-    hs, _ = get_latest("Harnsäure")
-    ggt, _ = get_latest("GGT")
-    gpt, _ = get_latest("GPT")
-    got, _ = get_latest("GOT")
-
-    # Diabetes-Risiko
-    if hba1c and hba1c > 6.0:
-        e.append(
-            f"HbA1c {hba1c:.1f}% – Diabetes-Schwelle erreicht. Diabetologische Abklärung empfohlen."
-        )
-    elif hba1c and hba1c > 5.7:
-        e.append(
-            f"HbA1c {hba1c:.1f}% – Prädiabetes-Bereich. Lebensstil-Intervention (Bewegung, Ernährung) kann Progression verhindern."
-        )
-
-    if glucose and glucose > 126:
-        e.append(f"Nüchtern-Glucose {glucose:.0f} mg/dL – diabetischer Bereich.")
-    elif glucose and glucose > 100:
-        e.append(f"Nüchtern-Glucose {glucose:.0f} mg/dL – leicht erhöht (Prädiabetes).")
-
-    # Triglyceride
-    if trig and trig > 200:
-        e.append(
-            f"Triglyceride {trig:.0f} – deutlich erhöht. Zucker/Alkohol einschränken, Omega-3 erwägen."
-        )
-    elif trig and trig > 150:
-        e.append(f"Triglyceride {trig:.0f} – leicht erhöht. Ernährung überprüfen.")
-
-    # Harnsäure / Gicht
-    if hs and hs > 8.0:
-        e.append(
-            f"Harnsäure {hs:.1f} – Gichtrisiko erhöht. Purin-arme Ernährung, ausreichend trinken."
-        )
-    elif hs and hs > 7.0:
-        e.append(
-            f"Harnsäure {hs:.1f} – oberer Grenzbereich. Fleisch/Alkohol reduzieren."
-        )
-
-    # Leber
-    leber_auffaellig = []
-    if ggt and ggt > 60:
-        leber_auffaellig.append(f"GGT {ggt:.0f}")
-    if gpt and gpt > 50:
-        leber_auffaellig.append(f"GPT {gpt:.0f}")
-    if got and got > 50:
-        leber_auffaellig.append(f"GOT {got:.0f}")
-
-    if leber_auffaellig:
-        e.append(
-            f"Leberenzyme erhöht ({', '.join(leber_auffaellig)}) – mögliche Fettleber. Alkohol, Zucker und Gewicht kontrollieren."
-        )
-
-    # Kombination: metabolisches Syndrom
-    risiken = sum(
-        [
-            bool(hba1c and hba1c > 5.7),
-            bool(trig and trig > 150),
-            bool(hs and hs > 7.0),
-            bool(ggt and ggt > 60),
-        ]
-    )
-    if risiken >= 3:
-        e.append(
-            "Mehrere Stoffwechsel-Achsen gleichzeitig auffällig – metabolisches Syndrom wahrscheinlich. Ganzheitliche Therapie mit Arzt besprechen."
-        )
-
-    if not e:
-        e.append("Stoffwechselwerte im Normalbereich – weiter so.")
-
-    return e

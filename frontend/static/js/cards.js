@@ -1,7 +1,7 @@
 // cards.js – Gruppen- und Test-Karten rendern
-import { state, navigate } from "./state.js";
-import { starIconHtml, bindStarHandlers } from "./favoriten.js";
+import { bindStarHandlers, starIconHtml } from "./favoriten.js";
 import { renderNormBar } from "./norm-bar.js";
+import { navigate, state } from "./state.js";
 
 /** Prüft ob ein Wert nur knapp (<10% der Spanne) außerhalb des Normbereichs liegt. */
 function _isKnappDaneben(wertStr, normbereich) {
@@ -219,15 +219,15 @@ export function renderCards(items, mode = "gruppe") {
           state.pathSortDir = sortDir;
           localStorage.setItem("lab_state", JSON.stringify(state));
           renderTable(data, sortCol, sortDir);
-          // Bericht-Link aktualisieren
+          // Bericht-Link aktualisieren (nutzt von/bis statt befunde)
           const btn = document.querySelector(".report-btn");
-          if (btn) btn.href = `api/bericht/charts?befunde=${parseInt(sortCol === sortCol ? state.pathPeriod : state.pathPeriod) || 0}&sort=${sortCol}&dir=${sortDir}`;
+          if (btn) btn.href = `api/bericht/charts?von=${state.pathVon || ''}&bis=${state.pathBis || ''}&sort=${sortCol}&dir=${sortDir}`;
         });
       });
 
       // Bericht-Link immer nach renderTable aktualisieren
       const btn = document.querySelector(".report-btn");
-      if (btn) btn.href = `api/bericht/charts?befunde=${parseInt(state.pathPeriod) || 0}&sort=${col}&dir=${dir}`;
+      if (btn) btn.href = `api/bericht/charts?von=${state.pathVon || ''}&bis=${state.pathBis || ''}&sort=${col}&dir=${dir}`;
 
       // Row-Click
       el.querySelectorAll(".path-row").forEach(row => {
@@ -319,7 +319,7 @@ export function renderCards(items, mode = "gruppe") {
         detailHtml = `<div class="card-inline-values">
           ${data.werte.map(w => `
             <span class="inline-val ${w.flag === 'H' ? 'high' : w.flag === 'L' ? 'low' : ''}">
-              ${w.datum.slice(0,10)}: <strong>${w.wert}</strong>${w.flag ? (w.flag === 'H' ? ' ↑' : ' ↓') : ''}
+              ${w.datum.slice(0, 10)}: <strong>${w.wert}</strong>${w.flag ? (w.flag === 'H' ? ' ↑' : ' ↓') : ''}
             </span>
           `).join("")}
         </div>`;

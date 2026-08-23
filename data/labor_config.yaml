@@ -295,22 +295,22 @@ empfehlungen_tests:
     text: "Gesamt = HDL + LDL + (Triglyceride÷5). Bei hohem Gesamtwert die Einzelwerte anschauen – entscheidend ist was genau erhöht ist (LDL, Triglyceride oder beides). Therapie mit Arzt besprechen."
   Triglyceride:
     bedingung: "erhöht"
-    text: "Ursache unklar – kein Alkohol, wenig Zucker/Weißmehl. Mögliche Faktoren: 1) Nicht-nüchtern-Messung (verfälscht massiv!), 2) Genetische Veranlagung, 3) Medikamente (Betablocker, Cortison?), 4) Schilddrüsen-Unterfunktion. Nüchtern-Kontrolle empfohlen. Omega-3 (2g/Tag) und Bewegung können helfen."
+    text: "Mögliche Faktoren: 1) Nicht-nüchtern-Messung (verfälscht massiv!), 2) Genetische Veranlagung, 3) Medikamente (Betablocker, Cortison?), 4) Schilddrüsen-Unterfunktion. Nüchtern-Kontrolle empfohlen."
   Leukozyten:
     bedingung: "erhöht"
     text: "Dauerhaft leicht erhöht – Ursache ungeklärt. Kein Raucher. Mögliche Ursachen: chronische Entzündung (CRP prüfen), Medikamente (z.B. Cortison), reaktiv nach KH-Aufenthalt, oder chronische Erkrankung. Differentialblutbild und CRP-Verlauf mit Arzt besprechen."
   GFR:
     bedingung: "erniedrigt"
-    text: "Bei Alter 70 ist leichte GFR-Einschränkung häufig. Maßnahmen: viel trinken (2L/Tag), Blutdruck gut einstellen, Eiweiß nicht übertreiben (0.8-1.0g/kg), nephrotoxische Medikamente meiden. Kontrolle alle 6 Monate."
+    text: "Bei Alter 70 ist leichte GFR-Einschränkung häufig. Blutdruck gut einstellen, nephrotoxische Medikamente meiden. Kontrolle alle 6 Monate."
   CRP:
     bedingung: "erhöht"
     text: "Falls kein akuter Infekt vorliegt: chronische Ursachen prüfen – Viszeralfett, Zahnfleischentzündung, Autoimmunprozesse."
   HbA1c:
     bedingung: "erhöht"
-    text: "Zeigt Prä-Diabetes. Maßnahmen: Zucker und Weißmehl reduzieren, nach jeder Mahlzeit 15min bewegen (Spaziergang), Gewicht halten/reduzieren. Kontrolle in 3 Monaten. Bei >6.5% Diabetes-Diagnose möglich."
+    text: "Zeigt Prä-Diabetes. Kontrolle in 3 Monaten. Bei >6.5% Diabetes-Diagnose möglich."
   Harnsäure:
     bedingung: "erhöht"
-    text: "Gichtrisiko erhöht. Maßnahmen: weniger Fleisch und Innereien, viel Wasser trinken (2.5L/Tag), Alkohol (v.a. Bier) meiden, Kirschen und Vitamin C können helfen. Bei Gichtanfall sofort zum Arzt."
+    text: "Gichtrisiko erhöht. Bei Gichtanfall sofort zum Arzt. Verlauf kontrollieren."
   Hämoglobin:
     bedingung: "erniedrigt"
     text: "Mögliche Blutarmut. Ursachen abklären: Eisenmangel (Ferritin prüfen), B12/Folsäure-Mangel, chronische Erkrankung, Blutungsquelle. Bei KH-Aufenthalt oft durch Blutverlust/Verdünnung bedingt."
@@ -325,13 +325,13 @@ empfehlungen_tests:
     text: "Niedriger Hämatokrit deutet auf Verdünnung oder Blutarmut. Zusammen mit Hämoglobin und Erythrozyten beurteilen. Bei KH-Aufenthalt häufig durch Infusionen bedingt."
   Kalium:
     bedingung: "erhöht"
-    text: "Erhöhtes Kalium kann gefährlich sein (Herzrhythmusstörungen). Häufige Ursachen: Nierenschwäche, ACE-Hemmer/Sartane, kaliumreiche Ernährung. EKG und Nierenwerte kontrollieren. Hinweis: Auch erniedrigtes Kalium ist gefährlich (Diuretika?) – kaliumreiche Ernährung dann wichtig."
+    text: "Erhöhtes Kalium kann gefährlich sein (Herzrhythmusstörungen). Häufige Ursachen: Nierenschwäche, ACE-Hemmer/Sartane. EKG und Nierenwerte kontrollieren."
   Natrium:
     bedingung: "erniedrigt"
-    text: "Niedriges Natrium im Alter oft durch Medikamente (Diuretika), zu viel Wasser trinken oder SIADH. Symptome: Schwindel, Verwirrtheit. Trinkmenge und Medikamente mit Arzt prüfen."
+    text: "Niedriges Natrium im Alter oft durch Medikamente (Diuretika) oder SIADH. Symptome: Schwindel, Verwirrtheit. Medikamente mit Arzt prüfen."
   HbA1c (IFCC):
     bedingung: "erhöht"
-    text: "Zeigt Prä-Diabetes (IFCC-Einheit). Gleichbedeutend mit HbA1c >5.7%. Lebensstil-Maßnahmen (Zucker reduzieren, Bewegung) können den Wert senken."
+    text: "Zeigt Prä-Diabetes (IFCC-Einheit). Gleichbedeutend mit HbA1c >5.7%."
   Glucose:
     bedingung: "erhöht"
     text: "Nüchternwert erhöht. Mögliche Ursachen: Prä-Diabetes, Stress, Medikamente (z.B. Cortison). HbA1c zur Bestätigung prüfen. Bei >126 mg/dL Diabetes-Diagnose möglich."
