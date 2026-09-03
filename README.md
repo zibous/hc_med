@@ -279,3 +279,12 @@ make git-release      # Version-Tag + Push
 - **Theme**: HomeApps Unified Theme (Dark/Light)
 - **Deploy**: Docker oder direkt Uvicorn, Nginx Reverse-Proxy
 - **Daten**: hc_scale (Waage), Laborbefund-Textdateien (7 Formate)
+
+> [!IMPORTANT]
+> **Lizenz & Kommerzielle Nutzung (Commercial Use)**
+> Dieses Projekt ist für die **private, nicht-kommerzielle Nutzung** sowie für Fehlerkorrekturen (Pull Requests) völlig kostenlos. 
+> 
+> 🚫 **Eine kommerzielle Nutzung ist strikt untersagt.** 
+> Wenn Sie diesen Code geschäftlich, in einem Unternehmen oder für ein monetarisiertes Projekt nutzen möchten, benötigen Sie eine separate Lizenz.
+> 
+> 📧 **Kontakt für kommerzielle Lizenzen:** peter.siebler@gmail.com
