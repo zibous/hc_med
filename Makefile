@@ -67,6 +67,7 @@ labor: ## Laborwerte extrahieren → SQLite + CSV (PARAM: USER=peter)
 	@echo "🔬 Extrahiere Laborwerte für User: $(or $(USER),peter)..."
 	@python3 $(SCRIPT) $(or $(USER),peter)
 
+#  make labor-test USER=peter
 labor-test: ## Laborwerte extrahieren im Test-Modus (PARAM: USER=peter)
 	@echo "🧪 Test-Import für User: $(or $(USER),peter)..."
 	@python3 $(SCRIPT) $(or $(USER),peter) --test

@@ -12,11 +12,14 @@
     box-shadow: var(--shadow-sm);
     margin-bottom: 2.4rem;
     width: 100%;
+    min-height: 450px;
 }
 
 .chart-card canvas {
     width: 100% !important;
     height: 380px !important;
+    display: block;
+    max-height: 380px;
 }
 
 .chart-stats {
@@ -430,4 +433,64 @@
 .card .norm-bar {
     max-width: 100%;
     margin: .4rem 0;
+}
+
+/* Chart Data Table */
+.chart-table {
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2.4rem;
+    overflow-x: auto;
+}
+
+.chart-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.1rem;
+}
+
+.chart-table thead th {
+    text-align: left;
+    padding: .8rem 1rem;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    position: sticky;
+    top: 0;
+}
+
+.chart-table tbody td {
+    padding: .7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+.chart-table tbody tr:hover {
+    background: rgba(128, 128, 128, .05);
+}
+
+.chart-table .hint-flag-high {
+    color: var(--red);
+    font-weight: 500;
+}
+
+.chart-table .hint-flag-low {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.chart-table .hint-flag-normal {
+    color: var(--green);
+}
+
+.chart-table .value-cell {
+    font-weight: 600;
 }

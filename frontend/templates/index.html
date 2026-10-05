@@ -77,6 +77,7 @@
     <span style="margin:0 8px; color:var(--border);">|</span>
     <span id="themeToggleFooter" style="cursor:pointer; font-weight:500;">🌓 Design wechseln</span>
   </footer>
+
   <!-- Hilfe-Modal -->
   <div id="helpModal" class="modal hidden">
     <div class="modal-content">
@@ -116,7 +117,7 @@
     document.getElementById('helpClose').onclick = () => document.getElementById('helpModal').classList.add('hidden');
     document.getElementById('helpModal').onclick = (e) => { if (e.target.id === 'helpModal') e.target.classList.add('hidden'); };
   </script>
-  <!-- 
+  <!--
     <script src="static/js/theme-init.js?v=2"></script>
     <script type="module" src="static/js/main.js?v=2"></script>
   -->

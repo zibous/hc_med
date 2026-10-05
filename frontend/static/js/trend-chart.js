@@ -5,6 +5,10 @@ export function renderChart(data) {
   const card = document.getElementById("chartCard");
   const canvas = document.getElementById("mainChart");
 
+  // Bestehende Tabelle entfernen (bevor Chart neu gerendert wird)
+  const existingTable = document.querySelector(".chart-table");
+  if (existingTable) existingTable.remove();
+
   if (!data || !data.werte || data.werte.length === 0) {
     card.style.display = "none";
     return;
@@ -43,8 +47,16 @@ export function renderChart(data) {
     if (dashMax && !range) { normMin = 0; normMax = parseFloat(dashMax[1]); }
   }
 
-  // Punkt-Farben basierend auf Flag
-  const pointColors = flags.map((f, i) => {
+  // Flags basierend auf Referenzbereich neu berechnen (für konsistente Farben)
+  const calculatedFlags = values.map((v, i) => {
+    if (v === null) return flags[i] || "";
+    if (normMax !== null && v > normMax) return "H";
+    if (normMin !== null && v < normMin) return "L";
+    return "";
+  });
+
+  // Punkt-Farben basierend auf berechneten Flags
+  const pointColors = calculatedFlags.map((f, i) => {
     if (f === "H") return isDark ? "#f87171" : "#dc2626";
     if (f === "L") return isDark ? "#60a5fa" : "#2563eb";
     return isDark ? "#34d399" : "#059669";
@@ -171,6 +183,9 @@ export function renderChart(data) {
 
   // Statistik-Box unter dem Chart rendern
   renderChartStats(card, values, data);
+  
+  // Daten-Tabelle als separaten Container nach der chartCard rendern
+  renderChartTable(data);
 }
 
 function renderChartStats(container, values, data) {
@@ -252,6 +267,121 @@ function renderChartStats(container, values, data) {
     </div>
   `;
   container.appendChild(statsEl);
+}
+
+function renderChartTable(data) {
+  // Bestehende Tabelle entfernen
+  const existing = document.querySelector(".chart-table");
+  if (existing) existing.remove();
+
+  if (!data.werte || data.werte.length === 0) return;
+
+  // Tabelle als separaten Container nach der chartCard einfügen
+  const chartCard = document.getElementById("chartCard");
+  if (!chartCard) return;
+
+  const tableEl = document.createElement("div");
+  tableEl.className = "chart-table";
+  
+  // Tabellen-Header
+  let tableHtml = `
+    <table>
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Wert (${data.einheit || ""})</th>
+          <th>Hinweis</th>
+          <th>Krankenhaus</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  // Norm-Bereich parsen (für Klassifizierung in Tabelle)
+  let normMin = null, normMax = null;
+  if (data.normbereich) {
+    const norm = data.normbereich.trim();
+    const range = norm.match(/^([\d.]+)\s*-\s*([\d.]+)$/);
+    if (range) { normMin = parseFloat(range[1]); normMax = parseFloat(range[2]); }
+    const lt = norm.match(/^[<]\s*-?\s*([\d.]+)$/);
+    if (lt) { normMin = 0; normMax = parseFloat(lt[1]); }
+    const gt = norm.match(/^[>]\s*-?\s*([\d.]+)$/);
+    if (gt) { normMin = parseFloat(gt[1]); normMax = null; }
+    const dashMax = norm.match(/^-\s*([\d.]+)$/);
+    if (dashMax && !range) { normMin = 0; normMax = parseFloat(dashMax[1]); }
+  }
+
+  // Tabellen-Zeilen (umgekehrte Reihenfolge - neueste zuerst)
+  data.werte.slice().reverse().forEach(w => {
+    const date = w.datum || "";
+    const value = w.wert_norm || w.wert || "";
+    const flag = w.flag || "";
+    
+    // Wert bereinigen für Klassifizierung
+    let raw = String(value).replace(",", ".");
+    raw = raw.replace(/^[<>]\s*/, "");
+    const numValue = parseFloat(raw);
+    
+    // Flag basierend auf Referenzbereich berechnen (überschreibt gespeichertes Flag)
+    let calculatedFlag = flag;
+    if (!isNaN(numValue) && (normMin !== null || normMax !== null)) {
+      if (normMax !== null && numValue > normMax) {
+        calculatedFlag = "H";
+      } else if (normMin !== null && numValue < normMin) {
+        calculatedFlag = "L";
+      } else {
+        calculatedFlag = "";
+      }
+    }
+    
+    // Flag-Icon und Text-Hinweis
+    let hint = "";
+    let hintClass = "";
+    if (calculatedFlag === "H") {
+      hint = "↑ erhöht";
+      hintClass = "hint-flag-high";
+    } else if (calculatedFlag === "L") {
+      hint = "↓ erniedrigt";
+      hintClass = "hint-flag-low";
+    } else {
+      hint = "✓ normal";
+      hintClass = "hint-flag-normal";
+    }
+    
+    // Nüchtern-Hinweis
+    if (w.nicht_nuechtern) {
+      hint += " (nicht nüchtern)";
+    }
+    
+    // Krankenhaus-Marker prüfen
+    let hospitalMarker = "";
+    if (data.ereignisse && data.ereignisse.length > 0) {
+      const matchingEvent = data.ereignisse.find(e => 
+        date >= e.von && date <= e.bis
+      );
+      if (matchingEvent) {
+        hospitalMarker = matchingEvent.label || "";
+      }
+    }
+    
+    tableHtml += `
+      <tr>
+        <td>${date}</td>
+        <td><span class="value-cell ${hintClass}">${value}</span></td>
+        <td class="${hintClass}">${hint}</td>
+        <td>${hospitalMarker}</td>
+      </tr>
+    `;
+  });
+
+  tableHtml += `
+      </tbody>
+    </table>
+  `;
+
+  tableEl.innerHTML = tableHtml;
+  // Tabelle nach der chartCard einfügen (nicht darin)
+  chartCard.parentNode.insertBefore(tableEl, chartCard.nextSibling);
 }
 
 
