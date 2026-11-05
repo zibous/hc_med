@@ -26,6 +26,12 @@ def detect_format(filepath: Path) -> str:
         # print(f"  🔍 [Autodetect] {filepath.name} -> MATCH: Gruppe;Test;Wert ({fmt})")
         return fmt
 
+    # 1b. KH-Feldkirch CSV-Format: Test;Wert;Flag;Einheit;Normbereich
+    if first_line.startswith("Test;Wert;") or first_line.startswith("Test;Wert;Flag"):
+        fmt = "simple_csv"
+        # print(f"  🔍 [Autodetect] {filepath.name} -> MATCH: Test;Wert;Flag ({fmt})")
+        return fmt
+
     # 2. Pivot-Format: Header beginnt mit "Parameter;Einheit;Referenz;"
     if first_line.startswith("Parameter;") and "Referenz" in first_line:
         fmt = "pivot"

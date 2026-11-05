@@ -10,8 +10,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 LABEL maintainer="Peter Siebler <peter.siebler@gmail.com>" \
       application="hc_med"  \
       com.centurylinklabs.watchtower.enable="false" \
-      dockerhand.check-update="false"  \
-      dockerhand.ignore="true"
+      dockhand.check-update="false"  \
+      dockhand.ignore="true"
 
 WORKDIR /app
 

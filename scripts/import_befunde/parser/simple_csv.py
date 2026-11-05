@@ -34,24 +34,39 @@ class SimpleCSVParser:
         except (IOError, OSError):
             return results
 
+        # Format-Erkennung anhand des Headers
+        header = lines[0].strip() if lines else ""
+        is_kh_format = header.startswith("Test;Wert;")
+
         for line in lines:
             line = line.strip()
             
             # Header, Kommentare und Leerzeilen überspringen
-            if not line or line.startswith("Gruppe;Test") or line.startswith("#"):
+            if not line or line.startswith("Gruppe;Test") or line.startswith("Test;Wert") or line.startswith("#"):
                 continue
 
             parts = line.split(";")
-            if len(parts) < 3:
+            if len(parts) < 2:
                 continue
 
-            # Sicherer Index-Zugriff für alle Spalten
-            gruppe = parts[0].strip() if len(parts) > 0 else ""
-            test = parts[1].strip() if len(parts) > 1 else ""
-            wert = parts[2].strip() if len(parts) > 2 else ""
-            einheit = parts[3].strip() if len(parts) > 3 else ""
-            norm = parts[4].strip() if len(parts) > 4 else ""
-            flag = parts[5].strip() if len(parts) > 5 else ""
+            if is_kh_format:
+                # Format: Test;Wert;Flag;Einheit;Normbereich
+                test = parts[0].strip()
+                wert = parts[1].strip() if len(parts) > 1 else ""
+                flag = parts[2].strip() if len(parts) > 2 else ""
+                einheit = parts[3].strip() if len(parts) > 3 else ""
+                norm = parts[4].strip() if len(parts) > 4 else ""
+                gruppe = ""
+            else:
+                # Format: Gruppe;Test;Wert;Einheit;Normbereich;Flag
+                if len(parts) < 3:
+                    continue
+                gruppe = parts[0].strip()
+                test = parts[1].strip()
+                wert = parts[2].strip()
+                einheit = parts[3].strip() if len(parts) > 3 else ""
+                norm = parts[4].strip() if len(parts) > 4 else ""
+                flag = parts[5].strip() if len(parts) > 5 else ""
 
             # Validierung: Ohne Wert oder Testname überspringen wir die Zeile
             if not wert or not test:
@@ -59,7 +74,7 @@ class SimpleCSVParser:
 
             results.append({
                 "Datum": file_date,
-                "Gruppe": gruppe, # Wird direkt injiziert, assign_group skippt das später
+                "Gruppe": gruppe,  # Wird direkt injiziert, assign_group skippt das später
                 "Test": test,
                 "Wert": wert.replace(",", "."),
                 "Einheit": einheit,

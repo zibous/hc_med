@@ -8,7 +8,7 @@ test_aliases_by_category:
     RDW: ["erythrozyten rdw", "rdw", "rdw-cv", "ery-verteilungsbreite (cv)"]
     Hämoglobin: ["hämoglobin", "hgb", "hb"]
     MCH: ["hbe (mca)", "mch", "mittlerer hb-gehalt/ery"]
-    Hämatokrit: ["hämatokrit", "hk"]
+    Hämatokrit: ["hämatokrit", "hamatokrit", "hk"]
     MCV: ["mcv", "mittleres zellvolumen"]
     MCHC: ["mchc", "mittlere hb-konzentration"]
     Thrombozyten: ["thrombocyten", "thrombozyten", "thrombocyten (citrat)", "thrombo", "thrombozyten g/l", "thrombozyten               g/l"]
@@ -55,7 +55,7 @@ test_aliases_by_category:
 
   Niere:
     Kreatinin: ["kreatinin"]
-    GFR: ["gfr-ckd/1.73m2", "gfr-ckd", "gfr-ckd krea", "gfr (ckd-epi)"]
+    GFR: ["gfr-ckd/1.73m2", "gfr-ckd", "gfr-ckd krea", "gfr (ckd-epi)", "gfr-ckd kreatinin/1,73 m2"]
     Harnstoff: ["harnstoff"]
     Harnsäure: ["harnsäure"]
 

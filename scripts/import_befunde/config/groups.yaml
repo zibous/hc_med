@@ -37,6 +37,8 @@ group_rules_by_category:
       "normoblast",
       "unreife",
       "mittelgroße zellen",
+      "immature platelet",
+      "platelet fraction",
     ]
   Blutbild:
     [

@@ -41,6 +41,7 @@ def main():
     txt_files = []
     for ext in ("*.txt", "*.csv", "*.TXT", "*.CSV"):
         txt_files.extend(config.BEFUNDE_DIR.glob(ext))
+    txt_files.sort(key=lambda p: p.name.lower())
 
     if not txt_files:
         log.error(f"  Keine .txt oder .csv Dateien in {config.BEFUNDE_DIR} gefunden.")
